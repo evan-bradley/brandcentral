@@ -6101,3 +6101,9 @@ label.panel-block {
 .footer {
   background-color: whitesmoke;
   padding: 3rem 1.5rem 6rem; }
+
+html {
+  font-family: 'Cairo', sans-serif; }
+
+.secondary-class {
+  font-family: 'Roboto', sans-serif; }
