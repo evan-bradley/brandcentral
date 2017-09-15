@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     loggedIn: false,
-    userName: ''
+    userName: 'testUser'
   },
   mutations: {
     LogIn (state, username) {
@@ -20,7 +20,7 @@ export default new Vuex.Store({
   },
   getters: {
     getUser (state) {
-      return state.loggedIn
+      return state.userName
     }
   }
 })

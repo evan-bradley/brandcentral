@@ -4,13 +4,15 @@
       <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
-            <img src="./assets/logo.png" height="35">
+            <img src="./assets/bcslogo.png" height="35">
           </a>
         </div>
-        <div v-show="loggedIn">
-          <hr class="navbar-divider">
-          <div class="navbar-item">
-            <p>Home</p>
+        <div class="navbar-item" v-show="loggedIn">
+          <router-link to="/">Home</router-link>
+        </div>
+        <div class="navbar-end" v-show="loggedIn">
+          <div class="navbar-item" v-show="loggedIn">
+            <router-link :to="{ name: 'EditUser', params: { UserId: userName }  }" ><i class="fa fa-user-circle"></i></router-link>
           </div>
         </div>
       </nav>
@@ -22,14 +24,14 @@
 </template>
 
 <script>
-import store from './Vuex/states'
-import {mapState} from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'app',
-computed: mapState({
-      loggedIn: state => state.loggedIn
-})
+  computed: mapState({
+    loggedIn: state => state.loggedIn,
+    userName: state => state.userName
+  })
 }
 </script>
 
