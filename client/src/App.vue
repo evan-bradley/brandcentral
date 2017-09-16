@@ -7,12 +7,12 @@
             <img src="./assets/bcslogo.png" height="35">
           </a>
         </div>
-        <div class="navbar-item" v-show="loggedIn">
+        <div class="navbar-item" v-show="this.$store.state.user">
           <router-link to="/">Home</router-link>
         </div>
-        <div class="navbar-end" v-show="loggedIn">
-          <div class="navbar-item" v-show="loggedIn">
-            <router-link :to="{ name: 'EditUser', params: { UserId: userName }  }" ><i class="fa fa-user-circle"></i></router-link>
+        <div class="navbar-end" v-show="this.$store.state.user">
+          <div class="navbar-item" v-show="this.$store.state.user">
+            <router-link :to="{ name: 'EditUser', params: { UserId: this.$store.state.user }  }" ><i class="fa fa-user-circle"></i></router-link>
           </div>
         </div>
       </nav>
@@ -24,14 +24,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
-  name: 'app',
-  computed: mapState({
-    loggedIn: state => state.loggedIn,
-    userName: state => state.userName
-  })
+  name: 'app'
 }
 </script>
 
