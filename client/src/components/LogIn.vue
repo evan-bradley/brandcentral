@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="column is-4 is-offset-4 is-centered" id="log-in-box" v-show="!showRegistration">
+    <div class="column is-4 is-offset-4 is-centered" v-show="!showRegistration">
       <h1 class="title">Login</h1>
       <hr>
       <p class="notification is-danger" v-show="logInFailed">Invalid username or password.</p>
@@ -42,8 +42,13 @@ export default {
     login() {
       if (this.user.UserName !== '' && this.user.Password !== '') {
       this.$store.state.loggedIn = true
-      this.$store.state.user = this.user.UserName
-      this.$router.replace('/')
+      // Doing this for testing Can be removed when replaced wiht php      
+       this.$store.state.User.FirstName = 'FirstName'
+       this.$store.state.User.LastName = 'LastName'
+       this.$store.state.User.Email = 'Email@email.com'
+       this.$store.state.User.Password = 'password'
+       this.$store.state.User.UserName = 'userName'
+       this.$router.replace('/')
       }
       else{
         this.logInFailed = true

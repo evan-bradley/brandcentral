@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import LogIn from '@/components/LogIn'
 import Blank from '@/components/blank'
+import UserHome from '@/components/UserHome'
 
 var store = require('../Vuex/states')
 Vue.use(Router)
@@ -15,9 +16,9 @@ const router = new Router({
       component: Blank
     },
     {
-      path: '/UserProfile/:UserId',
-      name: 'EditUser',
-      component: Blank
+      path: '/UserProfile',
+      name: 'UserHome',
+      component: UserHome
     },
     {
       path: '/LogIn',

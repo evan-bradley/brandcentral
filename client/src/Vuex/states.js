@@ -2,11 +2,13 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
+var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
 export default new Vuex.Store({
   state: {
     loggedIn: false,
-    userName: 'testUser'
+    userName: 'testUser',
+    User: new Classes.User()
   },
   mutations: {
     LogIn (state, username) {
@@ -20,7 +22,7 @@ export default new Vuex.Store({
   },
   getters: {
     getUser (state) {
-      return state.userName
+      return state.User
     }
   }
 })

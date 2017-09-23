@@ -18,4 +18,19 @@ var Classes;
         return User;
     }());
     Classes.User = User;
+    var PasswordVerification = (function () {
+        function PasswordVerification(currentPassword, newPassword, verifyNewPassword) {
+            if (currentPassword === void 0) { currentPassword = ""; }
+            if (newPassword === void 0) { newPassword = ""; }
+            if (verifyNewPassword === void 0) { verifyNewPassword = ""; }
+            this.CurrentPassword = currentPassword;
+            this.NewPassword = newPassword;
+            this.VerifyNewPassword = verifyNewPassword;
+        }
+        PasswordVerification.prototype.Verify = function (currentPassword) {
+            return (this.CurrentPassword === currentPassword && this.NewPassword === this.VerifyNewPassword);
+        };
+        return PasswordVerification;
+    }());
+    Classes.PasswordVerification = PasswordVerification;
 })(Classes = exports.Classes || (exports.Classes = {}));

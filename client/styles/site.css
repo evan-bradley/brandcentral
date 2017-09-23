@@ -123,7 +123,7 @@ a {
   a strong {
     color: currentColor; }
   a:hover {
-    color: #363636; }
+    color: #E74C3C; }
 
 code {
   background-color: whitesmoke;
@@ -859,7 +859,7 @@ a.box:active {
     margin-right: calc(-0.375em - 1px); }
   .button:hover, .button.is-hovered {
     border-color: #b5b5b5;
-    color: #363636; }
+    color: #E74C3C; }
   .button:focus, .button.is-focused {
     border-color: #2C3E50;
     color: #363636; }
@@ -3106,7 +3106,7 @@ a.tag:hover {
     justify-content: center;
     padding: 0.5em 0.75em; }
     .breadcrumb a:hover {
-      color: #363636; }
+      color: #E74C3C; }
   .breadcrumb li {
     align-items: center;
     display: flex; }
@@ -3744,7 +3744,7 @@ a.nav-item:not(.button) {
   color: #7a7a7a; }
   .nav-item a:not(.button):hover,
   a.nav-item:not(.button):hover {
-    color: #363636; }
+    color: #E74C3C; }
   .nav-item a:not(.button).is-active,
   a.nav-item:not(.button).is-active {
     color: #363636; }
@@ -4499,7 +4499,7 @@ a.navbar-item:hover, a.navbar-item.is-active,
   .pagination-next:hover,
   .pagination-link:hover {
     border-color: #b5b5b5;
-    color: #363636; }
+    color: #E74C3C; }
   .pagination-previous:focus,
   .pagination-next:focus,
   .pagination-link:focus {

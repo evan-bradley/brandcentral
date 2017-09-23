@@ -46,7 +46,7 @@ export default {
         Register() {
             if (this.user.Password === this.emailVerfy && this.user.UserName !== "" && this.UserNameCheck(this.user.UserName)){
                 // send to PHP to insert user
-                this.$store.state.user = this.user.UserName
+                this.$store.state.User = this.user
                 this.$emit('Registered', this.user)
             }       
         },
