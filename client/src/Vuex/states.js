@@ -11,13 +11,13 @@ export default new Vuex.Store({
     User: new Classes.User()
   },
   mutations: {
-    LogIn (state, username) {
+    setUser (state, userObject) {
       state.loggedIn = true
-      state.userName = username
+      state.User = userObject
     },
     LogOut (state) {
       state.loggedIn = false
-      state.username = ''
+      state.User = null
     }
   },
   getters: {

@@ -20,7 +20,7 @@
         </div>
         <div class="small-padding">
             <label class="label">Verfiy Password</label>
-            <input class="input" type="password" placeholder="Password" v-model="emailVerfy" @keydown.enter="login" />
+            <input class="input" type="password" placeholder="Password" v-model="emailVerify" @keydown.enter="login" />
         </div>
         <div class="small-padding">
             <label class="label">Email</label>
@@ -39,12 +39,26 @@ export default {
     data() {
         return {
             user: new Classes.User(),
-            emailVerfy: ''
+            emailVerify: ''
         }
     },
     methods: {
         Register() {
-            if (this.user.Password === this.emailVerfy && this.user.UserName !== "" && this.UserNameCheck(this.user.UserName)){
+            if (this.user.Password === this.emailVerify && this.user.UserName !== "" && this.UserNameCheck(this.user.UserName)){
+                const registration = {
+                    username: this.user.UserName,
+                    firstName: this.user.FirstName,
+                    lastName: this.user.LastName,
+                    password: this.user.Password,
+                    email: this.user.Email,
+                }
+
+                this.$http.post('/api/register', registration)
+                    .then(response => { // Success
+                        console.log(response)
+                    }, response => { // Error
+                        console.log(response)
+                    })
                 // send to PHP to insert user
                 this.$store.state.User = this.user
                 this.$emit('Registered', this.user)
