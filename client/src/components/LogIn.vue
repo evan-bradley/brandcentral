@@ -5,16 +5,17 @@
         <div class="columns is-vcentered">
           <div class="column is-4 is-offset-4">
             <h4 class="title has-text-centered is-4">
-              Login
+              <img src="../assets/brand_central_icon.png" style="max-width: 20%">
             </h4>
             <div class="box">
+              <h4 class="title has-text-centered is-4">Login</h4>
               <article class="message is-danger" v-show="logInFailed">
                 <div class="message-body">
                   Invalid username or password.
                 </div>
               </article>
               <div class="field">
-                <label class="label">Email</label>
+                <label class="label">Username</label>
                 <div class="control">
                   <input class="input" type="text" placeholder="Username" v-model="user.UserName" />
                 </div>

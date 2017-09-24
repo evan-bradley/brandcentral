@@ -4,7 +4,7 @@
       <nav v-show="this.$store.state.loggedIn" class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
-            <img src="./assets/bcslogo.png" height="35">
+            <img src="./assets/brand_central_full.png" height="50">
           </a>
         </div>
         <div class="navbar-end">
