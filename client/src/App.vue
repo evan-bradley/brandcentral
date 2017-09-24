@@ -1,18 +1,28 @@
 <template>
   <div id="app" class="columns is-multiline">
     <div class="column is-12">
-      <nav class="navbar" role="navigation" aria-label="main navigation">
+      <nav v-show="this.$store.state.loggedIn" class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
             <img src="./assets/bcslogo.png" height="35">
           </a>
         </div>
-        <div class="navbar-item" v-show="this.$store.state.loggedIn">
-          <router-link to="/">Home</router-link>
-        </div>
-        <div class="navbar-end" v-show="this.$store.state.loggedIn">
-          <div class="navbar-item" v-show="this.$store.state.loggedIn">
-            <router-link :to="{ name: 'UserHome' }" ><i class="fa fa-user-circle"></i></router-link>
+        <div class="navbar-end">
+          <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">
+              <img src="https://secure.gravatar.com/avatar/9c789dff1d20cc49a6f0b0df8c6308db?s=46&d=identicon" class="profile-image"/>
+              <p>jpherkness</p>
+            </a>
+            <div class="navbar-dropdown">
+              <div class="navbar-item">
+                <b>Joseph Herkness</b>
+              </div>
+              <router-link :to="{ name: 'Profile' }" class="navbar-item">Profile</router-link>
+              <a class="navbar-item">Settings</a>
+              <a class="navbar-item">Help</a>
+              <hr class="navbar-divider">
+              <a class="navbar-item">Sign out</a>
+            </div>
           </div>
         </div>
       </nav>

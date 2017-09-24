@@ -1,24 +1,44 @@
 <template>
-  <div>
-    <div class="column is-4 is-offset-4 is-centered" v-show="!showRegistration">
-      <h1 class="title">Login</h1>
-      <hr>
-      <p class="notification is-danger" v-show="logInFailed">Invalid username or password.</p>
-      <div class="small-padding">
-        <label class="label">Username</label>
-        <input class="input" type="text" placeholder="Username" v-model="user.UserName" />
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-vcentered">
+          <div class="column is-4 is-offset-4">
+            <h4 class="title has-text-centered is-4">
+              Login
+            </h4>
+            <div class="box">
+              <article class="message is-danger" v-show="logInFailed">
+                <div class="message-body">
+                  Invalid username or password.
+                </div>
+              </article>
+              <div class="field">
+                <label class="label">Email</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="Username" v-model="user.UserName" />
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Password</label>
+                <div class="control">
+                  <input class="input" type="password" placeholder="Password" v-model="user.Password" @keydown.enter="login"/>
+                </div>
+              </div>
+              <hr>
+              <div class="control">
+                <button class="button is-primary" @click="login">Login</button>
+              </div>
+            </div>
+            <p class="has-text-centered">
+              Don't have an account?
+              <router-link :to="{ name: 'Register' }"><u>Register</u></router-link>
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="small-padding">
-        <label class="label">Password</label>
-        <input class="input" type="password" placeholder="Password" v-model="user.Password" @keydown.enter="login" />
-      </div>
-      <a @click="showRegistration = true">
-        <p>Register Now!</p>
-      </a>
-      <button class="button is-primary large-margins" v-on:click="login">Log In</button>
     </div>
-    <Register v-show="showRegistration" v-on:Registered="registerAndLogIn" v-on:Return="ReturnToLogIn"/>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -31,9 +51,7 @@ export default {
   name: 'LogIn',
   data() {
     return {
-      user: new Classes.User(),
-      showRegistration: false,
-      logInFailed: false
+      user: new Classes.User()
     }
   },
   components: {
@@ -61,18 +79,6 @@ export default {
           console.log(response)
         })
       }
-      else{
-        this.logInFailed = true
-      }
-    },
-    registerAndLogIn(user){
-      // debugger
-      this.showRegistration = false;
-      // log in user
-    },
-    ReturnToLogIn(){
-      this.showRegistration = false;
-      this.user = new Classes.User()
     }
   }
 }

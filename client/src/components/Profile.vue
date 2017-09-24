@@ -54,7 +54,7 @@
                 Last Name: <input type="text" class="is-centered" v-model="PasswordChange.VerifyNewPassword">
             </div>
             <button class="button is-primary large-margins" @click="TryAndChangePassword">Change Password</button>
-            <button class="button is-danger large-margins" @click="BackToUserHome">I don't want to change it anymore</button>
+            <button class="button is-danger large-margins" @click="BackToProfile">I don't want to change it anymore</button>
         </div>
     </div>
 </template>
@@ -63,7 +63,7 @@
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
 export default {
-    name: 'UserHome',
+    name: 'Profile',
     data() {
         return {
             User: this.$store.state.User,
@@ -125,7 +125,7 @@ export default {
                 this.ChangePassword = false
             }
         },
-        BackToUserHome() {
+        BackToProfile() {
             this.PasswordChange = new Classes.PasswordVerification()
             this.EditEnabled = false
             this.ChangePassword = false
