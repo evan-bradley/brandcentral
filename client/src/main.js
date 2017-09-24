@@ -9,6 +9,7 @@ import store from './Vuex/states'
 Vue.use(VueResource)
 
 Vue.config.productionTip = false
+window._ = require('lodash')
 
 /* eslint-disable no-new */
 new Vue({
