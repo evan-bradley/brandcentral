@@ -25,6 +25,7 @@
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 var router = require('../router/index')
 import Register from './Register'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'LogIn',
@@ -39,23 +40,33 @@ export default {
     'Register': Register
   },
   methods: {
+    ...mapMutations([
+      'setUser'
+    ]),
     login() {
       if (this.user.UserName !== '' && this.user.Password !== '') {
-      this.$store.state.loggedIn = true
-      // Doing this for testing Can be removed when replaced wiht php      
-       this.$store.state.User.FirstName = 'FirstName'
-       this.$store.state.User.LastName = 'LastName'
-       this.$store.state.User.Email = 'Email@email.com'
-       this.$store.state.User.Password = 'password'
-       this.$store.state.User.UserName = 'userName'
-       this.$router.replace('/')
+        const loginInfo = {
+          username: this.user.UserName,
+          password: this.user.Password
+        }
+
+        this.$http.post('/api/login', loginInfo)
+        .then(response => { // Success
+          this.user.FirstName = response.data.firstName
+          this.user.LastName = response.data.lastName
+          this.user.Email = response.data.email
+          this.setUser(this.user)
+          this.$router.replace('/')
+        }, response => { // Failure
+          console.log(response)
+        })
       }
       else{
         this.logInFailed = true
       }
     },
     registerAndLogIn(user){
-      debugger
+      // debugger
       this.showRegistration = false;
       // log in user
     },

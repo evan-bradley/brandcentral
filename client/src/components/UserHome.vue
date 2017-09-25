@@ -17,7 +17,7 @@
                 Last Name: {{ User.LastName }}
             </div>
             <div class="column is-12 is-size-5">
-                Password: did you really thing we would display this
+                Password: did you really think we would display this
             </div>
             <div class="column is-12 is-size-5">
                 Email: {{ User.Email }}
@@ -75,15 +75,37 @@ export default {
     },
     methods: {
         Update() {
-            this.$store.state.User.FirstName = this.EditUser.FirstName
-            this.$store.state.User.LastName = this.EditUser.LastName
-            this.$store.state.User.Email = this.EditUser.Email
+            const updateInfo = {
+              username: this.$store.state.User.UserName
+            }
+
+            if (this.$store.state.User.FirstName !== this.EditUser.FirstName) {
+              updateInfo.firstname = this.EditUser.FirstName
+              this.$store.state.User.FirstName = this.EditUser.FirstName
+            }
+
+            if (this.$store.state.User.LastName !== this.EditUser.LastName) {
+              updateInfo.lastname = this.EditUser.LastName
+              this.$store.state.User.LastName = this.EditUser.LastName
+            }
+
+            if (this.$store.state.User.Email !== this.EditUser.Email) {
+              updateInfo.email = this.EditUser.Email
+              this.$store.state.User.Email = this.EditUser.Email
+            }
+
             this.$store.state.User.UserName = this.EditUser.UserName
             this.User.FirstName = this.EditUser.FirstName
             this.User.LastName = this.EditUser.LastName
             this.User.Email = this.EditUser.Email
             this.User.UserName = this.EditUser.UserName
             this.EditEnabled = false
+            this.$http.post('/api/profile', updateInfo)
+            .then(response => {
+              console.log(response)
+            }, response => {
+              console.log(response)
+            })
         },
         UpdateEditData() {
             this.EditUser.FirstName = this.User.FirstName
