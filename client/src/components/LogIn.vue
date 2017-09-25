@@ -52,7 +52,7 @@ export default {
   name: 'LogIn',
   data() {
     return {
-      user: this.$store.state.User,
+      user: new Classes.User(),
       failureMessage: ''
     }
   },

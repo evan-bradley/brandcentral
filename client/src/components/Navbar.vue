@@ -41,10 +41,8 @@ export default {
   },
   methods: {
     signOut() {
-      this.$store.commit('logOut')
-      this.$router.push({
-        name: 'Login'
-      })
+      this.$store.commit('LogOut')
+      this.$router.push({ name: 'Login' })
     },
     hash(str) {
       return md5(str)
