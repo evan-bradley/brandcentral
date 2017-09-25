@@ -9,6 +9,11 @@
             </h4>
             <div class="box">
               <h4 class="title has-text-centered is-4">Register Account</h4>
+              <article class="message is-danger" v-show="failureMessage">
+                <div class="message-body">
+                  {{ failureMessage }}
+                </div>
+              </article>
               <div class="field">
                 <label class="label">First Name</label>
                 <div class="control">
@@ -70,20 +75,41 @@ export default {
     data() {
         return {
             user: new Classes.User(),
-            confirmPassword: ''
+            confirmPassword: '',
+            failureMessage: ''
         }
     },
     methods: {
         Register() {
-            if (this.user.Password === this.confirmPassword && this.user.UserName !== "" && this.UserNameCheck(this.user.UserName)){
-                // send to PHP to insert user
-                this.$store.state.User = this.user
-                this.$emit('Registered', this.user)
-            }       
-        },
-        UserNameCheck(userName){
-            // some PHP stuff to check the username
-            return true
+            // Basic validation
+            if (this.user.UserName == ''){
+              this.failureMessage = 'Username cannot be blank'
+              return
+            }
+            if (this.user.Password !== this.confirmPassword){
+              this.failureMessage = 'Passwords must match'
+              return
+            }
+            // Everything looks okay
+            const registration = {
+                username: this.user.UserName,
+                firstName: this.user.FirstName,
+                lastName: this.user.LastName,
+                password: this.user.Password,
+                email: this.user.Email,
+            }
+            this.$http.post('/api/register', registration)
+                .then(response => { // Success
+                    if (response.data.success) {
+                      this.$router.push({ name: 'Login' })
+                    } else {
+                      console.log(response)
+                      this.failureMessage = response.data.message
+                    }
+                }, response => { // Error
+                    console.log(response)
+                    this.failureMessage = response.data.message
+                })
         }
     }
 }

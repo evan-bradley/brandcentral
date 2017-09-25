@@ -30,7 +30,7 @@
 
 <script>
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-var md5 = require('md5');
+var md5 = require('md5')
 
 export default {
   name: 'Navbar',

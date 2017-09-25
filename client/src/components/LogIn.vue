@@ -9,9 +9,9 @@
             </h4>
             <div class="box">
               <h4 class="title has-text-centered is-4">Login</h4>
-              <article class="message is-danger" v-show="logInFailed">
+              <article class="message is-danger" v-show="failureMessage">
                 <div class="message-body">
-                  Invalid username or password.
+                  {{ failureMessage }}
                 </div>
               </article>
               <div class="field">
@@ -52,7 +52,8 @@ export default {
   name: 'LogIn',
   data() {
     return {
-      user: new Classes.User()
+      user: this.$store.state.User,
+      failureMessage: ''
     }
   },
   components: {
@@ -71,14 +72,22 @@ export default {
 
         this.$http.post('/api/login', loginInfo)
         .then(response => { // Success
-          this.user.FirstName = response.data.firstName
-          this.user.LastName = response.data.lastName
-          this.user.Email = response.data.email
-          this.setUser(this.user)
-          this.$router.replace('/')
+          if (response.data.success) {
+            this.user.Id = response.data.id
+            this.user.FirstName = response.data.firstName
+            this.user.LastName = response.data.lastName
+            this.user.Email = response.data.email
+            this.setUser(this.user)
+            this.$router.push({ name: 'Home' })
+          }else{
+            this.failureMessage = response.data.message
+          }
         }, response => { // Failure
-          console.log(response)
+          this.failureMessage = response.data.message
         })
+      }
+      else{
+        this.failureMessage = 'Username or password cannot be blank'
       }
     }
   }
