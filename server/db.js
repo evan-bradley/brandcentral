@@ -108,23 +108,18 @@ pool.loginUser = (info, callback) => {
 };
 
 pool.updateProfile = (info, callback) => {
-  const firstName = info.firstName ? `SET USER_FNAME = ? ` : '';
-  const lastName = info.lastName ? `SET USER_LNAME = ? ` : '';
-  const email = info.email ? `SET USER_EMAIL = ? ` : '';
-  const UPDATE_PROFILE_Q = `UPDATE USER ${firstName}${lastName}${email}WHERE USERNAME = ?`;
-  const parameters = [];
+  var newColumns = { }
+  if (info.firstName) newColumns.USER_FNAME = info.firstName
+  if (info.lastName) newColumns.USER_LNAME = info.lastName
+  if (info.email) newColumns.USER_EMAIL = info.email
 
-  if (typeof info.firstName !== "undefined") {
-    parameters.push(info.firstName);
-  } else if (typeof info.lastName !== "undefined") {
-    parameters.push(info.lastName);
-  } else if (typeof info.email !== "undefined") {
-    parameters.push(info.email);
+  // Check to make sure there are attributes to set
+  if (Object.keys(newColumns).length !== 0) {
+    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
+    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
   }
-  parameters.push(info.username);
-
-  pool.query(UPDATE_PROFILE_Q, parameters, callback);
 };
+
 
 const LAST_SEEN_Q = `
 UPDATE USER

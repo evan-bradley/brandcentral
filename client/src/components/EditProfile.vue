@@ -65,12 +65,12 @@ export default {
       }
 
       if (this.$store.state.User.FirstName !== this.EditedUser.FirstName) {
-        updateInfo.firstname = this.EditedUser.FirstName
+        updateInfo.firstName = this.EditedUser.FirstName
         this.$store.state.User.FirstName = this.EditedUser.FirstName
       }
 
       if (this.$store.state.User.LastName !== this.EditedUser.LastName) {
-        updateInfo.lastname = this.EditedUser.LastName
+        updateInfo.lastName = this.EditedUser.LastName
         this.$store.state.User.LastName = this.EditedUser.LastName
       }
 
@@ -81,12 +81,12 @@ export default {
 
       // Send a request to the api to update the user's information
       this.$http.post('/api/profile', updateInfo)
-        .then(response => {
-          console.log(response)
-          this.User = this.EditedUser
-        }, response => {
-          console.log(response)
-        })
+      .then(response => {
+        console.log(response)
+        this.User = this.EditedUser
+      }, response => {
+        console.log(response)
+      })
     }
   }
 }
