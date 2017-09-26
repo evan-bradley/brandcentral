@@ -1,12 +1,14 @@
 export namespace Classes {
   export class User {
+    public Id: string;
     public FirstName: string;
     public LastName: string;
     public UserName: string;
     public Email: string;
     public Password: string;
 
-    constructor(userName: string = "", email: string = "", password: string = "", firstName: string = "", lastName: string = "") {
+    constructor(id: string = "", userName: string = "", email: string = "", password: string = "", firstName: string = "", lastName: string = "") {
+      this.Id = id;
       this.FirstName = firstName;
       this.LastName = lastName;
       this.UserName = userName;

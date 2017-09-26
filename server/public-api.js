@@ -7,10 +7,16 @@ const db = require('./db');
 
 const bcrypt = require('bcrypt');
 
+const mail = require('node-smtp-client').Mail({
+  host: 'mail.cock.li',
+  username: 'BrandCentralStation@firemail.cc',
+  password: 'brandcentral',
+  port: 465
+});
+
 /*
- * Login user.
- * TODO: Return session key.
- */
+ *  * Login user.
+ *   */
 router.post('/api/login', (req, res) => {
   db.loginUser(req.body, (err, results) => {
     if (err) {
@@ -20,11 +26,10 @@ router.post('/api/login', (req, res) => {
         message: err.message,
       });
     } else {
-      console.log('Logged in', results.id);
-      const id = results.id;
-      req.session.id = id;
+      console.log('Logged in', results.id, req.session.id);
+      req.session.userId = results.id;
 
-      db.updateLastSeen(id, (err) => {
+      db.updateLastSeen(results.id, (err) => {
         if(err) {
           console.log(err);
           res.send({
@@ -35,20 +40,20 @@ router.post('/api/login', (req, res) => {
 
         res.send({
           success: true,
-          id,
+          id: results.id,
           lastName: results.lastName,
           firstName: results.firstName,
           email: results.email,
           lastSeen: results.lastSeen ? results.lastSeen : "never"
         });
-     });
+      });
     }
   });
 });
 
 /*
- * Register user.
- */
+ *  * Register user.
+ *   */
 router.post('/api/register', (req, res) => {
   db.registerUser(req.body, (error, results, fields) => {
     if(error) {

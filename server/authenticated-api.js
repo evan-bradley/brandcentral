@@ -8,15 +8,37 @@ const db = require('./db');
 
 /*
  * Update a user profile.
- * TODO: Should probably be /api/profile:id or /api/profile:username
  */
-router.post('/api/profile', (req, res) => {
-    db.updateProfile(req.body, (error, results, fields) => {
+router.post('/api/profile/:id', (req, res) => {
+    const queryData = req.body;
+    queryData.id = req.params.id;
+
+    if (parseInt(req.params.id, 10) === parseInt(req.session.userId, 10)) {
+        db.updateProfile(queryData, error => {
+            if(error) {
+                console.log(error);
+                res.send(JSON.stringify({res: "error"}));
+            } else {
+                res.send(JSON.stringify({res: "success"}));
+            }
+        });
+    } else {
+        res.send(JSON.stringify({res: "error"}));
+    }
+});
+
+/*
+ * Get information for a user's profile.
+ */
+router.get('/api/profile/:id', (req, res) => {
+    db.getProfileData({
+        id: req.params.id
+    }, (error, results, fields) => {
         if(error) {
             console.log(error);
             res.send(JSON.stringify({res: "error"}));
         } else {
-            res.send(JSON.stringify({res: "success"}));
+            res.send(JSON.stringify(results));
         }
     });
 });

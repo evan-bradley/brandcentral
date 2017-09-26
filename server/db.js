@@ -1,5 +1,6 @@
 /*
  * db.js -- Database setup and related functions.
+ * TODO: Move from callbacks to Promises-based or async/await-based control.
  */
 'use strict';
 
@@ -108,25 +109,63 @@ pool.loginUser = (info, callback) => {
 };
 
 pool.updateProfile = (info, callback) => {
-  var newColumns = { }
-  if (info.firstName) newColumns.USER_FNAME = info.firstName
-  if (info.lastName) newColumns.USER_LNAME = info.lastName
-  if (info.email) newColumns.USER_EMAIL = info.email
+  let updateProfileQuery = `UPDATE USER `;
+  const parameters = [];
 
-  // Check to make sure there are attributes to set
-  if (Object.keys(newColumns).length !== 0) {
-    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
-    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
+  if (info.username) {
+    updateProfileQuery += `SET USERNAME = ? `;
+    parameters.push(info.username);
+  }
+  if (info.firstName) {
+    updateProfileQuery += `SET USER_FNAME = ? `;
+    parameters.push(info.firstName);
+  }
+  if (info.lastName) {
+    updateProfileQuery += `SET USER_LNAME = ? `;
+    parameters.push(info.lastName);
+  }
+  if (info.email) {
+    updateProfileQuery += `SET USER_EMAIL = ? `;
+    parameters.push(info.email);
+  }
+  if (info.password) {
+    // Separate query for user password to avoid nasty control flow.
+    bcrypt
+      .hash(info.password, 10)
+      .then((hash) => {
+        pool.query("UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?",
+          [ hash, info.id ],
+          (err, result) => {
+            if (err) {
+              throw err;
+            }
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  }
+  if (updateProfileQuery !== "UPDATE USER ") {
+    updateProfileQuery += `WHERE USER_ID = ?;`;
+    parameters.push(info.id);
+    pool.query(updateProfileQuery, parameters, callback);
   }
 };
 
+const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
+FROM USER WHERE USER_ID = ?;`;
+pool.getProfileData = (info, callback) => {
+      pool.query(PROFILE_Q, [
+                info.id
+            ], callback);
+};
 
 const LAST_SEEN_Q = `
 UPDATE USER
   SET LAST_SEEN = CURRENT_TIMESTAMP()
   WHERE USER_ID = ?;`;
 pool.updateLastSeen = (id, callback) => {
-    pool.query(LAST_SEEN_Q, [ id ], callback);
+      pool.query(LAST_SEEN_Q, [ id ], callback);
 };
 
 module.exports = pool;
