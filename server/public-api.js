@@ -6,17 +6,40 @@ const router = require('express').Router();
 const db = require('./db');
 
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
-const mail = require('node-smtp-client').Mail({
-  host: 'mail.cock.li',
-  username: 'BrandCentralStation@firemail.cc',
-  password: 'brandcentral',
-  port: 465
+// create reusable transporter object using the default SMTP transport
+const transporter = nodemailer.createTransport({
+    host: 'mail.cock.li',
+    port: 465,
+    secure: true, // true for 465, false for other ports
+    auth: {
+        user: "BrandCentralStation@firemail.cc", // generated ethereal user
+        pass: "brandcentral" // generated ethereal password
+    }
 });
 
+const registerEmailTemplate = {
+    from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+    //to: '', // list of receivers
+    subject: 'Hello ✔', // Subject line
+    text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
+};
+
+// Generate test SMTP service account from ethereal.email
+// Only needed if you don't have a real mail account for testing
+nodemailer.createTestAccount((err, account) => {
+
+
+    // setup email data with unicode symbols
+
+    // send mail with defined transport object
+});
+
+
 /*
- *  * Login user.
- *   */
+ * Login user.
+ */
 router.post('/api/login', (req, res) => {
   db.loginUser(req.body, (err, results) => {
     if (err) {
@@ -26,7 +49,7 @@ router.post('/api/login', (req, res) => {
         message: err.message,
       });
     } else {
-      console.log('Logged in', results.id, req.session.id);
+      //console.log('Logged in', results.id, req.session.id);
       req.session.userId = results.id;
 
       db.updateLastSeen(results.id, (err) => {
@@ -46,14 +69,14 @@ router.post('/api/login', (req, res) => {
           email: results.email,
           lastSeen: results.lastSeen ? results.lastSeen : "never"
         });
-      });
+     });
     }
   });
 });
 
 /*
- *  * Register user.
- *   */
+ * Register user.
+ */
 router.post('/api/register', (req, res) => {
   db.registerUser(req.body, (error, results, fields) => {
     if(error) {
@@ -63,12 +86,30 @@ router.post('/api/register', (req, res) => {
         message: error.message,
       });
     } else {
+        const registerEmail = registerEmailTemplate;
+        registerEmail.to = req.body.email;
+        registerEmail.text += `http://localhost:8080/verify/${results.token}`;
+        console.log(registerEmail);
+
+        transporter.sendMail(registerEmail, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message sent: %s', info.messageId);
+        });
       res.send({
         success: true,
-        uid: results.uid,
+        id: results.id,
       });
     }
   });
+});
+
+router.post('/api/verify/:token', (req, res) => {
+    db.verifyUser(req.params.token, err => {
+        if (err) throw err;
+        res.send(JSON.stringify({ success: true }));
+    });
 });
 
 module.exports = router;

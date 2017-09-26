@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import LogIn from '@/components/LogIn'
 import Register from '@/components/Register'
 import Profile from '@/components/Profile'
+import Verify from '@/components/Verify'
 import Home from '@/components/Home'
 import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
@@ -39,6 +40,12 @@ const router = new Router({
       component: Register
     },
     {
+      path: '/verify/:GUID',
+      name: 'Verify',
+      component: Verify,
+      props: true
+    },
+    {
       path: '/',
       name: 'Home',
       component: Home
@@ -52,7 +59,8 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   // debugger
-  if ((!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/login')) && to.matched[0].name !== 'Verify') {
+  console.log(store.default.state)
+  if (!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/login' && to.path.indexOf('/verify') === -1)) {
     next({ path: '/login' })
   } else {
     next()
