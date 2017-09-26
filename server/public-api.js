@@ -19,13 +19,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const registerEmailTemplate = {
-    from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-    //to: '', // list of receivers
-    subject: 'Hello ✔', // Subject line
-    text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
-};
-
 // Generate test SMTP service account from ethereal.email
 // Only needed if you don't have a real mail account for testing
 nodemailer.createTestAccount((err, account) => {
@@ -86,8 +79,13 @@ router.post('/api/register', (req, res) => {
         message: error.message,
       });
     } else {
-        const registerEmail = registerEmailTemplate;
-        registerEmail.to = req.body.email;
+        let registerEmail = {
+            from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+            to: req.body.email,
+            subject: 'Hello ✔', // Subject line
+            text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
+        };
+
         registerEmail.text += `http://localhost:8080/verify/${results.token}`;
         console.log(registerEmail);
 
