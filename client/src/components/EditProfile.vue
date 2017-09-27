@@ -6,8 +6,9 @@
         <div class="field">
           <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.UserName" v-model="EditedUser.UserName" />
+            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"/>
           </div>
+          <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
         </div>
         <div class="field">
           <label class="label">First Name</label>
@@ -24,8 +25,9 @@
         <div class="field">
           <label class="label">Email</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.Email" v-model="EditedUser.Email" />
+            <input class="input" type="text" v-bind:placeholder="User.Email" name="email" v-model="EditedUser.Email" v-validate="{ required: true, email: true }"/>
           </div>
+          <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
         </div>
         <div class="field">
           <label class="label">Password</label>
@@ -59,6 +61,12 @@ export default {
   },
   methods: {
     Update() {
+      // Quit if any inputs are invalid
+      this.$validator.validateAll();
+      if (this.errors.any()) {
+          return
+      }
+
       // TODO: This needs to be changed to also update the username
       const updateInfo = {
         username: this.$store.state.User.UserName

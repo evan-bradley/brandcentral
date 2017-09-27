@@ -12,14 +12,16 @@
         <div class="field">
           <label class="label">New password</label>
           <div class="control">
-            <input class="input" type="password" placeholder="New password" v-model="PasswordChange.NewPassword" />
+            <input class="input" type="password" placeholder="New password" name="password" v-model="PasswordChange.NewPassword" v-validate="{ required: true, min: 8 }"/>
           </div>
+          <p class="help is-danger" v-show="errors.has('password')">{{ errors.first('password') }}</p>
         </div>
         <div class="field">
           <label class="label">Password confirmation</label>
           <div class="control">
-            <input class="input" type="password" placeholder="Password confirmation" v-model="PasswordChange.VerifyNewPassword" />
+            <input class="input" type="password" placeholder="Password confirmation" name="confirm password" v-model="PasswordChange.VerifyNewPassword" v-validate="{ required: true, confirmed: 'password' }"/>
           </div>
+          <p class="help is-danger" v-show="errors.has('confirm password')">{{ errors.first('confirm password') }}</p>
         </div>
         <button class="button is-primary" @click="ChangePassword">Change Password</button>
         <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
@@ -45,6 +47,12 @@ export default {
   },
   methods: {
     ChangePassword() {
+      // Quit if any inputs are invalid
+      this.$validator.validateAll();
+      if (this.errors.any()) {
+          return
+      }
+
       // TODO: This needs to actually change the password in the database
       if (this.PasswordChange.Verify(this.$store.state.User.Password)) {
         this.$store.state.User.Password = this.PasswordChange.NewPassword
@@ -57,6 +65,8 @@ export default {
           console.log(response)
         })
       }
+
+      this.$router.go(-1)
     }
   }
 }
