@@ -51,7 +51,7 @@
               <div class="field">
                 <label class="label">Confirm Password</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="Confirm Password" name="confirm password"v-model="confirmPassword" @keydown.enter="login" v-validate="{confirmed: 'password'}"/>
+                  <input class="input" type="password" placeholder="Confirm Password" name="confirm password"v-model="confirmPassword" @keydown.enter="login" v-validate="{required: true, confirmed: 'password'}"/>
                 </div>
                 <p class="help is-danger" v-show="errors.has('confirm password')">{{ errors.first('confirm password') }}</p>
               </div>
