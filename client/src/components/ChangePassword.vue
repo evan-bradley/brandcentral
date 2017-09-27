@@ -56,6 +56,14 @@ export default {
       // TODO: This needs to actually change the password in the database
       if (this.PasswordChange.Verify(this.$store.state.User.Password)) {
         this.$store.state.User.Password = this.PasswordChange.NewPassword
+        this.$http.post(`/api/profile/${this.$store.state.User.Id}`, {
+          password: this.PasswordChange.NewPassword
+        })
+        .then(response => {
+          console.log(response)
+        }, response => {
+          console.log(response)
+        })
       }
 
       this.$router.go(-1)

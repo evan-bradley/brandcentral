@@ -1,5 +1,6 @@
 /*
  * db.js -- Database setup and related functions.
+ * TODO: Move from callbacks to Promises-based or async/await-based control.
  */
 'use strict';
 
@@ -24,6 +25,7 @@ const pool = mysql.createPool({
  * in the database.
  */
 const DUPCHECK_Q = 'SELECT USERNAME, USER_EMAIL FROM USER WHERE USERNAME = ? OR USER_EMAIL = ?';
+const REGISTER_Q = 'INSERT INTO USER (USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VERIFICATION, LAST_SEEN) VALUES(?, ?, ?, ?, ?, ?, ?);';
 pool.registerUser = (info, callback) => {
   if (!info.username || !info.email ||
       !info.lastName || !info.firstName || !info.password ) {
@@ -46,23 +48,28 @@ pool.registerUser = (info, callback) => {
       bcrypt
         .hash(info.password, 10)
         .then((hash) => {
-          pool.query('INSERT INTO USER (USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, LAST_SEEN) VALUES(?, ?, ?, ?, ?, ?);', [
-            info.username,
-            info.lastName,
-            info.firstName,
-            info.email,
-            hash,
-            moment().format("YYYY-MM-DD HH:mm:ss")
-          ], (err, res) => {
-            if (err) {
-              if (err.code === 'ER_DUP_ENTRY') {
-                err.message = 'A user with that ID is already registered';
-              }
-              callback(err);
-            } else {
-              callback(null, res);
-            }
-          });
+            require('crypto').randomBytes(16, function(err, buffer) {
+                const token = buffer.toString('hex');
+                pool.query(REGISTER_Q, [
+                    info.username,
+                    info.lastName,
+                    info.firstName,
+                    info.email,
+                    hash,
+                    token,
+                    moment().format("YYYY-MM-DD HH:mm:ss")
+                ], (err, res) => {
+                    if (err) {
+                        if (err.code === 'ER_DUP_ENTRY') {
+                            err.message = 'A user with that ID is already registered';
+                        }
+                        callback(err);
+                    } else {
+                        res.token = token;
+                        callback(null, res);
+                    }
+                });
+            });
         })
         .catch((err) => {
             callback(err);
@@ -74,13 +81,18 @@ pool.registerUser = (info, callback) => {
 /*
  * Check user's password and return user info if it is valid
  */
-const LOGIN_Q = 'SELECT USER_ID, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, LAST_SEEN FROM USER WHERE USERNAME = ?;';
+const LOGIN_Q = 'SELECT USER_ID, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VERIFIED, LAST_SEEN FROM USER WHERE USERNAME = ?;';
 pool.loginUser = (info, callback) => {
   pool.query(LOGIN_Q, [ info.username ], (err, results, fields) => {
     // Error for username not found same as that for password not found.
     if (err || results.length === 0) {
       // login failure
       callback({ message: 'Username or password invalid' });
+      return;
+    }
+
+    if (results[0].VERIFIED !== 1) {
+      callback({ message: 'User not verified '});
       return;
     }
 
@@ -108,18 +120,63 @@ pool.loginUser = (info, callback) => {
 };
 
 pool.updateProfile = (info, callback) => {
-  var newColumns = { }
-  if (info.firstName) newColumns.USER_FNAME = info.firstName
-  if (info.lastName) newColumns.USER_LNAME = info.lastName
-  if (info.email) newColumns.USER_EMAIL = info.email
+  let updateProfileQuery = `UPDATE USER `;
+  const parameters = [];
 
-  // Check to make sure there are attributes to set
-  if (Object.keys(newColumns).length !== 0) {
-    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
-    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
+  if (info.username) {
+      updateProfileQuery += `SET USERNAME = ? `;
+      parameters.push(info.username);
+  }
+  if (info.firstName) {
+    updateProfileQuery += `SET USER_FNAME = ? `;
+    parameters.push(info.firstName);
+  }
+  if (info.lastName) {
+    updateProfileQuery += `SET USER_LNAME = ? `;
+    parameters.push(info.lastName);
+  }
+  if (info.email) {
+    updateProfileQuery += `SET USER_EMAIL = ? `;
+    parameters.push(info.email);
+  }
+  if (info.password) {
+      // Separate query for user password to avoid nasty control flow.
+      bcrypt
+          .hash(info.password, 10)
+          .then((hash) => {
+              pool.query("UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?",
+                         [ hash, info.id ],
+                         (err, result) => {
+                             if (err) {
+                                 throw err;
+                             }
+                         });
+          })
+          .catch(err => {
+              console.log(err);
+          });
+  }
+
+  if (updateProfileQuery !== "UPDATE USER ") {
+      updateProfileQuery += `WHERE USER_ID = ?;`;
+      parameters.push(info.id);
+
+      pool.query(updateProfileQuery, parameters, callback);
   }
 };
 
+const VERIFY_Q = "UPDATE USER SET VERIFIED = '1' WHERE VERIFICATION = ?;";
+pool.verifyUser = (token, callback) => {
+    pool.query(VERIFY_Q, [ token ], callback);
+}
+
+const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
+FROM USER WHERE USER_ID = ?;`;
+pool.getProfileData = (info, callback) => {
+    pool.query(PROFILE_Q, [
+        info.id
+    ], callback);
+};
 
 const LAST_SEEN_Q = `
 UPDATE USER
