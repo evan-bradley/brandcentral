@@ -23,7 +23,7 @@ import time
 from bs4 import BeautifulSoup
 from clarifai.rest import ClarifaiApp
 
-
+app = ClarifaiApp()
 
 
 def AmzonParser(url):
@@ -34,7 +34,8 @@ def AmzonParser(url):
     page = requests.get(url, headers=headers)
     soup = BeautifulSoup(page.content)
     aName = ''
-    aCategory = ''
+    aTags = []
+    aTagStrengths = []
     aPrice = ''
     aDesc = ''
     aImageURL = ''
@@ -43,7 +44,8 @@ def AmzonParser(url):
         nameAndCat = str(soup.title)[19:-8].split(':')
         imageList = soup.find(id='landingImage')['data-a-dynamic-image'].split('\"')
         aName = nameAndCat[0]
-        aCategory = nameAndCat[1].replace('amp;', '')
+        aTags[0] = nameAndCat[1].replace('amp;', '')
+        aTagStrengths[0] = 1
         aPrice = soup.find(id = 'priceblock_ourprice').text
         aDesc = soup.find(id = 'productDescription').text.strip()
         aImageURL = imageList[1]
@@ -51,10 +53,13 @@ def AmzonParser(url):
         if page.status_code != 200:
             raise ValueError('captha')
 
+        tags = getTags(aImageURL)
+
     except Exception as e:
         data = {
             'NAME': '',
-            'CATEGORY': '',
+            'TAGS': [],
+            'TAG_STRENGTH'
             'SALE_PRICE': '',
             'DESCRIPTION': '',
             'IMAGE_URL': '',
@@ -64,7 +69,7 @@ def AmzonParser(url):
 
     data = {
         'NAME': aName,
-        'CATEGORY': aCategory,
+        'TAGS': aTags,
         'SALE_PRICE': aPrice,
         'DESCRIPTION': aDesc,
         'IMAGE_URL': aImageURL,
@@ -72,19 +77,23 @@ def AmzonParser(url):
     }
     return data
 
+def getTags(image):
+    tags = app.tag_urls(image)
+    return tags
 
 def ReadAsin():
     # AsinList = csv.DictReader(open(os.path.join(os.path.dirname(__file__),"Asinfeed.csv")))
-    AsinList = ['B0046UR4F4',
-                'B00JGTVU5A',
-                'B00GJYCIVK',
-                'B00EPGK7CQ',
-                'B00EPGKA4G',
-                'B00YW5DLB4',
-                'B00KGD0628',
-                'B00O9A48N2',
-                'B00O9A4MEW',
-                'B00UZKG8QU', ]
+    AsinList = ['B0046UR4F4'
+                # 'B00JGTVU5A',
+                # 'B00GJYCIVK',
+                # 'B00EPGK7CQ',
+                # 'B00EPGKA4G',
+                # 'B00YW5DLB4',
+                # 'B00KGD0628',
+                # 'B00O9A48N2',
+                # 'B00O9A4MEW',
+                # 'B00UZKG8QU',
+                ]
     extracted_data = []
     for i in AsinList:
         url = "http://www.amazon.com/dp/" + i
@@ -92,7 +101,7 @@ def ReadAsin():
         data = AmzonParser(url)
         if data['NAME'] != '':
             extracted_data.append(data)
-        time.sleep(random.randint(2, 10))
+        time.sleep(random.randint(5, 15))
     f = open('data.json', 'w')
     json.dump(extracted_data, f, indent=4)
 
