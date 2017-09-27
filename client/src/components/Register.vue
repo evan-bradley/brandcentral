@@ -29,27 +29,31 @@
               <div class="field">
                 <label class="label">Username</label>
                 <div class="control">
-                  <input class="input" type="text" placeholder="Username" v-model="user.UserName" />
+                  <input class="input" type="text" placeholder="Username" name="username" v-model="user.UserName" v-validate="{ required: true }"/>
                 </div>
+                <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
               </div>
               <div class="field">
                 <label class="label">Email</label>
                 <div class="control">
-                  <input class="input" type="text" placeholder="Email" v-model="user.Email" />
+                  <input class="input" type="text" placeholder="Email" name="email" v-model="user.Email" v-validate="{ required: true, email: true}"/>
                 </div>
+                <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
               </div>
               <hr>
               <div class="field">
                 <label class="label">Password</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="Password" v-model="user.Password"/>
+                  <input class="input" type="password" placeholder="Password" name="password" v-model="user.Password" v-validate="{ required: true, min: 8}"/>
                 </div>
+                <p class="help is-danger" v-show="errors.has('password')">{{ errors.first('password') }}</p>
               </div>
               <div class="field">
                 <label class="label">Confirm Password</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="Confirm Password" v-model="confirmPassword" @keydown.enter="login"/>
+                  <input class="input" type="password" placeholder="Confirm Password" name="confirm password"v-model="confirmPassword" @keydown.enter="login" v-validate="{confirmed: 'password'}"/>
                 </div>
+                <p class="help is-danger" v-show="errors.has('confirm password')">{{ errors.first('confirm password') }}</p>
               </div>
               <hr>
               <div class="control">
@@ -81,6 +85,12 @@ export default {
     },
     methods: {
         Register() {
+            // Quit if any inputs are invalid
+            this.$validator.validateAll();
+            if (this.errors.any()) {
+                return
+            }
+
             // Basic validation
             if (this.user.UserName == ''){
               this.failureMessage = 'Username cannot be blank'
