@@ -120,25 +120,11 @@ pool.loginUser = (info, callback) => {
 };
 
 pool.updateProfile = (info, callback) => {
-  let updateProfileQuery = `UPDATE USER `;
-  const parameters = [];
+  const newColumns = {}
+  if (info.firstName) newColumns.USER_FNAME = info.firstName
+  if (info.lastName) newColumns.USER_LNAME = info.lastName
+  if (info.email) newColumns.USER_EMAIL = info.email
 
-  if (info.username) {
-      updateProfileQuery += `SET USERNAME = ? `;
-      parameters.push(info.username);
-  }
-  if (info.firstName) {
-    updateProfileQuery += `SET USER_FNAME = ? `;
-    parameters.push(info.firstName);
-  }
-  if (info.lastName) {
-    updateProfileQuery += `SET USER_LNAME = ? `;
-    parameters.push(info.lastName);
-  }
-  if (info.email) {
-    updateProfileQuery += `SET USER_EMAIL = ? `;
-    parameters.push(info.email);
-  }
   if (info.password) {
       // Separate query for user password to avoid nasty control flow.
       bcrypt
@@ -157,11 +143,10 @@ pool.updateProfile = (info, callback) => {
           });
   }
 
-  if (updateProfileQuery !== "UPDATE USER ") {
-      updateProfileQuery += `WHERE USER_ID = ?;`;
-      parameters.push(info.id);
-
-      pool.query(updateProfileQuery, parameters, callback);
+  // Check to make sure there are attributes to set
+  if (Object.keys(newColumns).length !== 0) {
+    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
+    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
   }
 };
 

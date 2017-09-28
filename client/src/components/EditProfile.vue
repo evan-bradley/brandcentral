@@ -88,7 +88,7 @@ export default {
       }
 
       // Send a request to the api to update the user's information
-      this.$http.post('/api/profile', updateInfo)
+      this.$http.post(`/api/profile/${this.$store.state.User.Id}`, updateInfo)
       .then(response => {
         console.log(response)
         this.User = this.EditedUser
