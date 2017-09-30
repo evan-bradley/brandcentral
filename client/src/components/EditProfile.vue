@@ -1,5 +1,5 @@
 <template>
-  <div class="column is-8 is-offset-2">
+  <div class="column is-10">
     <div class="column is-12 columns is-multiline">
       <div class="column is-12 is-size-5">
         <h1 class="title is-size-2.5">Edit your profile</h1>
@@ -28,13 +28,7 @@
             <input class="input" type="text" v-bind:placeholder="User.Email" name="email" v-model="EditedUser.Email" v-validate="{ required: true, email: true }"/>
           </div>
           <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
-        </div>
-        <div class="field">
-          <label class="label">Password</label>
-          <div class="control">
-            <router-link class="button" :to="{ name: 'ChangePassword' }">Change password</router-link>
-          </div>
-        </div>
+        </div>        
         <button class="button is-primary" @click="Update">Update profile</button>
         <router-link class="button is-pulled-right" :to="{ name: 'Profile' }">Cancel</router-link>
       </div>
