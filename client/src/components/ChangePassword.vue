@@ -1,5 +1,5 @@
 <template>
-  <div class="column is-8 is-offset-2">
+  <div class="column is-10">
     <div class="column is-12 columns is-multiline" v-show="ChangePassword">
       <div class="column is-12 is-size-5">
         <h1 class="title is-size-2.5">Change your password</h1>

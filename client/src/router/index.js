@@ -7,7 +7,8 @@ import Verify from '@/components/Verify'
 import Home from '@/components/Home'
 import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
-
+import ProfileHome from '@/components/ProfileHome'
+import ChangeEmail from '@/components/ChangeEmail'
 var store = require('../Vuex/states')
 Vue.use(Router)
 
@@ -17,17 +18,29 @@ const router = new Router({
     {
       path: '/profile',
       name: 'Profile',
-      component: Profile
-    },
-    {
-      path: '/profile/edit',
-      name: 'EditProfile',
-      component: EditProfile
-    },
-    {
-      path: '/profile/edit/password',
-      name: 'ChangePassword',
-      component: ChangePassword
+      component: ProfileHome,
+      children: [
+        {
+          path: '',
+          name: 'Profile',
+          component: Profile
+        },
+        {
+          path: '/edit',
+          name: 'EditProfile',
+          component: EditProfile
+        },
+        {
+          path: '/ChangePassword',
+          name: 'ChangePassword',
+          component: ChangePassword
+        },
+        {
+          path: '/ChangeEmail',
+          name: 'ChangeEmail',
+          component: ChangeEmail
+        }
+      ]
     },
     {
       path: '/login',

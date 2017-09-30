@@ -1,9 +1,11 @@
 <template>
   <nav v-show="this.$store.state.loggedIn" class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <a class="navbar-item" href="/">
-        <img src="../assets/brand_central_full.png" height="50">
-      </a>
+      <router-link :to="{ name: 'Home' }">
+        <a class="navbar-item">
+          <img src="../assets/brand_central_full.png" height="50">
+        </a>
+      </router-link>
     </div>
     <div class="navbar-end">
       <div class="navbar-item has-dropdown is-hoverable">
