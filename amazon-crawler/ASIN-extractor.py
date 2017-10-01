@@ -4,7 +4,7 @@ import time
 from bs4 import BeautifulSoup
 
 amazon = 'https://www.amazon.com'
-url = '/s/ref=lp_172456_pg_2?rh=n%3A172282%2Cn%3A%21493964%2Cn%3A541966%2Cn%3A172456&page=2&ie=UTF8&qid=1506478022&lo=computers'
+url = '/s/ref=lp_3735061_pg_2?rh=n%3A1055398%2Cn%3A!1063498%2Cn%3A1063278%2Cn%3A3735061&page=2&ie=UTF8&qid=1506558832'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'}
 
 ASINs = []
