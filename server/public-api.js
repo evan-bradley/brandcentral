@@ -103,6 +103,16 @@ router.post('/api/register', (req, res) => {
   });
 });
 
+router.get('/api/username/:username', (req, res) => {
+    db.getUsername(req.params.username, (err, result) => {
+        if (err) {
+            res.send(JSON.stringify({ exists: false }));
+        } else {
+            res.send(JSON.stringify({ exists: true }));
+        }
+    });
+});
+
 router.post('/api/verify/:token', (req, res) => {
     db.verifyUser(req.params.token, err => {
         if (err) throw err;

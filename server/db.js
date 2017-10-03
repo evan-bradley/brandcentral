@@ -121,6 +121,9 @@ pool.loginUser = (info, callback) => {
 
 pool.updateProfile = (info, callback) => {
   const newColumns = {}
+
+  console.log(info.username);
+  if (info.username) newColumns.USERNAME = info.username
   if (info.firstName) newColumns.USER_FNAME = info.firstName
   if (info.lastName) newColumns.USER_LNAME = info.lastName
   if (info.email) newColumns.USER_EMAIL = info.email
@@ -145,8 +148,8 @@ pool.updateProfile = (info, callback) => {
 
   // Check to make sure there are attributes to set
   if (Object.keys(newColumns).length !== 0) {
-    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
-    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
+    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USER_ID = ?`;
+    pool.query(UPDATE_PROFILE_Q, [newColumns, info.id], callback);
   }
 };
 
@@ -169,6 +172,11 @@ UPDATE USER
   WHERE USER_ID = ?;`;
 pool.updateLastSeen = (id, callback) => {
     pool.query(LAST_SEEN_Q, [ id ], callback);
+};
+
+const GET_USERNAME_Q = "select * from user where username = ?";
+pool.getUsername = (username, callback) => {
+    pool.query(GET_USERNAME_Q, [ username ], callback);
 };
 
 module.exports = pool;
