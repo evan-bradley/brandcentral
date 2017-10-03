@@ -6,7 +6,7 @@
         <div class="field">
           <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"/>
+            <input class="input" type="text" v-bind:placeholder="User.UserName" v-model="EditedUser.UserName" v-validate="{ required: true }"/>
           </div>
           <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
         </div>
@@ -68,8 +68,11 @@ export default {
       }
 
       // TODO: This needs to be changed to also update the username
-      const updateInfo = {
-        username: this.$store.state.User.UserName
+      const updateInfo = {}
+
+      if (this.$store.state.User.UserName !== this.EditedUser.UserName) {
+        updateInfo.username = this.EditedUser.UserName
+        this.$store.state.User.UserName = this.EditedUser.UserName
       }
 
       if (this.$store.state.User.FirstName !== this.EditedUser.FirstName) {
