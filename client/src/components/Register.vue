@@ -38,7 +38,7 @@
                 <div class="control">
                   <input class="input" type="text" placeholder="Email" name="email" v-model="user.Email" v-validate="{ required: true, email: true}"/>
                 </div>
-                <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
+                <p class="help is-danger" id="email-error-message" v-show="errors.has('email')">{{ errors.first('email') }}</p>
               </div>
               <hr>
               <div class="field">
@@ -57,7 +57,7 @@
               </div>
               <hr>
               <div class="control">
-                <button class="button is-primary" @click="Register">Register</button>
+                <button class="button is-primary" id="register-button" @click="Register">Register</button>
               </div>
             </div>
             <p class="has-text-centered">
