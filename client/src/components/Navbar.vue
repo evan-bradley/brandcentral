@@ -10,13 +10,13 @@
     <div class="navbar-end">
       <div class="navbar-item has-dropdown is-hoverable">
         <a class="navbar-link">
-          <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(User.Email) + '?s=46&d=identicon'" class="profile-image" />
-          <p>{{ User.UserName }}</p>
+          <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(this.$store.state.User.Email) + '?s=46&d=identicon'" class="profile-image" />
+          <p>{{ this.$store.state.User.UserName }}</p>
         </a>
         <div class="navbar-dropdown">
           <div class="navbar-item" style="display:block;">
-            <b>{{ User.FirstName }} {{ User.LastName }}</b>
-            <br> @{{ User.UserName }}
+            <b>{{ this.$store.state.User.FirstName }} {{ this.$store.state.User.LastName }}</b>
+            <br> @{{ this.$store.state.User.UserName }}
           </div>
           <hr class="navbar-divider">
           <router-link :to="{ name: 'Profile' }" class="navbar-item">Profile</router-link>

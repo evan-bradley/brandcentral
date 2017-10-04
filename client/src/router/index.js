@@ -86,7 +86,7 @@ router.beforeEach((to, from, next) => {
         // Store the user from the existing session
         var user = new Classes.User()
         user.Id = response.data.user.id
-        user.Username = response.data.user.username
+        user.UserName = response.data.user.username
         user.Email = response.data.user.email
         user.FirstName = response.data.user.firstName
         user.LastName = response.data.user.lastName
