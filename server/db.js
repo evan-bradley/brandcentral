@@ -145,8 +145,8 @@ pool.updateProfile = (info, callback) => {
 
   // Check to make sure there are attributes to set
   if (Object.keys(newColumns).length !== 0) {
-    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
-    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
+    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USER_ID = ?`;
+    pool.query(UPDATE_PROFILE_Q, [newColumns, info.id], callback);
   }
 };
 
