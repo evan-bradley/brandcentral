@@ -1,20 +1,41 @@
 <template>
-  <div class="column is-10">
-    <div class="column is-12 columns is-multiline">
-      <div class="column is-12 is-size-5">
-        <h1 class="title is-size-2.5">Recover Your Password</h1>
-        <div class="field">
-          <label class="label">Current email address</label>
-          <div class="control">
-            <input class="input" type="password" placeholder="Current email address"  v-model="Email"/>
+  <section class="hero is-fullheight">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-vcentered">
+          <div class="column is-4 is-offset-4">
+            <h4 class="title has-text-centered is-4">
+              <img src="../assets/brand_central_icon.png" style="max-width: 20%">
+            </h4>
+            <div class="box">
+              <h4 class="title has-text-centered is-4">Recover Password</h4>
+              <article class="message is-danger" v-show="failureMessage">
+                <div class="message-body">
+                  {{ failureMessage }}
+                </div>
+              </article>
+
+              <div class="field">
+                <label class="label">Account Email</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="Email" name="email" v-model="Email" v-validate="{ required: true, email: true}"/>
+                </div>
+                <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
+              </div>
+
+              <hr>
+              <div class="control">
+                <button class="button is-primary" @click="SendEmail">Recover Password</button>
+                <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
+              </div>
+            </div>
           </div>
         </div>
-        <button class="button is-primary" @click="SendEmail">Recover Password</button>
-        <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
       </div>
     </div>
-  </div>
+  </section>
 </template>
+
 
 <script>
   export default {

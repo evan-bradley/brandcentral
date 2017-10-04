@@ -79,7 +79,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // debugger
   console.log(store.default.state)
-  if (!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/login' && to.path.indexOf('/verify') === -1)) {
+  if (!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/recover/password' && to.path !== '/login' && to.path.indexOf('/verify') === -1)) {
     next({ path: '/login' })
   } else {
     next()
