@@ -72,8 +72,9 @@ export default {
 
         this.$http.post('/api/login', loginInfo)
         .then(response => { // Success
+          
           if (response.data.success) {
-            this.user.id = response.data.id
+            this.user.Id = response.data.id
             this.user.FirstName = response.data.firstName
             this.user.LastName = response.data.lastName
             this.user.Email = response.data.email
