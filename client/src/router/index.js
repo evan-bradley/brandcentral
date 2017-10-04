@@ -9,6 +9,7 @@ import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
+import RecoverPassword from '@/components/RecoverPassword'
 var store = require('../Vuex/states')
 Vue.use(Router)
 
@@ -51,6 +52,11 @@ const router = new Router({
       path: '/register',
       name: 'Register',
       component: Register
+    },
+    {
+      path: '/recover/password',
+      name: 'RecoverPassword',
+      component: RecoverPassword
     },
     {
       path: '/verify/:GUID',

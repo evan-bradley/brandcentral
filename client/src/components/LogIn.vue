@@ -35,6 +35,10 @@
               Don't have an account?
               <router-link :to="{ name: 'Register' }"><u>Register</u></router-link>
             </p>
+            <p class="has-text-centered">
+              Forgot your password?
+              <router-link :to="{ name: 'RecoverPassword' }"><u>Recover Password</u></router-link>
+            </p>
           </div>
         </div>
       </div>
@@ -46,6 +50,7 @@
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 var router = require('../router/index')
 import Register from './Register'
+import RecoverPassword from './RecoverPassword'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -57,8 +62,10 @@ export default {
     }
   },
   components: {
+    'RecoverPassword': RecoverPassword,
     'Register': Register
   },
+
   methods: {
     ...mapMutations([
       'setUser'
