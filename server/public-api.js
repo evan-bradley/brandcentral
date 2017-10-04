@@ -110,4 +110,38 @@ router.post('/api/verify/:token', (req, res) => {
     });
 });
 
+/**
+ * Returns a message indicating whether or not the session is authenticated. If
+ * the session is authenticated, the response also contains information for the
+ * user who is authenticated. This should always return a successful response,
+ * and contain a attribute called authenticated, which is a boolean.
+ */
+router.get('/api/authenticated', (req, res) => {
+    // Check to see if the session has a user
+    if (!req.session.userId) {
+        res.send({
+            success: true,
+            authenticated: false
+        });
+        return;
+    }
+
+    // Fetch and return the user
+    db.getUserWithId(req.session.userId, (err, results) => {
+      if (err) res.status(404).send("Something went wrong");
+      if (results.lenth < 1) res.status(404).send("User with that id does not exist");
+      res.send({
+          success: true,
+          authenticated: true,
+          user: {
+              id: results[0].USER_ID,
+              lastName: results[0].USER_LNAME,
+              firstName: results[0].USER_FNAME,
+              username: results[0].USERNAME,
+              email: results[0].USER_EMAIL
+          }
+      });
+    });
+});
+
 module.exports = router;
