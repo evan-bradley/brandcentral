@@ -86,11 +86,11 @@ export default {
     methods: {
         Register() {
             // Quit if any inputs are invalid
-           // this.$validator.validateAll();
-            // if (this.errors.any()) {
-            //     return
-            // }
-            console.log(this.user.UserName)
+          //   this.$validator.validateAll();
+          //   if (this.errors.any()) {
+          //       return
+          //   }
+
             // Basic validation
             if (this.user.UserName == ''){
               this.failureMessage = 'Username cannot be blank'
