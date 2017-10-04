@@ -43,8 +43,13 @@ export default {
   },
   methods: {
     signOut() {
-      this.$store.commit('LogOut')
-      this.$router.push({ name: 'Login' })
+      this.$http.get('/api/logout')
+      .then(response => {
+        this.$store.commit('LogOut')
+        this.$router.push({ name: 'Login' })
+      }, response => {
+        console.log(response)
+      })
     },
     hash(str) {
       return md5(str)
