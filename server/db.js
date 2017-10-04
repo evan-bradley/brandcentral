@@ -150,6 +150,11 @@ pool.updateProfile = (info, callback) => {
   }
 };
 
+const GET_USER_Q = "SELECT * FROM USER WHERE USER_ID = ?;";
+pool.getUserWithId = (id, callback) => {
+    pool.query(GET_USER_Q, [id], callback);
+}
+
 const VERIFY_Q = "UPDATE USER SET VERIFIED = '1' WHERE VERIFICATION = ?;";
 pool.verifyUser = (token, callback) => {
     pool.query(VERIFY_Q, [ token ], callback);
