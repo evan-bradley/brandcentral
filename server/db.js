@@ -145,10 +145,15 @@ pool.updateProfile = (info, callback) => {
 
   // Check to make sure there are attributes to set
   if (Object.keys(newColumns).length !== 0) {
-    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USERNAME = ?`;
-    pool.query(UPDATE_PROFILE_Q, [newColumns, info.username], callback);
+    var UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USER_ID = ?`;
+    pool.query(UPDATE_PROFILE_Q, [newColumns, info.id], callback);
   }
 };
+
+const GET_USER_Q = "SELECT * FROM USER WHERE USER_ID = ?;";
+pool.getUserWithId = (id, callback) => {
+    pool.query(GET_USER_Q, [id], callback);
+}
 
 const VERIFY_Q = "UPDATE USER SET VERIFIED = '1' WHERE VERIFICATION = ?;";
 pool.verifyUser = (token, callback) => {

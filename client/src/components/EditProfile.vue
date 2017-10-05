@@ -61,9 +61,11 @@ export default {
           return
       }
 
-      // TODO: This needs to be changed to also update the username
-      const updateInfo = {
-        username: this.$store.state.User.UserName
+      const updateInfo = {}
+
+      if (this.$store.state.User.UserName !== this.EditedUser.UserName) {
+        updateInfo.username = this.EditedUser.UserName
+        this.$store.state.User.UserName = this.EditedUser.UserName
       }
 
       if (this.$store.state.User.FirstName !== this.EditedUser.FirstName) {
