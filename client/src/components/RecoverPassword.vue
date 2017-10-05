@@ -1,6 +1,6 @@
 <template>
   <section class="hero is-fullheight">
-    <div v-if="token === ''">
+    <div v-if="token === '/'">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">

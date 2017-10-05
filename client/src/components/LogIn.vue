@@ -37,7 +37,7 @@
             </p>
             <p class="has-text-centered">
               Forgot your password?
-              <router-link :to="{name: 'ResetPassword'}"><u>Reset Password</u></router-link>
+              <router-link :to="{name: 'ResetPassword', params:{token: '/'}}"><u>Reset Password</u></router-link>
             </p>
           </div>
         </div>

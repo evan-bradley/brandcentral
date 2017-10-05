@@ -9,15 +9,15 @@
     </div>
     <div class="navbar">
       <router-link :to="{ name: 'LikedProducts' }">
-        <a class="navbar-item">
-          <font color ="#EF243A"> Liked Products </font>
+        <a class="navbar-item" style ="color: #EF243A">
+         Liked Products
         </a>
       </router-link>
     </div>
     <div class="navbar">
       <router-link :to="{ name: 'Home' }">
-        <a class="navbar-item">
-          <font color ="#EF243A"> Browse </font>
+        <a class="navbar-item" style ="color: #EF243A">
+          Browse
         </a>
       </router-link>
     </div>
