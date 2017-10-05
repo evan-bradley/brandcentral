@@ -2,113 +2,99 @@
  * public-api.js -- Publicly-accessible REST endpoints.
  */
 
-const router = require('express').Router();
-const db = require('./db');
+const router = require('express').Router()
+const db = require('./db')
 
-const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+// const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
-    host: 'mail.cock.li',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: "BrandCentralStation@firemail.cc", // generated ethereal user
-        pass: "brandcentral" // generated ethereal password
-    }
-});
-
-// Generate test SMTP service account from ethereal.email
-// Only needed if you don't have a real mail account for testing
-nodemailer.createTestAccount((err, account) => {
-
-
-    // setup email data with unicode symbols
-
-    // send mail with defined transport object
-});
-
+  host: 'mail.cock.li',
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: 'BrandCentralStation@firemail.cc', // generated ethereal user
+    pass: 'brandcentral' // generated ethereal password
+  }
+})
 
 /*
  * Login user.
  */
-router.post('/api/login', (req, res) => {
-  db.loginUser(req.body, (err, results) => {
-    if (err) {
-      console.log(err);
-      res.send({
-        success: false,
-        message: err.message,
-      });
-    } else {
-      //console.log('Logged in', results.id, req.session.id);
-      req.session.userId = results.id;
+router.post('/api/login', async (req, res) => {
+  try {
+    const results = await db.loginUser(req.body)
+    // console.log('Logged in', results.id, req.session.id)
+    req.session.userId = results.id
 
-      db.updateLastSeen(results.id, (err) => {
-        if(err) {
-          console.log(err);
-          res.send({
-            success: false,
-            message: err.message,
-          });
-        }
-
-        res.send({
-          success: true,
-          id: results.id,
-          lastName: results.lastName,
-          firstName: results.firstName,
-          email: results.email,
-          lastSeen: results.lastSeen ? results.lastSeen : "never"
-        });
-     });
-    }
-  });
-});
+    await db.updateLastSeen(results.id)
+    res.send({
+      success: true,
+      id: results.id,
+      lastName: results.lastName,
+      firstName: results.firstName,
+      email: results.email,
+      lastSeen: results.lastSeen ? results.lastSeen : 'never'
+    })
+  } catch (e) {
+    console.log(e)
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
 
 /*
  * Register user.
  */
-router.post('/api/register', (req, res) => {
-  db.registerUser(req.body, (error, results, fields) => {
-    if(error) {
-      console.log(error);
-      res.send({
-        success: false,
-        message: error.message,
-      });
-    } else {
-        let registerEmail = {
-            from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-            to: req.body.email,
-            subject: 'Hello ✔', // Subject line
-            text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
-        };
+router.post('/api/register', async (req, res) => {
+  try {
+    const results = db.registerUser(req.body)
 
-        registerEmail.text += `http://localhost:8080/verify/${results.token}`;
-        console.log(registerEmail);
-
-        transporter.sendMail(registerEmail, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Message sent: %s', info.messageId);
-        });
-      res.send({
-        success: true,
-        id: results.id,
-      });
+    let registerEmail = {
+      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+      to: req.body.email,
+      subject: 'Hello ✔', // Subject line
+      text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
     }
-  });
-});
 
-router.post('/api/verify/:token', (req, res) => {
-    db.verifyUser(req.params.token, err => {
-        if (err) throw err;
-        res.send(JSON.stringify({ success: true }));
-    });
-});
+    registerEmail.text += `http://localhost:8080/verify/${results.token}`
+    console.log(registerEmail)
+
+    transporter.sendMail(registerEmail, (error, info) => {
+      if (error) {
+        return console.log(error)
+      }
+      console.log('Message sent: %s', info.messageId)
+    })
+    res.send({
+      success: true,
+      id: results.id
+    })
+  } catch (e) {
+    console.log(e)
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+router.post('/api/verify/:token', async (req, res) => {
+  try {
+    await db.verifyUser(req.params.token)
+    res.send(JSON.stringify({
+      success: true
+    }))
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
 
 /**
  * Returns a message indicating whether or not the session is authenticated. If
@@ -116,32 +102,35 @@ router.post('/api/verify/:token', (req, res) => {
  * user who is authenticated. This should always return a successful response,
  * and contain a attribute called authenticated, which is a boolean.
  */
-router.get('/api/authenticated', (req, res) => {
-    // Check to see if the session has a user
-    if (!req.session.userId) {
-        res.send({
-            success: true,
-            authenticated: false
-        });
-        return;
-    }
+router.get('/api/authenticated', async (req, res) => {
+  // Check to see if the session has a user
+  if (!req.session.userId) {
+    res.send({
+      success: true,
+      authenticated: false
+    })
+    return
+  }
 
+  try {
     // Fetch and return the user
-    db.getUserWithId(req.session.userId, (err, results) => {
-      if (err) res.status(404).send("Something went wrong");
-      if (results.lenth < 1) res.status(404).send("User with that id does not exist");
-      res.send({
-          success: true,
-          authenticated: true,
-          user: {
-              id: results[0].USER_ID,
-              lastName: results[0].USER_LNAME,
-              firstName: results[0].USER_FNAME,
-              username: results[0].USERNAME,
-              email: results[0].USER_EMAIL
-          }
-      });
-    });
-});
+    const results = await db.getUserWithId(req.session.userId)
+    if (results.lenth < 1) res.status(404).send('User with that id does not exist')
 
-module.exports = router;
+    res.send({
+      success: true,
+      authenticated: true,
+      user: {
+        id: results[0].USER_ID,
+        lastName: results[0].USER_LNAME,
+        firstName: results[0].USER_FNAME,
+        username: results[0].USERNAME,
+        email: results[0].USER_EMAIL
+      }
+    })
+  } catch (e) {
+    if (e) res.status(404).send('Something went wrong')
+  }
+})
+
+module.exports = router

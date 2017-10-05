@@ -26,6 +26,7 @@
     "nodemailer": "^4.1.0",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
+    "promise-mysql": "^3.1.0",
     "socket.io": "^1.7.3",
     "vue-event-calendar": "^1.4.11",
     "vue-fullcalendar": "^1.0.9",
