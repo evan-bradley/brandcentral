@@ -171,4 +171,48 @@ pool.updateLastSeen = (id, callback) => {
     pool.query(LAST_SEEN_Q, [ id ], callback);
 };
 
+const CHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
+pool.registerUser = (email, callback) => {
+    if (!email) {
+        callback({ message: 'Missing email' });
+        return;
+    }
+
+    pool.query(CHECKEMAIL_Q, [ email ], (error, results) => {
+        if (results.length > 0) {
+        bcrypt
+            .hash(email, 10)
+            .then((hash) => {
+            require('crypto').randomBytes(16, function(err, buffer) {
+            const token = buffer.toString('hex');
+            pool.query(REGISTER_Q, [
+                info.username,
+                info.lastName,
+                info.firstName,
+                info.email,
+                hash,
+                token,
+                moment().format("YYYY-MM-DD HH:mm:ss")
+            ], (err, res) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        err.message = 'A user with that ID is already registered';
+                    }
+                    callback(err);
+                } else {
+                    res.token = token;
+            callback(null, res);
+        }
+        });
+        });
+    })
+    .catch((err) => {
+            callback(err);
+    });
+
+    } else {
+        callback({ message: 'Invalid Email' });
+    }
+});
+};
 module.exports = pool;

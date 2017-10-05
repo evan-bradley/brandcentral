@@ -110,4 +110,15 @@ router.post('/api/verify/:token', (req, res) => {
     });
 });
 
+router.post('/api/password/reset/', (req, res) => {
+    db.resetPassword(req.body.email, err => {
+        if (err){
+            res.send(JSON.stringify({ success: false }));
+            throw err;
+        }
+        res.send(JSON.stringify({ success: true }));
+    });
+});
+
+
 module.exports = router;
