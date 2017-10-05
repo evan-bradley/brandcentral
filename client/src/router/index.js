@@ -18,11 +18,10 @@ const router = new Router({
   routes: [
     {
       path: '/profile',
-      name: 'Profile',
       component: ProfileHome,
       children: [
         {
-          path: '',
+          path: '/',
           name: 'Profile',
           component: Profile
         },
@@ -41,28 +40,43 @@ const router = new Router({
           name: 'ChangeEmail',
           component: ChangeEmail
         }
-      ]
+      ],
+      meta: {
+        auth: true
+      }
     },
     {
       path: '/login',
       name: 'Login',
-      component: LogIn
+      component: LogIn,
+      meta: {
+        auth: false
+      }
     },
     {
       path: '/register',
       name: 'Register',
-      component: Register
+      component: Register,
+      meta: {
+        auth: false
+      }
     },
     {
       path: '/verify/:GUID',
       name: 'Verify',
       component: Verify,
-      props: true
+      props: true,
+      meta: {
+        auth: false
+      }
     },
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
+      meta: {
+        auth: false
+      }
     }
   ],
   scrollBehavior (to, from, savedPosition) {
@@ -75,15 +89,16 @@ const router = new Router({
 // If they are authenticated, they can continue.
 router.beforeEach((to, from, next) => {
   // An array of routes that do not require authentication
-  const noAuthRequired = ['/register', '/login']
+  console.log(to)
+  console.log(store.default.state.loggedIn, to.meta.auth)
   if (!store.default.state.loggedIn &&
-    !noAuthRequired.includes(to.path) &&
-    to.path.indexOf('/verify') === -1) {
+      to.meta.auth ? to.meta.auth : to.matched[0].meta.auth) {
     // Check to see if a session exists for the user
     Vue.http.get('/api/authenticated')
     .then(response => {
       if (response.data.authenticated) {
         // Store the user from the existing session
+        console.log(response.data.authenticated)
         var user = new Classes.User()
         user.Id = response.data.user.id
         user.UserName = response.data.user.username
