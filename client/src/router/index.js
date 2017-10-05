@@ -89,8 +89,6 @@ const router = new Router({
 // If they are authenticated, they can continue.
 router.beforeEach((to, from, next) => {
   // An array of routes that do not require authentication
-  console.log(to)
-  console.log(store.default.state.loggedIn, to.meta.auth)
   if (!store.default.state.loggedIn &&
       to.meta.auth ? to.meta.auth : to.matched[0].meta.auth) {
     // Check to see if a session exists for the user
@@ -98,7 +96,6 @@ router.beforeEach((to, from, next) => {
     .then(response => {
       if (response.data.authenticated) {
         // Store the user from the existing session
-        console.log(response.data.authenticated)
         var user = new Classes.User()
         user.Id = response.data.user.id
         user.UserName = response.data.user.username
