@@ -9,7 +9,8 @@ import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
-import RecoverPassword from '@/components/RecoverPassword'
+import ResetPassword from '@/components/RecoverPassword'
+import LikedProducts from '@/components/LikedProducts'
 var store = require('../Vuex/states')
 Vue.use(Router)
 
@@ -44,6 +45,11 @@ const router = new Router({
       ]
     },
     {
+      path: '/LikedProducts',
+      name: 'LikedProducts',
+      component: LikedProducts
+    },
+    {
       path: '/login',
       name: 'Login',
       component: LogIn
@@ -54,9 +60,10 @@ const router = new Router({
       component: Register
     },
     {
-      path: '/recover/password',
-      name: 'RecoverPassword',
-      component: RecoverPassword
+      path: '/reset/:token',
+      name: 'ResetPassword',
+      component: ResetPassword,
+      props: true
     },
     {
       path: '/verify/:GUID',
@@ -79,7 +86,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // debugger
   console.log(store.default.state)
-  if (!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/recover/password' && to.path !== '/login' && to.path.indexOf('/verify') === -1)) {
+  if (!store.default.state.loggedIn && (to.path !== '/register' && to.path !== '/reset/' && to.path.indexOf('/reset') === -1 && to.path !== '/login' && to.path.indexOf('/verify') === -1)) {
     next({ path: '/login' })
   } else {
     next()

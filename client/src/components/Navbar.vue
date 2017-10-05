@@ -3,7 +3,21 @@
     <div class="navbar-brand">
       <router-link :to="{ name: 'Home' }">
         <a class="navbar-item">
-          <img src="../assets/brand_central_full.png" height="50">
+          <img src="../assets/brand_central_full.png">
+        </a>
+      </router-link>
+    </div>
+    <div class="navbar">
+      <router-link :to="{ name: 'LikedProducts' }">
+        <a class="navbar-item">
+          <font color ="#EF243A"> Liked Products </font>
+        </a>
+      </router-link>
+    </div>
+    <div class="navbar">
+      <router-link :to="{ name: 'Home' }">
+        <a class="navbar-item">
+          <font color ="#EF243A"> Browse </font>
         </a>
       </router-link>
     </div>
