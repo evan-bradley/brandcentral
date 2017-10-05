@@ -6,8 +6,6 @@ var Classes = require('../../../src/TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(VueResource)
 
 Vue.http.interceptors.unshift((request, next) => {
-  // console.log(request)
-  // console.log(next)
   if (request.url === '/api/register') {
     next(request.respondWith({ status: 200 }))
   }

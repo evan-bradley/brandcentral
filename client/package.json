@@ -14,6 +14,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "avoriaz": "^6.0.0",
     "bulma": "^0.5.2",
     "ts-loader": "^2.3.7",
     "typescript": "^2.5.3",
