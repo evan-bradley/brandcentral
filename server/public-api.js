@@ -144,4 +144,17 @@ router.get('/api/authenticated', (req, res) => {
     });
 });
 
+// Returns a collection of tags to present to the user during the onboarding
+// process. The response will contain an attribute called success, which
+// indicates the success of the request. The response will also contain an
+// array of tags.
+router.get('/api/onboard/tags', (req, res) => {
+  db.getOnboardTags((err, results) => {
+    res.send({
+      success: true,
+      tags: results
+    })
+  });
+});
+
 module.exports = router;
