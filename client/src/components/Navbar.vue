@@ -3,7 +3,14 @@
     <div class="navbar-brand">
       <router-link :to="{ name: 'Home' }">
         <a class="navbar-item">
-          <img src="../assets/brand_central_full.png" height="50">
+          <img src="../assets/brand_central_full.png">
+        </a>
+      </router-link>
+    </div>
+    <div class="navbar">
+      <router-link :to="{ name: 'Home' }">
+        <a class="navbar-item" style ="color: #EF243A">
+          Browse
         </a>
       </router-link>
     </div>

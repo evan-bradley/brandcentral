@@ -71,13 +71,13 @@ router.post('/api/login', (req, res) => {
  * Register user.
  */
 router.post('/api/register', (req, res) => {
-  db.registerUser(req.body, (error, results, fields) => {
+    db.registerUser(req.body, (error, results, fields) => {
     if(error) {
-      console.log(error);
-      res.send({
-        success: false,
-        message: error.message,
-      });
+        console.log(error);
+        res.send({
+            success: false,
+            message: error.message,
+        });
     } else {
         let registerEmail = {
             from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
@@ -95,20 +95,58 @@ router.post('/api/register', (req, res) => {
             }
             console.log('Message sent: %s', info.messageId);
         });
+        res.send({
+            success: true,
+            id: results.id,
+        });
+        }
+    });
+});
+
+router.post('/api/verify/:token', (req, res) => {
+  db.verifyUser(req.params.token, err => {
+    if (err) throw err;
+    res.send(JSON.stringify({ success: true }));
+  });
+});
+
+router.post('/api/password/reset/:token', (req, res) => {
+  db.verifyTokenResetPassword(req.params.token, req.body.newPassword, err => {
+    if (err) throw err;
+    res.send(JSON.stringify({ success: true }));
+  });
+});
+
+router.post('/api/password/reset', (req, res) => {
+  db.generatePasswordResetToken(req.body.email, (err, results) => {
+    if (err) {
       res.send({
-        success: true,
-        id: results.id,
+        success: false
       });
+      throw err;
+    } else {
+      let resetEmail =
+        {
+          from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+          to: req.body.email,
+          subject: 'Reset Password ✔', // Subject line
+          text: 'Hello, to reset your password, please click the following link:\n' // plain text body
+        };
+
+        resetEmail.text += `http://localhost:8080/reset/${results.token}`;
+
+        transporter.sendMail(resetEmail, (error, email) => {
+          if (error) {
+            return console.log(error);
+          }
+        });
+        res.send({
+          success: true,
+        });
     }
   });
 });
 
-router.post('/api/verify/:token', (req, res) => {
-    db.verifyUser(req.params.token, err => {
-        if (err) throw err;
-        res.send(JSON.stringify({ success: true }));
-    });
-});
 
 /**
  * Returns a message indicating whether or not the session is authenticated. If
@@ -143,5 +181,6 @@ router.get('/api/authenticated', (req, res) => {
       });
     });
 });
+
 
 module.exports = router;

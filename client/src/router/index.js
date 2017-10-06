@@ -9,6 +9,7 @@ import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
+import ResetPassword from '@/components/RecoverPassword'
 var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
@@ -54,6 +55,12 @@ const router = new Router({
       component: Register
     },
     {
+      path: '/reset/:token',
+      name: 'ResetPassword',
+      component: ResetPassword,
+      props: true
+    },
+    {
       path: '/verify/:GUID',
       name: 'Verify',
       component: Verify,
@@ -75,10 +82,11 @@ const router = new Router({
 // If they are authenticated, they can continue.
 router.beforeEach((to, from, next) => {
   // An array of routes that do not require authentication
-  const noAuthRequired = ['/register', '/login']
+  const noAuthRequired = ['/register', '/login', '/reset']
   if (!store.default.state.loggedIn &&
     !noAuthRequired.includes(to.path) &&
-    to.path.indexOf('/verify') === -1) {
+    to.path.indexOf('/verify') === -1 &&
+    to.path.indexOf('/reset') === -1) {
     // Check to see if a session exists for the user
     Vue.http.get('/api/authenticated')
     .then(response => {
