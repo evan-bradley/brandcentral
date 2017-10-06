@@ -87,6 +87,27 @@
         default: ''
       }
     },
+    methods: {
+      SendEmail() {
+        // Quit if any inputs are invalid
+        this.$validator.validateAll();
+        if (this.errors.any()) {
+          return
+        }
+        this.$http.post('/api/password/reset/', this.Email)
+          .then(response => { // Success
+            if (response.data.success) {
+              this.$router.push({ name: 'Login' })
+            } else {
+              console.log(response)
+              this.failureMessage = response.data.message
+            }
+          }, response => { // Error
+            console.log(response)
+            this.failureMessage = response.data.message
+          })
+      }
+    }
   }
 </script>
 

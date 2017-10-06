@@ -79,7 +79,7 @@ export default {
 
         this.$http.post('/api/login', loginInfo)
         .then(response => { // Success
-          
+
           if (response.data.success) {
             this.user.Id = response.data.id
             this.user.FirstName = response.data.firstName
