@@ -127,7 +127,7 @@ router.post('/api/password/reset', (req, res) => {
           text: 'Hello, to reset your password, please click the following link:\n' // plain text body
         };
 
-        resetEmail.text += `http://localhost:8080/verify/${results.token}`;
+        resetEmail.text += `http://localhost:8080/reset/${results.token}`;
 
         transporter.sendMail(resetEmail, (error, email) =>
         {
