@@ -117,7 +117,7 @@ router.post('/api/password/reset/:token', (req, res) => {
     console.log(err);
     throw err;
   }
-res.send(JSON.stringify({ success: true }));
+  res.send(JSON.stringify({ success: true }));
 });
 });
 
