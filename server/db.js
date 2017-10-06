@@ -175,8 +175,40 @@ UPDATE USER
 pool.updateLastSeen = (id, callback) => {
     pool.query(LAST_SEEN_Q, [ id ], callback);
 };
+const CHECKTOKEN_Q = 'SELECT USER_ID FROM RESET_PASSWORD_TOKENS WHERE TOKEN = ?;';
+const CHANGEPASSWORD_Q = 'UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?;';
+pool.verifyTokenResetPassword = (token, newPassword, callback) =>
+{
+  pool.query(CHECKTOKEN_Q, [token], (error, results) => {
+    if (results.length > 0)
+  {
+      bcrypt
+        .hash(newPassword, 10)
+        .then((hash) => {
+        pool.query(CHANGEPASSWORD_Q,
+        [ hash, results[0].USER_ID ],
+        (err, result) => {
+        if (err) {
+          console.log(err);
+          throw err;
+        }
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
 
-const CHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?;';
+
+  }
+  else
+    {
+      callback({message: 'Token not found'});
+    }
+});
+}
+
+const CHECKEMAIL_Q = 'SELECT USER_ID, USER_EMAIL FROM USER WHERE USER_EMAIL = ?;';
+const WRITETOKEN_Q = 'INSERT INTO RESET_PASSWORD_TOKENS (USER_ID , TOKEN) VALUES(?, ?);';
 pool.checkEmail = (email, callback) =>
 {
   if (!email) {
@@ -193,8 +225,17 @@ pool.checkEmail = (email, callback) =>
             .then((hash) => {
             require ('crypto').randomBytes(16, function (err, buffer) {
             const token = buffer.toString('hex');
-
-                    callback(null, { token });
+            pool.query(WRITETOKEN_Q, [
+              results[0].USER_ID,
+              token
+            ],(err, res) => {
+              if (err) {
+                err.message = 'Unable to write token';
+                callback(err);
+              } else {
+                callback(null, { token });
+              }
+          });
 
           });
         })

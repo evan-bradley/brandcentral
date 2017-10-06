@@ -110,6 +110,17 @@ router.post('/api/verify/:token', (req, res) => {
 });
 });
 
+router.post('/api/password/reset/:token', (req, res) => {
+  db.verifyTokenResetPassword(req.params.token, req.body.newPassword, err => {
+  if (err)
+  {
+    console.log(err);
+    throw err;
+  }
+res.send(JSON.stringify({ success: true }));
+});
+});
+
 router.post('/api/password/reset', (req, res) => {
   db.checkEmail(req.body.email, (err, results) => {
     if (err)

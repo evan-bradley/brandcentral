@@ -68,7 +68,7 @@
 
               <hr>
               <div class="control">
-                <button class="button is-primary" @click="SendEmail">Recover Password</button>
+                <button class="button is-primary" @click="Reset">Recover Password</button>
                 <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
               </div>
             </div>
@@ -103,6 +103,28 @@
 
         this.$http.post('/api/password/reset', {
           email: this.Email
+        })
+          .then(response => { // Success
+            if (response.data.success) {
+              this.$router.push({ name: 'Login' })
+            } else {
+              console.log(response)
+              this.failureMessage = response.data.message
+            }
+          }, response => { // Error
+            console.log(response)
+            this.failureMessage = response.data.message
+          })
+      },
+      Reset() {
+        // Quit if any inputs are invalid
+        this.$validator.validateAll();
+        if (this.errors.any()) {
+          return
+        }
+
+        this.$http.post('/api/password/reset/${this.token}', {
+          newPassword: this.NewPassword
         })
           .then(response => { // Success
             if (response.data.success) {
