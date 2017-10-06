@@ -10,7 +10,7 @@ import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
-import LikedProducts from '@/components/LikedProducts'
+// import LikedProducts from '@/components/LikedProducts'
 var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
@@ -45,11 +45,11 @@ const router = new Router({
         }
       ]
     },
-    {
+    /* {
       path: '/LikedProducts',
       name: 'LikedProducts',
       component: LikedProducts
-    },
+    }, */
     {
       path: '/login',
       name: 'Login',

@@ -194,8 +194,7 @@ pool.checkEmail = (email, callback) =>
             require ('crypto').randomBytes(16, function (err, buffer) {
             const token = buffer.toString('hex');
 
-            res.token = token;
-            callback(null, res);
+                    callback(null, { token });
 
           });
         })

@@ -87,6 +87,12 @@
         default: ''
       }
     },
+    data () {
+      return {
+        Email: '',
+        failureMessage: ''
+      }
+    },
     methods: {
       SendEmail() {
         // Quit if any inputs are invalid
@@ -94,7 +100,10 @@
         if (this.errors.any()) {
           return
         }
-        this.$http.post('/api/password/reset/', this.Email)
+
+        this.$http.post('/api/password/reset', {
+          email: this.Email
+        })
           .then(response => { // Success
             if (response.data.success) {
               this.$router.push({ name: 'Login' })

@@ -110,8 +110,8 @@ router.post('/api/verify/:token', (req, res) => {
 });
 });
 
-router.post('/api/password/reset/', (req, res) => {
-  db.checkEmail(req.body.Email, err => {
+router.post('/api/password/reset', (req, res) => {
+  db.checkEmail(req.body.email, (err, results) => {
     if (err)
     {
       res.send(JSON.stringify({ success: false }));
@@ -122,13 +122,12 @@ router.post('/api/password/reset/', (req, res) => {
       let resetEmail =
         {
           from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-          to: req.body.Email,
+          to: req.body.email,
           subject: 'Reset Password ✔', // Subject line
           text: 'Hello, to reset your password, please click the following link:\n' // plain text body
         };
 
         resetEmail.text += `http://localhost:8080/verify/${results.token}`;
-        console.log(resetEmail);
 
         transporter.sendMail(resetEmail, (error, email) =>
         {
