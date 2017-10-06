@@ -61,4 +61,11 @@ router.get('/api/logout', (req, res) => {
   });
 });
 
+router.post('/api/onboard/tags', (req, res) => {
+  console.log(req.session.userId);
+  console.log(req.body.tags);
+  res.send({
+    success: true
+  })
+});
 module.exports = router;
