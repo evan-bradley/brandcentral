@@ -168,6 +168,12 @@ pool.getProfileData = (info, callback) => {
     ], callback);
 };
 
+// This function will query the database for the first 16 tags.
+const GET_ONBOARD_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
+pool.getOnboardTags = (callback) => {
+  pool.query(GET_ONBOARD_TAGS_Q, [], callback);
+};
+
 const LAST_SEEN_Q = `
 UPDATE USER
   SET LAST_SEEN = CURRENT_TIMESTAMP()
