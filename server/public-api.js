@@ -104,32 +104,27 @@ router.post('/api/register', (req, res) => {
 });
 
 router.post('/api/verify/:token', (req, res) => {
-    db.verifyUser(req.params.token, err => {
+  db.verifyUser(req.params.token, err => {
     if (err) throw err;
     res.send(JSON.stringify({ success: true }));
-});
+  });
 });
 
 router.post('/api/password/reset/:token', (req, res) => {
   db.verifyTokenResetPassword(req.params.token, req.body.newPassword, err => {
-  if (err)
-  {
-    console.log(err);
-    throw err;
-  }
-  res.send(JSON.stringify({ success: true }));
-});
+    if (err) throw err;
+    res.send(JSON.stringify({ success: true }));
+  });
 });
 
 router.post('/api/password/reset', (req, res) => {
-  db.checkEmail(req.body.email, (err, results) => {
-    if (err)
-    {
-      res.send(JSON.stringify({ success: false }));
+  db.generatePasswordResetToken(req.body.email, (err, results) => {
+    if (err) {
+      res.send({
+        success: false
+      });
       throw err;
-    }
-    else
-    {
+    } else {
       let resetEmail =
         {
           from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
@@ -140,25 +135,16 @@ router.post('/api/password/reset', (req, res) => {
 
         resetEmail.text += `http://localhost:8080/reset/${results.token}`;
 
-        transporter.sendMail(resetEmail, (error, email) =>
-        {
+        transporter.sendMail(resetEmail, (error, email) => {
           if (error) {
             return console.log(error);
           }
-          //console.log('Message sent: %s', info.messageId);
         });
-        res.send(
-          {
-            success: true,
-            //id: results.id,
-          }
-        );
+        res.send({
+          success: true,
+        });
     }
-
-
-    //res.send(JSON.stringify({ success: true }));
-    });
-
+  });
 });
 
 

@@ -26,7 +26,7 @@
 
               <hr>
               <div class="control">
-                <button class="button is-primary" @click="SendEmail">Send Email</button>
+                <button class="button is-primary" @click="sendEmail">Send Email</button>
                 <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
               </div>
             </div>
@@ -68,7 +68,7 @@
 
               <hr>
               <div class="control">
-                <button class="button is-primary" @click="Reset">Reset Password</button>
+                <button class="button is-primary" @click="reset">Reset Password</button>
                 <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
               </div>
             </div>
@@ -90,11 +90,13 @@
     data () {
       return {
         Email: '',
+        NewPassword: '',
+        VerifyNewPassword: '',
         failureMessage: ''
       }
     },
     methods: {
-      SendEmail() {
+      sendEmail() {
         // Quit if any inputs are invalid
         this.$validator.validateAll();
         if (this.errors.any()) {
@@ -108,15 +110,13 @@
             if (response.data.success) {
               this.$router.push({ name: 'Login' })
             } else {
-              console.log(response)
               this.failureMessage = response.data.message
             }
           }, response => { // Error
-            console.log(response)
             this.failureMessage = response.data.message
           })
       },
-      Reset() {
+      reset() {
         // Quit if any inputs are invalid
         this.$validator.validateAll();
         if (this.errors.any()) {
@@ -125,16 +125,13 @@
 
         this.$http.post(`/api/password/reset/${this.token}`, {
           newPassword: this.NewPassword
-        })
-          .then(response => { // Success
-            if (response.body.success) {
+        }).then(response => { // Success
+          if (response.body.success) {
               this.$router.push({ name: 'Login' })
             } else {
-              console.log(response)
               this.failureMessage = response.data.message
             }
           }, response => { // Error
-            console.log(response)
             this.failureMessage = response.data.message
           })
       }

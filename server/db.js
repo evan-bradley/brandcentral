@@ -175,81 +175,70 @@ UPDATE USER
 pool.updateLastSeen = (id, callback) => {
     pool.query(LAST_SEEN_Q, [ id ], callback);
 };
+
+/**
+ * If the token is valid and exists in the system, the password for the user
+ * associated with that token is changed to newPassword.
+ * @param {String} token
+ * @param {String} newPassword
+ * @param {Function} callback
+ */
 const CHECKTOKEN_Q = 'SELECT USER_ID FROM RESET_PASSWORD_TOKENS WHERE TOKEN = ?;';
 const CHANGEPASSWORD_Q = 'UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?;';
-pool.verifyTokenResetPassword = (token, newPassword, callback) =>
-{
+pool.verifyTokenResetPassword = (token, newPassword, callback) => {
   pool.query(CHECKTOKEN_Q, [token], (error, results) => {
-    if (results.length > 0)
-  {
+    if (results.length > 0) {
       bcrypt
         .hash(newPassword, 10)
         .then((hash) => {
-        pool.query(CHANGEPASSWORD_Q,
-        [ hash, results[0].USER_ID ],
-        (err, result) => {
-        if (err) {
+          pool.query(CHANGEPASSWORD_Q, [ hash, results[0].USER_ID ], callback);
+        })
+        .catch(err => {
           console.log(err);
-          throw err;
-        }
-      });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-
-
-  }
-  else
-    {
+          callback({message: 'There was an error with the request' })
+        });
+    } else {
       callback({message: 'Token not found'});
     }
-});
+  });
 }
 
+/**
+ * Generates a password reset token for the specified email. The email must
+ * exist in the database in order to generate a password reset token.
+ * @param {String} email
+ */
 const CHECKEMAIL_Q = 'SELECT USER_ID, USER_EMAIL FROM USER WHERE USER_EMAIL = ?;';
 const WRITETOKEN_Q = 'INSERT INTO RESET_PASSWORD_TOKENS (USER_ID , TOKEN) VALUES(?, ?);';
-pool.checkEmail = (email, callback) =>
-{
+pool.generatePasswordResetToken = (email, callback) => {
   if (!email) {
     callback({message: 'Missing email'});
     return;
-  }
-  else {
-
+  } else {
     pool.query(CHECKEMAIL_Q, [email], (error, results) => {
-      if (results.length > 0)
-      {
-          bcrypt
-            .hash(email, 10)
-            .then((hash) => {
-            require ('crypto').randomBytes(16, function (err, buffer) {
-            const token = buffer.toString('hex');
-            pool.query(WRITETOKEN_Q, [
-              results[0].USER_ID,
-              token
-            ],(err, res) => {
-              if (err) {
-                err.message = 'Unable to write token';
-                callback(err);
-              } else {
-                callback(null, { token });
-              }
+      if (results.length > 0) {
+        bcrypt
+          .hash(email, 10)
+          .then((hash) => {
+            require ('crypto').randomBytes(16, (err, buffer) => {
+              const token = buffer.toString('hex');
+              pool.query(WRITETOKEN_Q, [ results[0].USER_ID, token ], (err, res) => {
+                if (err) {
+                  err.message = 'Unable to write token';
+                  callback(err);
+                } else {
+                  callback(null, { token });
+                }
+              });
+            });
+          })
+          .catch((err) => {
+            callback(err);
           });
-
-          });
-        })
-        .catch((err) => {
-            callback (err);
-        });
-
-
-      }
-    else
-      {
+      } else {
         callback({message: 'Email not found'});
       }
-  });
+    });
   }
 }
 
