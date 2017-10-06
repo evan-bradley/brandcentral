@@ -57,7 +57,7 @@
               </div>
               <hr>
               <div class="control">
-                <button class="button is-primary" id="register-button" @click="Register">Register</button>
+                <button class="button is-primary" id="register-button" @click="register">Register</button>
               </div>
             </div>
             <p class="has-text-centered">
@@ -84,7 +84,7 @@ export default {
         }
     },
     methods: {
-        Register() {
+        register() {
             // Quit if any inputs are invalid
           //   this.$validator.validateAll();
           //   if (this.errors.any()) {

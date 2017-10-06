@@ -12,93 +12,76 @@ Vue.http.interceptors.unshift((request, next) => {
 })
 
 describe('Register', () => {
-  beforeEach(() => {
-    let component = new Vue(Register).$mount()
-  })
+  var component
 
-  it('Register is a method', () => {
-    expect(typeof Register.data).to.equal('function')
+  beforeEach(() => {
+    component = new Vue(Register).$mount()
   })
 
   it('data is a function and returns blanks', () => {
     expect(typeof Register.data).to.equal('function')
     const data = Register.data()
     const newUser = new Classes.User()
-    expect(data.user.Id).to.equal(newUser.Id)
-    expect(data.user.FirstName).to.equal(newUser.FirstName)
-    expect(data.user.LastName).to.equal(newUser.LastName)
-    expect(data.user.UserName).to.equal(newUser.UserName)
-    expect(data.user.Email).to.equal(newUser.Email)
-    expect(data.user.Password).to.equal(newUser.Password)
+    expect(data.user).to.deep.equal(newUser)
     expect(data.confirmPassword).to.equal('')
     expect(data.failureMessage).to.equal('')
   })
 
-  it('testing Register - no username', () => {
-    let component = new Vue(Register).$mount()
+  describe('register', () => {
     const newUser = new Classes.User()
-    expect(component.user.Id).to.equal(newUser.Id)
-    expect(component.user.FirstName).to.equal(newUser.FirstName)
-    expect(component.user.LastName).to.equal(newUser.LastName)
-    expect(component.user.UserName).to.equal(newUser.UserName)
-    expect(component.user.Email).to.equal(newUser.Email)
-    expect(component.user.Password).to.equal(newUser.Password)
-    expect(component.confirmPassword).to.equal('')
-    expect(component.failureMessage).to.equal('')
 
-    component.Register()
+    it('should be a function', () => {
+      expect(typeof Register.methods.register).to.equal('function')
+    })
 
-    expect(component._data.failureMessage).to.equal('Username cannot be blank')
+    // describe('invalid email', () => {
+    //   it('should display error', (done) => {
+    //     component.user.Email = 'invalid-email'
+    //     component.user.UserName = 'username'
+    //     component.user.Password = 'password'
+    //     component.confirmPassword = 'password'
+    //     component.Regsiter()
+    //     Vue.nextTick(() => {
+    //       expect(component.$el.querySelector('#email-error-message').textContent).to.equal('The email field must be a valid email.')
+    //       done()
+    //     })
+    //   })
+    // })
+
+    it('should display error when no username is provided', () => {
+      expect(component.user).to.deep.equal(newUser)
+      expect(component.confirmPassword).to.equal('')
+      expect(component.failureMessage).to.equal('')
+
+      component.register()
+
+      expect(component._data.failureMessage).to.equal('Username cannot be blank')
+    })
+
+    it('should display error when passwords do not match', () => {
+      expect(component.user).to.deep.equal(newUser)
+
+      component.user.UserName = 'test'
+      component.user.Password = 'test'
+      component.confirmPassword = 'not test'
+
+      component.register()
+
+      expect(component._data.failureMessage).to.equal('Passwords must match')
+    })
+
+    it('should not display an error when all inputs are valid', () => {
+      let component = new Vue(Register).$mount()
+      component.failureMessage = ''
+      expect(component.user).to.deep.equal(newUser)
+
+      component.user.UserName = 'test'
+      component.user.Password = 'test'
+      component.confirmPassword = 'test'
+
+      component.register()
+
+      expect(component._data.failureMessage).to.equal('')
+    })
   })
-
-  it('testing  Register - non matching passwords', () => {
-    let component = new Vue(Register).$mount()
-    const newUser = new Classes.User()
-    expect(component.user.Id).to.equal(newUser.Id)
-    expect(component.user.FirstName).to.equal(newUser.FirstName)
-    expect(component.user.LastName).to.equal(newUser.LastName)
-    expect(component.user.UserName).to.equal(newUser.UserName)
-    expect(component.user.Email).to.equal(newUser.Email)
-    expect(component.user.Password).to.equal(newUser.Password)
-    expect(component.confirmPassword).to.equal('')
-    expect(component.failureMessage).to.equal('')
-
-    component.user.UserName = 'test'
-    component.failureMessage = ''
-    component.confirmPassword = 'not test'
-
-    component.Register()
-
-    expect(component._data.failureMessage).to.equal('Passwords must match')
-  })
-
-  it('testing  Register - passing', () => {
-    let component = new Vue(Register).$mount()
-    const newUser = new Classes.User()
-    component.failureMessage = ''
-    expect(component.user.Id).to.equal(newUser.Id)
-    expect(component.user.FirstName).to.equal(newUser.FirstName)
-    expect(component.user.LastName).to.equal(newUser.LastName)
-    expect(component.user.UserName).to.equal(newUser.UserName)
-    expect(component.user.Email).to.equal(newUser.Email)
-    expect(component.user.Password).to.equal(newUser.Password)
-    expect(component.confirmPassword).to.equal('')
-    expect(component.failureMessage).to.equal('')
-
-    component.user.UserName = 'test'
-    component.user.Password = 'test'
-    component.confirmPassword = 'test'
-    console.log('pre reg')
-    component.Register()
-
-    expect(component._data.failureMessage).to.equal('')
-  })
-
-  // it('should display an error when email is invalid', () => {
-  //   // const button = RegisterComponent.$el.querySelector('#register-button')
-  //   RegisterComponent.user.email = 'not an email'
-  //   // button.dispatchEvent(new window.event('click'))
-  //   // RegisterComponent._watcher.run()
-  //   expect(RegisterComponent.$el.querySelector('#email-error-message')).to.exists
-  // })
 })

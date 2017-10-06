@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Profile from '@/components/Profile.vue'
 var Classes = require('../../../src/TypeScriptFolder/Compliled/Classes').Classes
-var md5 = require('md5')
 
 Vue.use(Vuex)
 
@@ -26,8 +25,10 @@ describe('Profile', () => {
   // })
 
   let store
+  let component
 
   beforeEach(() => {
+    component = new Vue(Profile).$mount()
     store = new Vuex.Store({
       state: {
         loggedIn: false,
@@ -35,32 +36,38 @@ describe('Profile', () => {
         User: new Classes.User()
       }
     })
-  })
-
-  it('Profile data is a method', () => {
-    expect(typeof Profile.data).to.equal('function')
+    Profile.$store = store
   })
 
   it('data is a function and returns blanks', () => {
-    Profile.$store = store
-    console.log(Profile)
     expect(typeof Profile.data).to.equal('function')
     const data = Profile.data()
     const newUser = new Classes.User()
-    expect(data.User.Id).to.equal(newUser.Id)
-    expect(data.User.FirstName).to.equal(newUser.FirstName)
-    expect(data.User.LastName).to.equal(newUser.LastName)
-    expect(data.User.UserName).to.equal(newUser.UserName)
-    expect(data.User.Email).to.equal(newUser.Email)
-    expect(data.User.Password).to.equal(newUser.Password)
+    expect(data.User).to.deep.equal(newUser)
   })
 
-  it('Profile hash is unique', () => {
-    expect(typeof Profile.methods.hash).to.equal('function')
-    const profileHash = Profile.methods.hash('testing')
-    const md5hash = md5('testing')
-    const othermd5hash = md5('ops')
-    expect(profileHash).to.equal(md5hash)
-    expect(profileHash).to.not.equal(othermd5hash)
+  describe('hash', () => {
+    var testEmail = 'test@gmail.com'
+    var hashValue = '1aedb8d9dc4751e229a335e371db8058'
+
+    it('should be a function', () => {
+      expect(typeof component.hash).to.equal('function')
+    })
+
+    it('should be unique', () => {
+      const firstHash = component.hash('testing')
+      const secondHash = component.hash('not testing')
+      expect(firstHash).to.not.equal(secondHash)
+    })
+
+    it('should be reproducible', () => {
+      const firstHash = component.hash('testing')
+      const secondHash = component.hash('testing')
+      expect(firstHash).to.equal(secondHash)
+    })
+
+    it('should generate an md5 hash', () => {
+      expect(component.hash(testEmail)).to.equal(hashValue)
+    })
   })
 })
