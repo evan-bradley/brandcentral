@@ -161,8 +161,8 @@ pool.updateLastSeen = id => pool.query(LAST_SEEN_Q, [ id ])
  * @param {String} newPassword
  * @param {Function} callback
  */
-const CHECKTOKEN_Q = 'SELECT USER_ID FROM RESET_PASSWORD_TOKENS WHERE TOKEN = ?;';
-const CHANGEPASSWORD_Q = 'UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?;';
+const CHECKTOKEN_Q = 'SELECT USER_ID FROM RESET_PASSWORD_TOKENS WHERE TOKEN = ?;'
+const CHANGEPASSWORD_Q = 'UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?;'
 pool.verifyTokenResetPassword = (token, newPassword) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -184,8 +184,8 @@ pool.verifyTokenResetPassword = (token, newPassword) => {
  * exist in the database in order to generate a password reset token.
  * @param {String} email
  */
-const CHECKEMAIL_Q = 'SELECT USER_ID, USER_EMAIL FROM USER WHERE USER_EMAIL = ?;';
-const WRITETOKEN_Q = 'INSERT INTO RESET_PASSWORD_TOKENS (USER_ID , TOKEN) VALUES(?, ?);';
+const CHECKEMAIL_Q = 'SELECT USER_ID, USER_EMAIL FROM USER WHERE USER_EMAIL = ?;'
+const WRITETOKEN_Q = 'INSERT INTO RESET_PASSWORD_TOKENS (USER_ID , TOKEN) VALUES(?, ?);'
 pool.generatePasswordResetToken = email => {
   return new Promise(async (resolve, reject) => {
     if (!email) {
@@ -194,8 +194,13 @@ pool.generatePasswordResetToken = email => {
       try {
         const results = await pool.query(CHECKEMAIL_Q, [ email ])
         if (results.length > 0) {
-          const hash = await bcrypt.hash(email, 10)
-          require ('crypto').randomBytes(16, async (err, buffer) => {
+          // TODO: Are we going to use this value?
+          // const hash = await bcrypt.hash(email, 10)
+          require('crypto').randomBytes(16, async (err, buffer) => {
+            if (err) {
+              reject(err)
+            }
+
             const token = buffer.toString('hex')
             await pool.query(WRITETOKEN_Q, [ results[0].USER_ID, token ])
             resolve(token)

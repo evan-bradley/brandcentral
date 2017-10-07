@@ -84,7 +84,7 @@ router.post('/api/register', async (req, res) => {
 
 router.post('/api/password/reset', async (req, res) => {
   try {
-    const token = db.generatePasswordResetToken(req.body.email)
+    const token = await db.generatePasswordResetToken(req.body.email)
     let resetEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
       to: req.body.email,
@@ -92,7 +92,7 @@ router.post('/api/password/reset', async (req, res) => {
       text: 'Hello, to reset your password, please click the following link:\n' // plain text body
     }
 
-    resetEmail.text += `http://localhost:8080/reset/${results.token}`
+    resetEmail.text += `http://localhost:8080/reset/${token}`
 
     transporter.sendMail(resetEmail, (error, email) => {
       if (error) {
@@ -100,26 +100,26 @@ router.post('/api/password/reset', async (req, res) => {
       }
 
       res.send({
-        success: true,
+        success: true
       })
     })
-  } catch(e) {
-      res.send({
-        success: false,
-        message: e.message
-      })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
 router.post('/api/password/reset/:token', async (req, res) => {
   try {
     await db.verifyTokenResetPassword(req.params.token, req.body.newPassword)
-    res.send(JSON.stringify({ success: true }));
-  } catch(e) {
-      res.send({
-        success: false,
-        message: e.message
-      })
+    res.send(JSON.stringify({ success: true }))
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
