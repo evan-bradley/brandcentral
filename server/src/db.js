@@ -148,6 +148,11 @@ const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
 FROM USER WHERE USER_ID = ?`
 pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
 
+
+// This function will query the database for the first 16 tags.
+const GET_ONBOARD_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
+pool.getOnboardTags = pool.query.bind(pool, GET_ONBOARD_TAGS_Q, [])
+
 const LAST_SEEN_Q = `
 UPDATE USER
   SET LAST_SEEN = CURRENT_TIMESTAMP()

@@ -10,6 +10,7 @@ import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
+import Onboard from '@/components/Onboard'
 var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
@@ -65,6 +66,11 @@ const router = new Router({
       name: 'Verify',
       component: Verify,
       props: true
+    },
+    {
+      path: '/onboard',
+      name: 'Onboard',
+      component: Onboard
     },
     {
       path: '/',
