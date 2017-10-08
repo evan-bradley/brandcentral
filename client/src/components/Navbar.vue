@@ -1,17 +1,11 @@
 <template>
-  <nav v-show="this.$store.state.loggedIn" class="navbar" role="navigation" aria-label="main navigation">
+  <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <router-link :to="{ name: 'Home' }">
-        <a class="navbar-item">
-          <img src="../assets/brand_central_full.png">
-        </a>
+      <router-link class="navbar-item" :to="{ name: 'Home' }">
+        <img src="../assets/brand_central_full.png">
       </router-link>
-    </div>
-    <div class="navbar">
-      <router-link :to="{ name: 'Home' }">
-        <a class="navbar-item" style ="color: #EF243A">
-          Browse
-        </a>
+      <router-link class="navbar-item" :to="{ name: 'Home' }">
+        Browse
       </router-link>
     </div>
     <div class="navbar-end">
@@ -27,7 +21,7 @@
           </div>
           <hr class="navbar-divider">
           <router-link :to="{ name: 'Profile' }" class="navbar-item">Profile</router-link>
-          <a class="navbar-item">Settings</a>
+          <router-link :to="{ name: 'EditProfile' }" class="navbar-item">Settings</router-link>
           <a class="navbar-item">About</a>
           <hr class="navbar-divider">
           <a class="navbar-item" @click="signOut">Sign out</a>

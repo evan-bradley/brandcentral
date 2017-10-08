@@ -10,8 +10,8 @@ import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
-import Onboard from '@/components/Onboard'
-var store = require('../Vuex/states')
+import Interests from '@/components/Interests'
+// var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
 
@@ -19,58 +19,78 @@ const router = new Router({
   mode: 'history',
   routes: [
     {
-      path: '/profile',
-      name: 'Profile',
+      path: '/settings',
+      name: 'Settings',
       component: ProfileHome,
       children: [
         {
-          path: '',
-          name: 'Profile',
-          component: Profile
-        },
-        {
-          path: '/edit',
+          path: 'profile',
           name: 'EditProfile',
           component: EditProfile
         },
         {
-          path: '/ChangePassword',
+          path: 'password',
           name: 'ChangePassword',
           component: ChangePassword
         },
         {
-          path: '/ChangeEmail',
+          path: 'email',
           name: 'ChangeEmail',
           component: ChangeEmail
         }
       ]
     },
     {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
+    },
+    {
       path: '/login',
       name: 'Login',
-      component: LogIn
+      component: LogIn,
+      meta: {
+        hideNav: true,
+        requireAuth: false
+      }
     },
     {
       path: '/register',
       name: 'Register',
-      component: Register
+      component: Register,
+      meta: {
+        hideNav: true,
+        requireAuth: false
+      }
     },
     {
-      path: '/reset/:token',
+      path: '/reset/:token?',
       name: 'ResetPassword',
       component: ResetPassword,
-      props: true
+      props: true,
+      meta: {
+        hideNav: true,
+        requireAuth: false
+      }
     },
     {
-      path: '/verify/:GUID',
+      path: '/verify/:token?',
       name: 'Verify',
       component: Verify,
-      props: true
+      props: true,
+      meta: {
+        hideNav: true,
+        requireAuth: false
+      }
     },
     {
-      path: '/onboard',
-      name: 'Onboard',
-      component: Onboard
+      path: '/interests',
+      name: 'Interests',
+      component: Interests,
+      meta: {
+        hideNav: true,
+        requireAuth: false
+      }
     },
     {
       path: '/',
@@ -89,9 +109,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   // An array of routes that do not require authentication
   const noAuthRequired = ['/register', '/login', '/reset']
-  if (!store.default.state.loggedIn &&
-    !noAuthRequired.includes(to.path) &&
-    to.path.indexOf('/verify') === -1 &&
+  if (!noAuthRequired.includes(to.path) &&
     to.path.indexOf('/reset') === -1) {
     // Check to see if a session exists for the user
     Vue.http.get('/api/authenticated')

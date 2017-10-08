@@ -1,7 +1,6 @@
 <template>
-  <section class="hero is-fullheight">
-    <div v-if="token === '/'">
-    <div class="hero-body">
+  <div class="hero is-fullheight">
+    <div v-if="!$route.query.token" class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
           <div class="column is-4 is-offset-4">
@@ -34,9 +33,7 @@
         </div>
       </div>
     </div>
-    </div>
-    <div v-else>
-    <div class="hero-body">
+    <div v-else class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
           <div class="column is-4 is-offset-4">
@@ -76,8 +73,7 @@
         </div>
       </div>
     </div>
-    </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -117,15 +113,21 @@
           })
       },
       reset() {
+        if (!this.$route.query.token) return
+
         // Quit if any inputs are invalid
         this.$validator.validateAll();
         if (this.errors.any()) {
           return
         }
-
-        this.$http.post(`/api/password/reset/${this.token}`, {
+ 
+        var body = {
+          token: this.$route.query.token,
           newPassword: this.NewPassword
-        }).then(response => { // Success
+        }
+
+        this.$http.post(`/api/password/reset`, body)
+        .then(response => { // Success
           if (response.body.success) {
               this.$router.push({ name: 'Login' })
             } else {

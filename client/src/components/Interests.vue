@@ -37,7 +37,7 @@
 
 <script>
   export default{
-    name: 'Onboard',
+    name: 'Interests',
     data() {
       return {
         user: this.$store.state.User,
@@ -50,7 +50,7 @@
     },
     methods: {
       loadTags() {
-        this.$http.get('/api/onboard/tags')
+        this.$http.get('/api/interests/tags')
         .then(response => {
           if (response.data.success) {
             this.tags = response.data.tags
@@ -74,10 +74,10 @@
         var body = {
           tags: this.selectedTags
         }
-        this.$http.post('/api/onboard/tags', body)
+        this.$http.post('/api/interests/tags', body)
         .then(response => {
           if (response.data.success) {
-            this.$router.push({ name: 'Home' })
+            this.$router.push({ name: 'Verify' })
           }
         }, response => {
           // Tags could not be submitted
