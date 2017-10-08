@@ -74,7 +74,7 @@ pool.registerUser = info => {
   })
 }
 const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
-const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = 0 WHERE USER_EMAIL = ?;'
+const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\' WHERE USER_EMAIL = ?;'
 pool.CheckNewEmail = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.NewEmail) {

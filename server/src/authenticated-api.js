@@ -5,6 +5,16 @@
 
 const router = require('express').Router()
 const db = require('./db')
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  host: 'mail.cock.li',
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: 'BrandCentralStation@firemail.cc', // generated ethereal user
+    pass: 'brandcentral' // generated ethereal password
+  }
+})
 
 /*
  * Update a user profile.
