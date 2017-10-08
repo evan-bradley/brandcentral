@@ -11,6 +11,9 @@ import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
 import Interests from '@/components/Interests'
+import WelcomePage from '@/components/WelcomePage'
+import Channel from '@/components/Channel'
+
 // var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
@@ -95,8 +98,22 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
+      children: [
+        {
+          path: '',
+          name: 'WelcomeScreen',
+          component: WelcomePage
+        },
+        {
+          path: '/channel/:ChannelId',
+          name: 'Channel',
+          props: true,
+          component: Channel
+        }
+      ]
     }
+
   ],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }

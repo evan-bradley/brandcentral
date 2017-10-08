@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <router-link class="navbar-item" :to="{ name: 'Home' }">
+      <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
         <img src="../assets/brand_central_full.png">
       </router-link>
       <router-link class="navbar-item" :to="{ name: 'Home' }">
