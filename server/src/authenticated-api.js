@@ -68,12 +68,12 @@ router.get('/api/logout', async (req, res) => {
 router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
 
   try {
-        await db.CheckNewEmail(req.body)
+        const test = await db.CheckNewEmail(req.body)
         let OldEmail = {
           from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
           to: req.body.currentEmail,
           subject: 'Email Change ✔', // Subject line
-          text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you' // plain text body
+          text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
         }
         console.log(OldEmail)
 
@@ -90,7 +90,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
         text: 'Hello, please click this link to verify your new email:\n' // plain text body
       }
 
-      NewVerifyEmail.text += `http://localhost:8080/verify/${results.token}`
+      NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
       console.log(NewVerifyEmail)
 
       transporter.sendMail(NewVerifyEmail, (error, info) => {

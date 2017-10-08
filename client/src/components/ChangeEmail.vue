@@ -57,7 +57,8 @@
             this.$http.post(`/api/profile/ChangeEmail/${this.$store.state.User.Id}`, EmailChangeInfo)
               .then(response => {
                 if (response.body.success) {
-                  this.$router.push({ name: 'Home' })
+                    this.$store.state.User.Email = EmailChangeInfo.NewEmail
+                  this.$router.push({ name: 'EditProfile' })
                 } else {
                   console.log(response)
                   this.failureMessage = response.data.message
