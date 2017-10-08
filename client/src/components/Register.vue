@@ -1,5 +1,5 @@
 <template>
-    <section class="hero is-fullheight">
+  <div class="hero is-fullheight">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -111,7 +111,7 @@ export default {
             this.$http.post('/api/register', registration)
                 .then(response => { // Success
                     if (response.data.success) {
-                      this.$router.push({ name: 'Login' })
+                      this.$router.push({ name: 'Interests' })
                     } else {
                       console.log(response)
                       this.failureMessage = response.data.message

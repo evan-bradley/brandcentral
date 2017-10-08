@@ -54,7 +54,7 @@ router.get('/api/logout', async (req, res) => {
   }
 })
 
-router.post('/api/onboard/tags', (req, res) => {
+router.post('/api/interests/tags', (req, res) => {
   console.log(req.session.userId)
   console.log(req.body.tags)
   res.send({
