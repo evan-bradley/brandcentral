@@ -3,25 +3,25 @@
         <div class="column is-12 columns is-multiline">
             <div class="column is-12 is-size-5">
                 <h1 class="title is-size-2.5">Change your email address</h1>
-                <div class="field">
-                    <label class="label">Current email address</label>
-                    <div class="control">
-                        <input class="input" type="password" placeholder="Current email address"  v-model="OldEmail"/>
-                    </div>
+              <article class="message is-danger" v-show="failureMessage">
+                <div class="message-body">
+                  {{ failureMessage }}
                 </div>
-                <div class="field">
-                    <label class="label">New email address</label>
-                    <div class="control">
-                        <input class="input" type="password" placeholder="New email address" v-model="NewEmail"/>
-                    </div>
+              </article>
+              <div class="field">
+                <label class="label">New Email</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="Email" name="email" v-model="EnteredEmail" v-validate="{ required: true, email: true}"/>
                 </div>
+                <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
+              </div>
                 <div class="field">
                     <label class="label">Current Password</label>
                     <div class="control">
                         <input class="input" type="password" placeholder="Password" v-model="password"  />
                     </div>
                 </div>
-                <button class="button is-primary" @click="UpdateEmail">Change email address</button>
+                <button class="button is-primary" @click="ChangeEmail">Change email address</button>
                 <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
             </div>
         </div>
@@ -29,32 +29,54 @@
 </template>
 
 <script>
+  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  import EditProfile from './EditProfile'
     export default {
         data(){
             return {
-                NewEmail: '',
-                OldEmail: '',
-                password: ''
+                EnteredEmail: '',
+                password: '',
+                User: this.$store.state.User,
+                EditedUser: _.cloneDeep(this.$store.state.User),
+                PasswordChange: new Classes.PasswordVerification(),
+                failureMessage: ''
             }
         },
-        methods: {
-            UpdateEmail(){
-                const EmailChangeInfo = {
-                    NewEmail: this.NewEmail,
-                    username: this.$store.state.User.UserName
+
+      methods: {
+        ChangeEmail() {
+          // Quit if any inputs are invalid
+          this.$validator.validateAll();
+          if (this.errors.any()) {
+            return
+          }
+
+          const EmailChangeInfo = {
+            id: this.$store.state.User.Id,
+            NewEmail: this.EnteredEmail,
+            currentEmail: this.$store.state.User.Email,
+            password: this.password
+          }
+          if (this.$store.state.User.Password === this.password) {
+            // Send a request to the api to update the user's information
+            this.$http.post(`/api/profile/ChangeEmail/${this.$store.state.User.Id}`, EmailChangeInfo)
+              .then(response => {
+                if (response.body.success) {
+                    this.$store.state.User.Email = EmailChangeInfo.NewEmail
+                  this.$router.push({ name: 'EditProfile' })
+                } else {
+                  console.log(response)
+                  this.failureMessage = response.data.message
                 }
 
-            //    this.$http.post('/api/changeEmail',EmailChangeInfo)
-            //    .then(response =>{
-            //        if(response.data.success){
-
-            //        }
-            //        else{
-
-            //        }
-            //    }) 
-            }
+              }, response => {
+                console.log(response)
+              })
+          }else{
+            this.failureMessage = 'Incorrect Password'
+          }
         }
+      }
     }
 </script>
 

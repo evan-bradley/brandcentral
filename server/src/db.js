@@ -73,7 +73,38 @@ pool.registerUser = info => {
     }
   })
 }
+const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
+const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFICATION = ? WHERE USER_EMAIL = ?;'
+pool.CheckNewEmail = info => {
+  return new Promise(async (resolve, reject) => {
+    if (!info.NewEmail) {
+    reject(new Error('Missing Email'))
+    return
+  }
 
+  try {
+    const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
+    if (results.length > 0) {
+      reject(new Error('Email already used'))
+    } else {
+        require('crypto').randomBytes(16, async (err, buffer) => {
+        if (err) {
+          reject(err)
+        }
+
+        const token = buffer.toString('hex')
+        const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
+        res.token = token
+        resolve(res)
+      })
+        // if (err.code === 'ER_DUP_ENTRY')
+        // err.message = 'A user with that ID is already registered'
+      }
+  } catch (e) {
+    reject(e)
+  }
+})
+}
 /*
  * Check user's password and return user info if it is valid
  */
