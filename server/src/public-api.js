@@ -53,6 +53,8 @@ router.post('/api/register', async (req, res) => {
   try {
     const results = await db.registerUser(req.body)
 
+    req.session.userId = results.insertId
+
     let registerEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
       to: req.body.email,
@@ -60,7 +62,7 @@ router.post('/api/register', async (req, res) => {
       text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
     }
 
-    registerEmail.text += `http://localhost:8080/verify/${results.token}`
+    registerEmail.text += `http://localhost:8080/verify?token=${results.token}`
     console.log(registerEmail)
 
     transporter.sendMail(registerEmail, (error, info) => {
@@ -84,25 +86,30 @@ router.post('/api/register', async (req, res) => {
 
 router.post('/api/password/reset', async (req, res) => {
   try {
-    const token = await db.generatePasswordResetToken(req.body.email)
-    let resetEmail = {
-      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-      to: req.body.email,
-      subject: 'Reset Password ✔', // Subject line
-      text: 'Hello, to reset your password, please click the following link:\n' // plain text body
-    }
-
-    resetEmail.text += `http://localhost:8080/reset/${token}`
-
-    transporter.sendMail(resetEmail, (error, email) => {
-      if (error) {
-        throw error
+    if (req.body.token) {
+      await db.verifyTokenResetPassword(req.body.token, req.body.newPassword)
+      res.send(JSON.stringify({ success: true }))
+    } else {
+      const token = await db.generatePasswordResetToken(req.body.email)
+      let resetEmail = {
+        from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+        to: req.body.email,
+        subject: 'Reset Password ✔', // Subject line
+        text: 'Hello, to reset your password, please click the following link:\n' // plain text body
       }
 
-      res.send({
-        success: true
+      resetEmail.text += `http://localhost:8080/reset?token=${token}`
+
+      transporter.sendMail(resetEmail, (error, email) => {
+        if (error) {
+          throw error
+        }
+
+        res.send({
+          success: true
+        })
       })
-    })
+    }
   } catch (e) {
     res.send({
       success: false,
@@ -111,21 +118,9 @@ router.post('/api/password/reset', async (req, res) => {
   }
 })
 
-router.post('/api/password/reset/:token', async (req, res) => {
+router.post('/api/verify', async (req, res) => {
   try {
-    await db.verifyTokenResetPassword(req.params.token, req.body.newPassword)
-    res.send(JSON.stringify({ success: true }))
-  } catch (e) {
-    res.send({
-      success: false,
-      message: e.message
-    })
-  }
-})
-
-router.post('/api/verify/:token', async (req, res) => {
-  try {
-    await db.verifyUser(req.params.token)
+    await db.verifyUser(req.body.token)
     res.send(JSON.stringify({
       success: true
     }))
@@ -173,5 +168,23 @@ router.get('/api/authenticated', async (req, res) => {
     if (e) res.status(404).send('Something went wrong')
   }
 })
+
+// Returns a collection of tags to present to the user during the onboarding
+// process. The response will contain an attribute called success, which
+// indicates the success of the request. The response will also contain an
+// array of tags.
+router.get('/api/interests/tags', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      tags: await db.getInterestsTags()
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      tags: e.message
+    })
+  }
+});
 
 module.exports = router

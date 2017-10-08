@@ -46,14 +46,14 @@ pool.registerUser = info => {
         }
       } else {
         const hash = await bcrypt.hash(info.password, 10)
-        require('crypto').randomBytes(16, function (err, buffer) {
+        require('crypto').randomBytes(16, async (err, buffer) => {
           if (err) {
             reject(err)
             return
           }
 
           const token = buffer.toString('hex')
-          const res = pool.query(REGISTER_Q, [
+          const res = await pool.query(REGISTER_Q, [
             info.username,
             info.lastName,
             info.firstName,
@@ -179,6 +179,11 @@ const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
 FROM USER WHERE USER_ID = ?`
 pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
 
+
+// This function will query the database for the first 16 tags.
+const GET_INTERESTS_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
+pool.getInterestsTags = pool.query.bind(pool, GET_INTERESTS_TAGS_Q, [])
+
 const LAST_SEEN_Q = `
 UPDATE USER
   SET LAST_SEEN = CURRENT_TIMESTAMP()
@@ -201,6 +206,7 @@ pool.verifyTokenResetPassword = (token, newPassword) => {
       if (results.length > 0) {
         const hash = await bcrypt.hash(newPassword, 10)
         await pool.query(CHANGEPASSWORD_Q, [ hash, results[0].USER_ID ])
+        resolve()
       } else {
         reject(new Error('Token not found'))
       }

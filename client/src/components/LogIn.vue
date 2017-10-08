@@ -1,5 +1,5 @@
 <template>
-  <section class="hero">
+  <div class="hero is-fullheight">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>

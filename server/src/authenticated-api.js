@@ -64,7 +64,6 @@ router.get('/api/logout', async (req, res) => {
   }
 })
 
-
 router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
 
   try {
@@ -113,6 +112,13 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
     message: e.message
   })
 }
+
+router.post('/api/interests/tags', (req, res) => {
+  console.log(req.session.userId)
+  console.log(req.body.tags)
+  res.send({
+    success: true
+  })
 })
 
 module.exports = router

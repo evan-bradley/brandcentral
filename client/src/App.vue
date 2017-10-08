@@ -1,9 +1,9 @@
 <template>
-  <div id="app" class="columns is-multiline">
-    <div class="column is-12">
+  <div id="app">
+    <div v-cloak v-show="!$route.meta.hideNav">
       <navbar></navbar>
     </div>
-    <div class="column is-12">
+    <div>
       <router-view></router-view>
     </div>
   </div>
