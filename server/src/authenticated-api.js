@@ -100,7 +100,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
         console.log('Message sent: %s', info.messageId)
       })
       res.send({
-        success: true,
+        success: true
         //id: results.id
       })
 

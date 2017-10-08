@@ -93,7 +93,7 @@ pool.CheckNewEmail = info => {
         }
 
         const token = buffer.toString('hex')
-        const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, info.currentEmail, token])
+        const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
         res.token = token
         resolve(res)
       })

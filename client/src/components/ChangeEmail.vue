@@ -3,6 +3,11 @@
         <div class="column is-12 columns is-multiline">
             <div class="column is-12 is-size-5">
                 <h1 class="title is-size-2.5">Change your email address</h1>
+              <article class="message is-danger" v-show="failureMessage">
+                <div class="message-body">
+                  {{ failureMessage }}
+                </div>
+              </article>
               <div class="field">
                 <label class="label">New Email</label>
                 <div class="control">
