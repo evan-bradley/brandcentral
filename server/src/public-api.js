@@ -51,7 +51,7 @@ router.post('/api/login', async (req, res) => {
  */
 router.post('/api/register', async (req, res) => {
   try {
-    const results = db.registerUser(req.body)
+    const results = await db.registerUser(req.body)
 
     let registerEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
