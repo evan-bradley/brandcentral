@@ -111,7 +111,7 @@ export default {
             this.$http.post('/api/register', registration)
                 .then(response => { // Success
                     if (response.data.success) {
-                      this.$router.push({ name: 'Interests' })
+                      this.$router.push({ name: 'Verify' })
                     } else {
                       console.log(response)
                       this.failureMessage = response.data.message

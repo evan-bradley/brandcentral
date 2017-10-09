@@ -1,5 +1,6 @@
 <template>
-    <div class="card">
+  <div>
+    <div class="box">
         <div class="card-image">
             <figure class="image is-4by3">
                 <img :src=item.ImmageURL alt="Placeholder image">
@@ -17,6 +18,8 @@
             <div class="content has-text-left">
                 {{ item.ItemDescription }}
             </div>
+        </div>
+    </div>
             <div>
                 <a v-on:click="GoLeft">
                     <i class="fa fa-hand-o-left fa-3x left-right-buttons has-text-centered" aria-hidden="true"></i>
@@ -43,8 +46,7 @@
                     <i class="fa fa-chevron-right fa-3x left-right-buttons has-text-centered" aria-hidden="true"></i>
                 </a>-->
             </div>
-        </div>
-    </div>
+          </div>
 </template>
 
 <script>

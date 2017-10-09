@@ -77,7 +77,7 @@
         this.$http.post('/api/interests/tags', body)
         .then(response => {
           if (response.data.success) {
-            this.$router.push({ name: 'Verify' })
+            this.$router.push({ name: 'Browse' })
           }
         }, response => {
           // Tags could not be submitted

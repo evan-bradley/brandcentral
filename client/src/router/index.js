@@ -4,7 +4,7 @@ import LogIn from '@/components/LogIn'
 import Register from '@/components/Register'
 import Profile from '@/components/Profile'
 import Verify from '@/components/Verify'
-import Home from '@/components/Home'
+import Browse from '@/components/Browse'
 import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
@@ -97,8 +97,8 @@ const router = new Router({
     },
     {
       path: '/',
-      name: 'Home',
-      component: Home,
+      name: 'Browse',
+      component: Browse,
       children: [
         {
           path: '',
@@ -106,7 +106,7 @@ const router = new Router({
           component: WelcomePage
         },
         {
-          path: '/channel/:ChannelId',
+          path: '/channel/:user?/:tag?',
           name: 'Channel',
           props: true,
           component: Channel
