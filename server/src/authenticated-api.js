@@ -67,44 +67,45 @@ router.get('/api/logout', async (req, res) => {
 router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
 
   try {
-        const test = await db.CheckNewEmail(req.body)
-        let OldEmail = {
-          from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-          to: req.body.currentEmail,
-          subject: 'Email Change ✔', // Subject line
-          text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
-        }
-        console.log(OldEmail)
+    const test = await db.CheckNewEmail(req.body)
+  let OldEmail = {
+    from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+    to: req.body.currentEmail,
+    subject: 'Email Change ✔', // Subject line
+    text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+  }
+  console.log(OldEmail)
 
-          transporter.sendMail(OldEmail, (error, info) => {
-          if (error) {
-            return console.log(error)
-          }
-          console.log('Message sent: %s', info.messageId)
-      })
-      let NewVerifyEmail = {
-        from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-        to: req.body.NewEmail,
-        subject: 'Hello ✔', // Subject line
-        text: 'Hello, please click this link to verify your new email:\n' // plain text body
-      }
+transporter.sendMail(OldEmail, (error, info) => {
+  if (error) {
+    return console.log(error)
+  }
+  console.log('Message sent: %s', info.messageId)
+})
+let NewVerifyEmail = {
+  from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+  to: req.body.NewEmail,
+  subject: 'Hello ✔', // Subject line
+  text: 'Hello, please click this link to verify your new email:\n' // plain text body
+}
 
-      NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
-      console.log(NewVerifyEmail)
+NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
+console.log(NewVerifyEmail)
 
-      transporter.sendMail(NewVerifyEmail, (error, info) => {
-        if (error) {
-          return console.log(error)
-        }
-        console.log('Message sent: %s', info.messageId)
-      })
-      res.send({
-        success: true
-        //id: results.id
-      })
+transporter.sendMail(NewVerifyEmail, (error, info) => {
+  if (error) {
+    return console.log(error)
+  }
+  console.log('Message sent: %s', info.messageId)
+})
+res.send({
+  success: true
+  //id: results.id
+})
 
-
-} catch (e) {
+}catch
+(e)
+{
   console.log(e)
   console.log(e.message)
   res.send({
@@ -112,6 +113,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
     message: e.message
   })
 }
+})
 
 router.post('/api/interests/tags', (req, res) => {
   console.log(req.session.userId)
