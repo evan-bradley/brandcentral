@@ -118,7 +118,14 @@ router.post('/api/password/reset', async (req, res) => {
 
 router.post('/api/verify', async (req, res) => {
   try {
-    await db.verifyUser(req.body.token)
+    if (req.body.token) {
+      await db.verifyUserToken(req.body.token)
+    } else if (req.body.token) {
+      await db.verifyUserCode(req.body.code)
+    } else {
+      throw new Error('No code or token given.')
+    }
+
     res.send(JSON.stringify({
       success: true
     }))

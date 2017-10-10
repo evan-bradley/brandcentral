@@ -168,8 +168,11 @@ pool.updateProfile = info => {
 const GET_USER_Q = 'SELECT * FROM USER WHERE USER_ID = ?'
 pool.getUserWithId = id => pool.query(GET_USER_Q, [ id ])
 
-const VERIFY_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VERIFICATION = ?'
-pool.verifyUser = token => pool.query(VERIFY_Q, [token])
+const VERIFY_TOKEN_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VER_TOKEN = ?'
+pool.verifyUserToken = token => pool.query(VERIFY_TOKEN_Q, [ token ])
+
+const VERIFY_CODE_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VER_CODE = ?'
+pool.verifyUserCode = code => pool.query(VERIFY_CODE_Q, [ code ])
 
 const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
 FROM USER WHERE USER_ID = ?`
