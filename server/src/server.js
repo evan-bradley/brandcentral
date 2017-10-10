@@ -49,7 +49,6 @@ io.on('connection', (sock, test) => {
 })
 
 app.use(require('body-parser').json())
-app.use(express.static(path.join(__dirname, '../../client/dist')))
 app.use(require('./public-api'))
 app.use((req, res, next) => {
   if (!req.session || !req.session.id) {
@@ -61,6 +60,11 @@ app.use((req, res, next) => {
   next()
 })
 app.use(require('./authenticated-api'))
+
+app.use('/', express.static(path.join(__dirname, '../../client/dist')))
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/dist/index.html'))
+})
 
 const port = process.env.PORT || 8081
 server.listen(port)
