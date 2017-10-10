@@ -78,32 +78,32 @@ const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFIC
 pool.CheckNewEmail = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.NewEmail) {
-    reject(new Error('Missing Email'))
-    return
-  }
+      reject(new Error('Missing Email'))
+      return
+    }
 
-  try {
-    const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
-    if (results.length > 0) {
-      reject(new Error('Email already used'))
-    } else {
+    try {
+      const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
+      if (results.length > 0) {
+        reject(new Error('Email already used'))
+      } else {
         require('crypto').randomBytes(16, async (err, buffer) => {
-        if (err) {
-          reject(err)
-        }
+          if (err) {
+            reject(err)
+          }
 
-        const token = buffer.toString('hex')
-        const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
-        res.token = token
-        resolve(res)
-      })
+          const token = buffer.toString('hex')
+          const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
+          res.token = token
+          resolve(res)
+        })
         // if (err.code === 'ER_DUP_ENTRY')
         // err.message = 'A user with that ID is already registered'
       }
-  } catch (e) {
-    reject(e)
-  }
-})
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 /*
  * Check user's password and return user info if it is valid
@@ -179,7 +179,6 @@ const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
 FROM USER WHERE USER_ID = ?`
 pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
 
-
 // This function will query the database for the first 16 tags.
 const GET_INTERESTS_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
 pool.getInterestsTags = pool.query.bind(pool, GET_INTERESTS_TAGS_Q, [])
@@ -248,6 +247,48 @@ pool.generatePasswordResetToken = email => {
       } catch (e) {
         reject(e)
       }
+    }
+  })
+}
+
+pool.storeUserChannels = (user, channels) => {
+  return new Promise(async (resolve, reject) => {
+    if (!channels || channels.length === 0) {
+      reject(new Error('Missing channels'))
+    }
+
+    try {
+      // pool.query()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+pool.retrieveUserChannels = user => {
+  return new Promise(async (resolve, reject) => {
+    if (!user) {
+      reject(new Error('Missing user'))
+    }
+
+    try {
+      // pool.query()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+pool.getRandomProduct = channel => {
+  return new Promise(async (resolve, reject) => {
+    if (!channel) {
+      reject(new Error('Missing channels'))
+    }
+
+    try {
+      // pool.query()
+    } catch (e) {
+      reject(e)
     }
   })
 }

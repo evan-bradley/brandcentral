@@ -4,8 +4,6 @@
 
 const router = require('express').Router()
 const db = require('./db')
-
-// const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 
 // create reusable transporter object using the default SMTP transport
@@ -185,6 +183,6 @@ router.get('/api/interests/tags', async (req, res) => {
       tags: e.message
     })
   }
-});
+})
 
 module.exports = router
