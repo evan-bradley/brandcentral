@@ -24,7 +24,9 @@ const pool = mysql.createPool({
  * in the database.
  */
 const DUPCHECK_Q = 'SELECT USERNAME, USER_EMAIL FROM USER WHERE USERNAME = ? OR USER_EMAIL = ?'
-const REGISTER_Q = 'INSERT INTO USER (USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VER_TOKEN, VER_CODE, LAST_SEEN) VALUES(?, ?, ?, ?, ?, ?, ?)'
+const REGISTER_Q = `INSERT INTO USER
+(USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VER_TOKEN, VER_CODE, LAST_SEEN)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
 pool.registerUser = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.username || !info.email ||
@@ -47,8 +49,8 @@ pool.registerUser = info => {
         }
       } else {
         const hash = await bcrypt.hash(info.password, 10)
-        const token = await crypto.randomBytes(16).toString('hex')
-        const code = [...(await crypto.randomBytes(6))].map(num => num % 10)
+        const token = (await crypto.randomBytes(16)).toString('hex')
+        const code = [...(await crypto.randomBytes(6))].map(num => num % 10).join('')
         const res = await pool.query(REGISTER_Q, [
           info.username,
           info.lastName,
@@ -59,7 +61,9 @@ pool.registerUser = info => {
           code,
           moment().format('YYYY-MM-DD HH:mm:ss')
         ])
+
         res.token = token
+        res.code = code
         resolve(res)
         // if (err.code === 'ER_DUP_ENTRY')
         // err.message = 'A user with that ID is already registered'
@@ -69,6 +73,7 @@ pool.registerUser = info => {
     }
   })
 }
+
 const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
 const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFICATION = ? WHERE USER_EMAIL = ?;'
 pool.CheckNewEmail = info => {
