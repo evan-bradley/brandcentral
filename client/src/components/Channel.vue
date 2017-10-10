@@ -19,7 +19,7 @@ import VotingItem from './VotingItem.vue'
         props: ['ChannelId'],
         data() {
             return {
-                CurrentItem: new Classes.Item('productName', 'itemDescription', 100, 'https://images-na.ssl-images-amazon.com/images/I/71f86O03A7L._UY679_.jpg')
+                CurrentItem: new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61rzIAnzTQL._UX522_.jpg')
             }
         },
         components: {

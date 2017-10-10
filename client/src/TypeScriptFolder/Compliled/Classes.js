@@ -36,14 +36,12 @@ var Classes;
     }());
     Classes.PasswordVerification = PasswordVerification;
     var Item = (function () {
-        function Item(productName, itemDescription, price, immageURL) {
+        function Item(productName, itemDescription, immageURL) {
             if (productName === void 0) { productName = ""; }
             if (itemDescription === void 0) { itemDescription = ""; }
-            if (price === void 0) { price = 0; }
             this.ProductName = productName;
             this.ItemDescription = itemDescription;
             this.ImmageURL = immageURL;
-            this.Price = price;
         }
         return Item;
     }());

@@ -38,13 +38,11 @@ export namespace Classes {
     public ProductName : string;
     public ItemDescription : string;
     public ImmageURL : string;
-    public Price : number;
 
-    constructor(productName: string = "", itemDescription: string = "", price: number = 0, immageURL: string) {
+    constructor(productName: string = "", itemDescription: string = "", immageURL: string) {
       this.ProductName = productName;
       this.ItemDescription = itemDescription;
       this.ImmageURL = immageURL;
-      this.Price = price;
     }
   }
 }
