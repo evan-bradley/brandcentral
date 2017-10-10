@@ -5,6 +5,16 @@
 
 const router = require('express').Router()
 const db = require('./db')
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  host: 'mail.cock.li',
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: 'BrandCentralStation@firemail.cc', // generated ethereal user
+    pass: 'brandcentral' // generated ethereal password
+  }
+})
 
 /*
  * Update a user profile.
@@ -52,6 +62,57 @@ router.get('/api/logout', async (req, res) => {
       message: e
     })
   }
+})
+
+router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
+
+  try {
+    const test = await db.CheckNewEmail(req.body)
+  let OldEmail = {
+    from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+    to: req.body.currentEmail,
+    subject: 'Email Change ✔', // Subject line
+    text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+  }
+  console.log(OldEmail)
+
+transporter.sendMail(OldEmail, (error, info) => {
+  if (error) {
+    return console.log(error)
+  }
+  console.log('Message sent: %s', info.messageId)
+})
+let NewVerifyEmail = {
+  from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+  to: req.body.NewEmail,
+  subject: 'Hello ✔', // Subject line
+  text: 'Hello, please click this link to verify your new email:\n' // plain text body
+}
+
+NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
+console.log(NewVerifyEmail)
+
+transporter.sendMail(NewVerifyEmail, (error, info) => {
+  if (error) {
+    return console.log(error)
+  }
+  console.log('Message sent: %s', info.messageId)
+})
+res.send({
+  success: true
+  //id: results.id
+})
+
+}catch
+(e)
+{
+  console.log(e)
+  console.log(e.message)
+  res.send({
+    success: false,
+    message: e.message
+  })
+}
 })
 
 router.post('/api/interests/tags', (req, res) => {
