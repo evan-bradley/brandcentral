@@ -19,6 +19,7 @@
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "crypt": "0.0.2",
+    "crypto-promise": "^2.0.0",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
     "express-mysql-session": "^1.2.0",

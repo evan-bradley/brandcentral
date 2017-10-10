@@ -114,28 +114,54 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
 /*
  * Store user's channels.
  */
-router.post('/api/channels/:user', (req, res) => {
-  console.log(req.session.userId)
-  console.log(req.body.channels)
-  res.send({
-    success: true
-  })
+router.post('/api/channels/:user', async (req, res) => {
+  try {
+    await db.storeUserChannels(req.params.user, req.body.channels)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
 })
 
 /*
  * Retrieve user's channels.
  */
-router.get('/api/channels/:user', (req, res) => {
-  console.log(req.params.user)
-  console.log(req.session.userId)
-  res.send({
-    success: true
-  })
+router.get('/api/channels/:user', async (req, res) => {
+  try {
+    if (req.params.user === req.session.userId) {
+      const channels = await db.retrieveUserChannels(req.params.user)
+      res.send({
+        success: true,
+        channels
+      })
+    } else {
+      throw new Error('Unauthorized')
+    }
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
 })
 
-router.get('/api/product', (req, res) => {
-  // console.log(req.query.channelId)
-  db.getRandomProduct(req.query.channelId)
+router.get('/api/product', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      product: await db.getRandomProduct(req.query.channelId)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
 })
 
 module.exports = router
