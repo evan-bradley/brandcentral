@@ -133,7 +133,7 @@ router.post('/api/channels/:user', async (req, res) => {
  */
 router.get('/api/channels/:user', async (req, res) => {
   try {
-    if (req.params.user === req.session.userId) {
+    if (req.params.user == req.session.userId) {
       const channels = await db.retrieveUserChannels(req.params.user)
       res.send({
         success: true,

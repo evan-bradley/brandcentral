@@ -184,8 +184,8 @@ FROM USER WHERE USER_ID = ?`
 pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
 
 // This function will query the database for the first 16 tags.
-const GET_INTERESTS_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
-pool.getInterestsTags = pool.query.bind(pool, GET_INTERESTS_TAGS_Q, [])
+const GET_ONBOARD_CHANNELS_Q = `SELECT * FROM CHANNEL LIMIT 16;`
+pool.getOnboardChannels = pool.query.bind(pool, GET_ONBOARD_CHANNELS_Q, [])
 
 const LAST_SEEN_Q = `
 UPDATE USER
@@ -263,8 +263,8 @@ pool.storeUserChannels = (user, channels) => {
     }
 
     try {
-      const values = channels.map(channel => [ channel, user ])
-      await pool.query(STORE_USER_CHANNEL_Q, values)
+      const values = channels.map(channel => [ channel, parseInt(user) ])
+      await pool.query(STORE_USER_CHANNEL_Q, [ values ])
       resolve()
     } catch (e) {
       reject(e)
@@ -272,7 +272,7 @@ pool.storeUserChannels = (user, channels) => {
   })
 }
 
-const SELECT_USER_CHANNEL_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME FROM (CHANNEL INNER JOIN CHANNEL_USER_ASSIGN ON CHANNEL.CHANNEL_ID = CHANNEL_USER_ASSIGN.CHANNEL_ID) WHERE USER_ID = ?;'
+const SELECT_USER_CHANNEL_Q = 'SELECT CHANNEL.CHANNEL_ID, CHANNEL_NAME FROM (CHANNEL INNER JOIN CHANNEL_USER_ASSIGN ON CHANNEL.CHANNEL_ID = CHANNEL_USER_ASSIGN.CHANNEL_ID) WHERE USER_ID = ?;'
 pool.retrieveUserChannels = user => {
   return new Promise(async (resolve, reject) => {
     if (!user) {
@@ -287,6 +287,7 @@ pool.retrieveUserChannels = user => {
 
       resolve(channelsArray)
     } catch (e) {
+      console.log(e)
       reject(e)
     }
   })

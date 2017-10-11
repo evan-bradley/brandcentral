@@ -16,9 +16,9 @@
           <p v-show="channels.length > 0" class="menu-label">Channels</p>
           <ul class="menu-list">
             <li v-for="channel in channels" :key="channel.id">
-              <router-link v-bind:class="{ 'is-active': channel.id == $route.params.tag }" :to="{ name: 'Channel', params:{ tag: channel.id } }">
+              <router-link v-bind:class="{ 'is-active': channel.id == $route.params.channel }" :to="{ name: 'Channel', params:{ channel: channel.id } }">
                 <i class="fa fa-tag" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
-                {{ channel.description }}
+                {{ channel.name }}
               </router-link>
             </li>
           </ul>
@@ -42,25 +42,31 @@
 
 <script>
   export default {
-     data(){
-            return {
-              searchText: '',
-              channels: [
-                {
-                  id: 0, 
-                  description: 'General'
-                }, 
-                {
-                  id: 1, 
-                  description: 'Sports'
-                }, 
-                {
-                  id: 2, 
-                  description: 'Electronics'
-                }
-              ],
-              users: [{id: 13, username: 'jpherkness'}],
+    data() {
+      return {
+        user: this.$store.state.User,
+        searchText: '',
+        channels: [],
+        users: [{
+          id: 13,
+          username: 'jpherkness'
+        }],
+      }
+    },
+    created() {
+      this.loadChannels()
+    },
+    methods: {
+      loadChannels() {
+        this.$http.get(`/api/channels/${this.user.Id}`)
+          .then(response => {
+            if (response.data.success) {
+              this.channels = response.data.channels
             }
-        }
+          }, response => {
+            // Could not get any channels
+          })
+      }
+    }
   }
 </script>

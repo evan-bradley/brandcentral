@@ -25,6 +25,7 @@
           <p class="help is-danger" v-show="errors.has('confirm password')">{{ errors.first('confirm password') }}</p>
         </div>
         <button class="button is-primary" @click="ChangePassword">Change Password</button>
+        <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
       </div>
     </div>
   </div>

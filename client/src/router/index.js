@@ -106,7 +106,7 @@ const router = new Router({
           component: WelcomePage
         },
         {
-          path: '/channel/:tag',
+          path: '/channel/:channel',
           name: 'Channel',
           props: true,
           component: Channel

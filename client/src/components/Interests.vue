@@ -19,11 +19,11 @@
   <section class="section">
     <div class="container">
       <div class="columns is-mobile is-multiline">
-        <div v-for="tag in tags" v-bind:key="tag.id" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
-          <a class="box" v-on:click="toggleTagSelection(tag)" v-bind:class="{ 'selected-tag': selectedTags.includes(tag.TAG_ID) }">
+        <div v-for="channel in channels" v-bind:key="channel.id" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+          <a class="box" v-on:click="toggleChannelSelection(channel)" v-bind:class="{ 'selected-tag': selectedChannels.includes(channel.CHANNEL_ID) }">
             <h3 class="title is-6">
               <i class="fa fa-tag" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
-              <span>{{ tag.TAG_DESC | capitalize}}</span>
+              <span>{{ channel.CHANNEL_NAME | capitalize}}</span>
             </h3>
           </a>
         </div>
@@ -31,7 +31,7 @@
     </div>
   </section>
     <div class="container">
-      <a class="button is-primary is-pulled-right" v-bind:disabled="selectedTags.length < 1" v-on:click="submitTags">Continue</a>
+      <a class="button is-primary is-pulled-right" v-bind:disabled="selectedChannels.length < 1" v-on:click="submitChannels">Continue</a>
     </div>
 </section>
 </template>
@@ -42,50 +42,50 @@
     data() {
       return {
         user: this.$store.state.User,
-        tags: [],
-        selectedTags: []
+        channels: [],
+        selectedChannels: []
       }
     },
     created() {
-      this.loadTags()
+      this.loadChanneld()
     },
     methods: {
-      loadTags() {
-        this.$http.get('/api/interests/tags')
+      loadChanneld() {
+        this.$http.get('/api/channels/onboard')
         .then(response => {
           if (response.data.success) {
-            this.tags = response.data.tags
+            this.channels = response.data.channels
           }
         }, response => {
-          // Could not get any tags
+          // Could not get any channels
         })
       },
-      toggleTagSelection(tag) {
-        if (this.selectedTags.includes(tag.TAG_ID)) {
-          var deleteIndex = this.selectedTags.indexOf(tag.TAG_ID)
-          this.selectedTags.splice(deleteIndex, 1)
+      toggleChannelSelection(channel) {
+        if (this.selectedChannels.includes(channel.CHANNEL_ID)) {
+          var deleteIndex = this.selectedChannels.indexOf(channel.CHANNEL_ID)
+          this.selectedChannels.splice(deleteIndex, 1)
         } else {
-          this.selectedTags.push(tag.TAG_ID)
+          this.selectedChannels.push(channel.CHANNEL_ID)
         }
       },
-      submitTags() {
-        if (!this.canSubmitTags()) return
+      submitChannels() {
+        if (!this.canSubmitChannels()) return
 
-        // Send the tags that the user selected to the server
+        // Send the channels that the user selected to the server
         var body = {
-          tags: this.selectedTags
+          channels: this.selectedChannels
         }
-        this.$http.post('/api/interests/tags', body)
+        this.$http.post(`/api/channels/${this.user.Id}`, body)
         .then(response => {
           if (response.data.success) {
             this.$router.push({ name: 'Browse' })
           }
         }, response => {
-          // Tags could not be submitted
+          // channels could not be submitted
         })
       },
-      canSubmitTags(){
-        if (this.selectedTags.length >= 1) return true
+      canSubmitChannels(){
+        if (this.selectedChannels.length >= 1) return true
       },
     },
     filters: {
