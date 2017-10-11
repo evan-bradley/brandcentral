@@ -61,6 +61,7 @@ router.post('/api/register', async (req, res) => {
     }
 
     registerEmail.text += `http://localhost:8080/verify?token=${results.token}`
+    registerEmail.text += `\nYou can also enter the following code: ${results.code}`
 
     transporter.sendMail(registerEmail, (error, info) => {
       if (error) {
@@ -69,8 +70,7 @@ router.post('/api/register', async (req, res) => {
     })
     res.send({
       success: true,
-      id: results.insertId,
-      code: results.code
+      id: results.insertId
     })
   } catch (e) {
     console.log(e)
@@ -177,16 +177,16 @@ router.get('/api/authenticated', async (req, res) => {
 // process. The response will contain an attribute called success, which
 // indicates the success of the request. The response will also contain an
 // array of tags.
-router.get('/api/interests/tags', async (req, res) => {
+router.get('/api/channels/onboard', async (req, res) => {
   try {
     res.send({
       success: true,
-      tags: await db.getInterestsTags()
+      channels: await db.getOnboardChannels()
     })
   } catch (e) {
     res.send({
       success: false,
-      tags: e.message
+      message: e.message
     })
   }
 })

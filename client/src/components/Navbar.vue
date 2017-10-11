@@ -1,10 +1,10 @@
 <template>
-  <nav class="navbar" role="navigation" aria-label="main navigation">
+  <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <router-link class="navbar-item" :to="{ name: 'Home' }">
-        <img src="../assets/brand_central_full.png">
+      <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
+        <img src="../assets/brand_central_icon.png">
       </router-link>
-      <router-link class="navbar-item" :to="{ name: 'Home' }">
+      <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
         Browse
       </router-link>
     </div>
@@ -14,7 +14,7 @@
           <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(this.$store.state.User.Email) + '?s=46&d=identicon'" class="profile-image" />
           <p>{{ this.$store.state.User.UserName }}</p>
         </a>
-        <div class="navbar-dropdown">
+        <div class="navbar-dropdown is-right">
           <div class="navbar-item" style="display:block;">
             <b>{{ this.$store.state.User.FirstName }} {{ this.$store.state.User.LastName }}</b>
             <br> @{{ this.$store.state.User.UserName }}
@@ -22,7 +22,8 @@
           <hr class="navbar-divider">
           <router-link :to="{ name: 'Profile' }" class="navbar-item">Profile</router-link>
           <router-link :to="{ name: 'EditProfile' }" class="navbar-item">Settings</router-link>
-          <a class="navbar-item">About</a>
+          <!--<a class="navbar-item">About</a>  
+          about is empty right now. we can add it back when we get something to put here--> 
           <hr class="navbar-divider">
           <a class="navbar-item" @click="signOut">Sign out</a>
         </div>

@@ -2,12 +2,13 @@
   <div class="column is-10">
     <div class="column is-12 columns is-multiline" v-show="ChangePassword">
       <div class="column is-12 is-size-5">
-        <h1 class="title is-size-2.5">Change your password</h1>
+        <h1 class="title is-size-2.5">Password</h1>
         <div class="field">
           <label class="label">Current password</label>
           <div class="control">
             <input class="input" type="password" placeholder="Current password" v-model="PasswordChange.CurrentPassword" />
           </div>
+          <p class="help">You must provide your current password in order to change it.</p>
         </div>
         <div class="field">
           <label class="label">New password</label>

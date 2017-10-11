@@ -68,7 +68,7 @@ export default {
             this.$http.post(`/api/verify`, body)
                 .then(response => {
                     if (response.body.success) {
-                        this.$router.push({ name: 'Home' })
+                        this.$router.push({ name: 'Interests' })
                     } else {
                         failureMessage = response.body.message
                     }

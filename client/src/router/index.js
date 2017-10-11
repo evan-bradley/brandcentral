@@ -4,13 +4,16 @@ import LogIn from '@/components/LogIn'
 import Register from '@/components/Register'
 import Profile from '@/components/Profile'
 import Verify from '@/components/Verify'
-import Home from '@/components/Home'
+import Browse from '@/components/Browse'
 import EditProfile from '@/components/EditProfile'
 import ChangePassword from '@/components/ChangePassword'
 import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
 import Interests from '@/components/Interests'
+import WelcomePage from '@/components/WelcomePage'
+import Channel from '@/components/Channel'
+
 // var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 Vue.use(Router)
@@ -94,9 +97,29 @@ const router = new Router({
     },
     {
       path: '/',
-      name: 'Home',
-      component: Home
+      name: 'Browse',
+      component: Browse,
+      children: [
+        {
+          path: '/',
+          name: 'WelcomeScreen',
+          component: WelcomePage
+        },
+        {
+          path: '/channel/:channel',
+          name: 'Channel',
+          props: true,
+          component: Channel
+        },
+        {
+          path: '/user/:user',
+          name: 'BrowseProfile',
+          props: true,
+          component: Profile
+        }
+      ]
     }
+
   ],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }

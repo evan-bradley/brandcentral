@@ -7,7 +7,8 @@ export namespace Classes {
     public Email: string;
     public Password: string;
 
-    constructor(id: string = "", userName: string = "", email: string = "", password: string = "", firstName: string = "", lastName: string = "") {
+    constructor(id: string = "", userName: string = "", email: string = "",
+     password: string = "", firstName: string = "", lastName: string = "") {
       this.Id = id;
       this.FirstName = firstName;
       this.LastName = lastName;
@@ -16,6 +17,7 @@ export namespace Classes {
       this.Password = password;
     }
   }
+
   export class PasswordVerification {
     public CurrentPassword: string;
     public NewPassword: string;
@@ -29,6 +31,18 @@ export namespace Classes {
 
     Verify (currentPassword: string): boolean {
       return (this.CurrentPassword === currentPassword && this.NewPassword === this.VerifyNewPassword);
+    }
+  }
+
+  export class Item {
+    public ProductName : string;
+    public ItemDescription : string;
+    public ImmageURL : string;
+
+    constructor(productName: string = "", itemDescription: string = "", immageURL: string) {
+      this.ProductName = productName;
+      this.ItemDescription = itemDescription;
+      this.ImmageURL = immageURL;
     }
   }
 }
