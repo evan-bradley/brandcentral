@@ -6,6 +6,7 @@
 const mysql = require('promise-mysql')
 const bcrypt = require('bcrypt')
 const moment = require('moment-range').extendMoment(require('moment'))
+const crypto = require('crypto-promise')
 
 const pool = mysql.createPool({
   'connectionLimit': 5,
@@ -23,7 +24,9 @@ const pool = mysql.createPool({
  * in the database.
  */
 const DUPCHECK_Q = 'SELECT USERNAME, USER_EMAIL FROM USER WHERE USERNAME = ? OR USER_EMAIL = ?'
-const REGISTER_Q = 'INSERT INTO USER (USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VERIFICATION, LAST_SEEN) VALUES(?, ?, ?, ?, ?, ?, ?)'
+const REGISTER_Q = `INSERT INTO USER
+(USERNAME, USER_LNAME, USER_FNAME, USER_EMAIL, USER_PASS_HASH, VER_TOKEN, VER_CODE, LAST_SEEN)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
 pool.registerUser = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.username || !info.email ||
@@ -46,64 +49,62 @@ pool.registerUser = info => {
         }
       } else {
         const hash = await bcrypt.hash(info.password, 10)
-        require('crypto').randomBytes(16, async (err, buffer) => {
-          if (err) {
-            reject(err)
-            return
-          }
+        const token = (await crypto.randomBytes(16)).toString('hex')
+        const code = [...(await crypto.randomBytes(6))].map(num => num % 10).join('')
+        const res = await pool.query(REGISTER_Q, [
+          info.username,
+          info.lastName,
+          info.firstName,
+          info.email,
+          hash,
+          token,
+          code,
+          moment().format('YYYY-MM-DD HH:mm:ss')
+        ])
 
-          const token = buffer.toString('hex')
-          const res = await pool.query(REGISTER_Q, [
-            info.username,
-            info.lastName,
-            info.firstName,
-            info.email,
-            hash,
-            token,
-            moment().format('YYYY-MM-DD HH:mm:ss')
-          ])
-          res.token = token
-          resolve(res)
-          // if (err.code === 'ER_DUP_ENTRY')
-          // err.message = 'A user with that ID is already registered'
-        })
+        res.token = token
+        res.code = code
+        resolve(res)
+        // if (err.code === 'ER_DUP_ENTRY')
+        // err.message = 'A user with that ID is already registered'
       }
     } catch (e) {
       reject(e)
     }
   })
 }
+
 const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
 const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFICATION = ? WHERE USER_EMAIL = ?;'
 pool.CheckNewEmail = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.NewEmail) {
-    reject(new Error('Missing Email'))
-    return
-  }
+      reject(new Error('Missing Email'))
+      return
+    }
 
-  try {
-    const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
-    if (results.length > 0) {
-      reject(new Error('Email already used'))
-    } else {
+    try {
+      const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
+      if (results.length > 0) {
+        reject(new Error('Email already used'))
+      } else {
         require('crypto').randomBytes(16, async (err, buffer) => {
-        if (err) {
-          reject(err)
-        }
+          if (err) {
+            reject(err)
+          }
 
-        const token = buffer.toString('hex')
-        const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
-        res.token = token
-        resolve(res)
-      })
+          const token = buffer.toString('hex')
+          const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
+          res.token = token
+          resolve(res)
+        })
         // if (err.code === 'ER_DUP_ENTRY')
         // err.message = 'A user with that ID is already registered'
       }
-  } catch (e) {
-    reject(e)
-  }
-})
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 /*
  * Check user's password and return user info if it is valid
@@ -172,13 +173,15 @@ pool.updateProfile = info => {
 const GET_USER_Q = 'SELECT * FROM USER WHERE USER_ID = ?'
 pool.getUserWithId = id => pool.query(GET_USER_Q, [ id ])
 
-const VERIFY_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VERIFICATION = ?'
-pool.verifyUser = token => pool.query(VERIFY_Q, [token])
+const VERIFY_TOKEN_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VER_TOKEN = ?'
+pool.verifyUserToken = token => pool.query(VERIFY_TOKEN_Q, [ token ])
+
+const VERIFY_CODE_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VER_CODE = ?'
+pool.verifyUserCode = code => pool.query(VERIFY_CODE_Q, [ code ])
 
 const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
 FROM USER WHERE USER_ID = ?`
 pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
-
 
 // This function will query the database for the first 16 tags.
 const GET_INTERESTS_TAGS_Q = `SELECT * FROM TAG LIMIT 16;`
@@ -248,6 +251,75 @@ pool.generatePasswordResetToken = email => {
       } catch (e) {
         reject(e)
       }
+    }
+  })
+}
+
+const STORE_USER_CHANNEL_Q = 'INSERT INTO CHANNEL_USER_ASSIGN (CHANNEL_ID, USER_ID) VALUES ?;'
+pool.storeUserChannels = (user, channels) => {
+  return new Promise(async (resolve, reject) => {
+    if (!channels || channels.length === 0) {
+      reject(new Error('Missing channels'))
+    }
+
+    try {
+      const values = channels.map(channel => [ channel, user ])
+      await pool.query(STORE_USER_CHANNEL_Q, values)
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const SELECT_USER_CHANNEL_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME FROM (CHANNEL INNER JOIN CHANNEL_USER_ASSIGN ON CHANNEL.CHANNEL_ID = CHANNEL_USER_ASSIGN.CHANNEL_ID) WHERE USER_ID = ?;'
+pool.retrieveUserChannels = user => {
+  return new Promise(async (resolve, reject) => {
+    if (!user) {
+      reject(new Error('Missing user'))
+    }
+
+    try {
+      const results = await pool.query(SELECT_USER_CHANNEL_Q, [ user ])
+      const channelsArray = results.map(result => {
+        return { id: result.CHANNEL_ID, name: result.CHANNEL_NAME }
+      })
+
+      resolve(channelsArray)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const GET_RAND_PRODUCT_Q = 'select * from (((product inner join prod_tag_assign on product.product_id = prod_tag_assign.product_id) inner join tag on prod_tag_assign.tag_id = tag.tag_id) inner join channel_tag_assign on tag.tag_id = channel_tag_assign.tag_id) where channel_tag_assign.channel_id = ? and product.product_id = ?;'
+pool.getRandomProduct = channel => {
+  return new Promise(async (resolve, reject) => {
+    if (!channel) {
+      reject(new Error('Missing channels'))
+    }
+
+    const productCount = await pool.query('SELECT COUNT(*) FROM PRODUCT')
+    const productId = parseInt(Math.random() * (productCount[0].count - 0) + 0, 10)
+    try {
+      const results = await pool.query(GET_RAND_PRODUCT_Q, [ channel, productId ])
+
+      if (results.length > 0) {
+        const product = {
+          id: results.rows[0].PRODUCT_ID,
+          name: results.rows[0].PROD_NAME,
+          description: results.rows[0].PROD_DESC,
+          pictureUrl: results.rows[0].PROD_PICT_URL,
+          productUrl: results.rows[0].PROD_URL,
+          model: results.rows[0].PROD_MODEL
+        }
+
+        resolve(product)
+      } else {
+        reject(new Error('No product found.'))
+      }
+    } catch (e) {
+      reject(e)
     }
   })
 }

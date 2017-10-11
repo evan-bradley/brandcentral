@@ -4,8 +4,10 @@
   "description": "Backend server for brand central station.",
   "main": "",
   "scripts": {
+    "start": "node src/server.js",
     "test": "./node_modules/.bin/mocha --exit test/tests.js",
-    "start": "node src/server.js"
+    "init-db": "cd db && mysql -uroot < setup.sql && cd ../ && echo '\\033[0;32mDATABASES INITIALIZED'",
+    "uninit-db": "cd db && mysql -uroot < teardown.sql && cd ../ && echo '\\033[0;31mDATABASES DROPPED'"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "crypt": "0.0.2",
+    "crypto-promise": "^2.0.0",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
     "express-mysql-session": "^1.2.0",

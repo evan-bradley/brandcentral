@@ -65,62 +65,103 @@ router.get('/api/logout', async (req, res) => {
 })
 
 router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
-
   try {
     const test = await db.CheckNewEmail(req.body)
-  let OldEmail = {
-    from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-    to: req.body.currentEmail,
-    subject: 'Email Change ✔', // Subject line
-    text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+    let OldEmail = {
+      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+      to: req.body.currentEmail,
+      subject: 'Email Change ✔', // Subject line
+      text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+    }
+
+    transporter.sendMail(OldEmail, (error, info) => {
+      if (error) {
+        return console.log(error)
+      }
+    })
+
+    let NewVerifyEmail = {
+      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+      to: req.body.NewEmail,
+      subject: 'Hello ✔', // Subject line
+      text: 'Hello, please click this link to verify your new email:\n' // plain text body
+    }
+
+    NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
+    console.log(NewVerifyEmail)
+
+    transporter.sendMail(NewVerifyEmail, (error, info) => {
+      if (error) {
+        return console.log(error)
+      }
+      console.log('Message sent: %s', info.messageId)
+    })
+
+    res.send({
+      success: true
+      // id: results.id
+    })
+  } catch (e) {
+    console.log(e)
+    console.log(e.message)
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
-  console.log(OldEmail)
+})
 
-transporter.sendMail(OldEmail, (error, info) => {
-  if (error) {
-    return console.log(error)
+/*
+ * Store user's channels.
+ */
+router.post('/api/channels/:user', async (req, res) => {
+  try {
+    await db.storeUserChannels(req.params.user, req.body.channels)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
-  console.log('Message sent: %s', info.messageId)
 })
-let NewVerifyEmail = {
-  from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-  to: req.body.NewEmail,
-  subject: 'Hello ✔', // Subject line
-  text: 'Hello, please click this link to verify your new email:\n' // plain text body
-}
 
-NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
-console.log(NewVerifyEmail)
-
-transporter.sendMail(NewVerifyEmail, (error, info) => {
-  if (error) {
-    return console.log(error)
+/*
+ * Retrieve user's channels.
+ */
+router.get('/api/channels/:user', async (req, res) => {
+  try {
+    if (req.params.user === req.session.userId) {
+      const channels = await db.retrieveUserChannels(req.params.user)
+      res.send({
+        success: true,
+        channels
+      })
+    } else {
+      throw new Error('Unauthorized')
+    }
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
-  console.log('Message sent: %s', info.messageId)
-})
-res.send({
-  success: true
-  //id: results.id
 })
 
-}catch
-(e)
-{
-  console.log(e)
-  console.log(e.message)
-  res.send({
-    success: false,
-    message: e.message
-  })
-}
-})
-
-router.post('/api/interests/tags', (req, res) => {
-  console.log(req.session.userId)
-  console.log(req.body.tags)
-  res.send({
-    success: true
-  })
+router.get('/api/product', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      product: await db.getRandomProduct(req.query.channelId)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
 })
 
 module.exports = router

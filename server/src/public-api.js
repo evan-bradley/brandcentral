@@ -4,8 +4,6 @@
 
 const router = require('express').Router()
 const db = require('./db')
-
-// const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 
 // create reusable transporter object using the default SMTP transport
@@ -63,17 +61,16 @@ router.post('/api/register', async (req, res) => {
     }
 
     registerEmail.text += `http://localhost:8080/verify?token=${results.token}`
-    console.log(registerEmail)
 
     transporter.sendMail(registerEmail, (error, info) => {
       if (error) {
-        return console.log(error)
+        throw error
       }
-      console.log('Message sent: %s', info.messageId)
     })
     res.send({
       success: true,
-      id: results.id
+      id: results.insertId,
+      code: results.code
     })
   } catch (e) {
     console.log(e)
@@ -120,10 +117,17 @@ router.post('/api/password/reset', async (req, res) => {
 
 router.post('/api/verify', async (req, res) => {
   try {
-    await db.verifyUser(req.body.token)
-    res.send(JSON.stringify({
+    if (req.body.token) {
+      await db.verifyUserToken(req.body.token)
+    } else if (req.body.code) {
+      await db.verifyUserCode(req.body.code)
+    } else {
+      throw new Error('No code or token given.')
+    }
+
+    res.send({
       success: true
-    }))
+    })
   } catch (e) {
     res.send({
       success: false,
@@ -185,6 +189,6 @@ router.get('/api/interests/tags', async (req, res) => {
       tags: e.message
     })
   }
-});
+})
 
 module.exports = router
