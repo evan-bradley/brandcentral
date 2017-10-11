@@ -101,15 +101,21 @@ const router = new Router({
       component: Browse,
       children: [
         {
-          path: '',
+          path: '/',
           name: 'WelcomeScreen',
           component: WelcomePage
         },
         {
-          path: '/channel/:user?/:tag?',
+          path: '/channel/:tag',
           name: 'Channel',
           props: true,
           component: Channel
+        },
+        {
+          path: '/user/:user',
+          name: 'BrowseProfile',
+          props: true,
+          component: Profile
         }
       ]
     }

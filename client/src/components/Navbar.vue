@@ -1,8 +1,8 @@
 <template>
-  <nav class="navbar" role="navigation" aria-label="main navigation">
+  <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
-        <img src="../assets/brand_central_full.png">
+        <img src="../assets/brand_central_icon.png">
       </router-link>
       <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
         Browse
@@ -14,7 +14,7 @@
           <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(this.$store.state.User.Email) + '?s=46&d=identicon'" class="profile-image" />
           <p>{{ this.$store.state.User.UserName }}</p>
         </a>
-        <div class="navbar-dropdown">
+        <div class="navbar-dropdown is-right">
           <div class="navbar-item" style="display:block;">
             <b>{{ this.$store.state.User.FirstName }} {{ this.$store.state.User.LastName }}</b>
             <br> @{{ this.$store.state.User.UserName }}

@@ -19,10 +19,11 @@
   <section class="section">
     <div class="container">
       <div class="columns is-mobile is-multiline">
-        <div v-for="tag in tags" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+        <div v-for="tag in tags" v-bind:key="tag.id" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
           <a class="box" v-on:click="toggleTagSelection(tag)" v-bind:class="{ 'selected-tag': selectedTags.includes(tag.TAG_ID) }">
             <h3 class="title is-6">
-              {{ tag.TAG_DESC | capitalize}}
+              <i class="fa fa-tag" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
+              <span>{{ tag.TAG_DESC | capitalize}}</span>
             </h3>
           </a>
         </div>

@@ -1,11 +1,6 @@
 <template>
-    <div class="columns is-multiline">
-        <div class='is-centered column is-12'>
-            <h1 class="title">
-                {{ChannelId}}
-            </h1>
-        </div>
-        <div class="column is-offset-3 is-6 is-centered">
+    <div class="columns is-multiline is-centered">
+        <div class="column is-5">
            <voting-item :item ="this.CurrentItem" />
         </div>
     </div>

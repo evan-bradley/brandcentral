@@ -1,49 +1,71 @@
 <template>
   <div>
     <div class="box">
-        <div class="card-image">
-            <figure class="image is-4by3">
-                <img :src=item.ImmageURL alt="Placeholder image">
-            </figure>
-        </div>
-        <div class="card-content">
-            <div class="media">
-                <div class="media-content">
-                    <div :class="[this.DisplayMode ? 'subtitle is-5':'title is-4']">
-                        <p class="has-text-left is-pulled-left">
-                            {{ item.ProductName }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="content has-text-left" v-show="!this.DisplayMode">
-                {{ item.ItemDescription }}
-            </div>
-        </div>
-    </div>
-            <div v-show="!this.DisplayMode">
-                <a v-on:click="GoLeft">
-                    <i class="fa fa-hand-o-left fa-3x left-right-buttons has-text-centered" aria-hidden="true"></i>
-                </a>
-                <a v-on:click="UpVote">
-                    <i class="fa fa-thumbs-o-up fa-3x upvote-button has-text-centered" aria-hidden="true"></i>
-                </a>
-                <a v-on:click="DownVote">
-                    <i class="fa fa-thumbs-o-down fa-3x downvote-button has-text-centered" aria-hidden="true"></i>
-                </a>
-                <a v-on:click="GoRight">
-                    <i class="fa fa-hand-o-right fa-3x left-right-buttons has-text-centered" aria-hidden="true"></i>
-                </a>
-            </div>
+        <figure class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
+            <img :src=item.ImmageURL alt="Placeholder image">
+        </figure>
+      <hr style="margin: 20px -20px">
+      <div class="media">
+        <div class="media-content">
+          <div :class="[this.DisplayMode ? 'subtitle is-5':'title is-4']">
+            <p class="has-text-left is-pulled-left">
+              {{ item.ProductName }}
+            </p>
           </div>
+        </div>
+      </div>
+      <div class="content has-text-left" v-show="!this.DisplayMode">
+        {{ item.ItemDescription }}
+      </div>
+    </div>
+    <div v-show="!this.DisplayMode">
+      <div class="has-text-centered">
+        <div class="field has-addons is-grouped is-grouped-centered">
+          <p class="control">
+            <a class="button" v-on:click="previous" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="fa fa-angle-left"></i>
+              </span>
+              <span>Prev</span>
+            </a>
+          </p>
+          <p class="control" style="margin-right: -1px;">
+            <a class="button" v-on:click="dislike" style="border-bottom-left-radius: 100px; border-top-left-radius: 100px;">
+              <span class="icon is-small">
+                <i class="fa fa-thumbs-o-down"></i>
+              </span>
+              <span>Dislike</span>
+            </a>
+          </p>
+          <p class="control">
+            <a class="button" v-on:click="like" style="border-bottom-right-radius: 100px; border-top-right-radius: 100px;">
+              <span class="icon is-small">
+                <i class="fa fa-thumbs-o-up"></i>
+              </span>
+              <span>Like</span>
+            </a>
+          </p>
+          <p class="control">
+            <a class="button" v-on:click="next" style="border-radius: 100px;">
+              <span>Next</span>
+              <span class="icon is-small">
+                <i class="fa fa-angle-right"></i>
+              </span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
+
 
 <script>
     export default {
         props: ['item'],
         data() {
             return {
-                DisplayMode: this.$route.name === 'Profile'
+                DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile'
             }
         },
         computed:{
@@ -52,17 +74,17 @@
             }
         },
         methods:{
-            GoLeft(){
-                console.log('tried to go left')
+            previous(){
+                console.log('clicked previous')
             },
-            GoRight(){
-                console.log('tried to go right')
+            next(){
+                console.log('clicked next')
             },
-            UpVote(){
-                console.log('up voted ' + this.item.ProductName)
+            like(){
+                console.log('liked ' + this.item.ProductName)
             },
-            DownVote(){
-                console.log('down voted ' + this.item.ProductName)
+            dislike(){
+                console.log('liked ' + this.item.ProductName)
             }
         }
     }

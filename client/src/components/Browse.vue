@@ -1,5 +1,6 @@
 <template>
-    <div class="columns" style="margin: 15px;">
+  <section class="section">
+    <div class="columns">
       <div class="column is-narrow">
         <aside class="menu box" style="width: 250px;">
           <div class="field">
@@ -9,13 +10,13 @@
           </div>
           <hr style="margin-right: -20px; margin-left: -20px;">
           <div v-show="searchText.length > 0">
-            Here is where it would show the results of the search...
+            No results found
             <hr style="margin-right: -20px; margin-left: -20px;">
           </div>
-          <p v-show="channels.length > 0" class="menu-label">Tags</p>
+          <p v-show="channels.length > 0" class="menu-label">Channels</p>
           <ul class="menu-list">
             <li v-for="channel in channels" :key="channel.id">
-              <router-link v-bind:class="{ 'is-active': channel.id == $route.query.tag }" :to="{ name: 'Channel', query:{ tag: channel.id } }">
+              <router-link v-bind:class="{ 'is-active': channel.id == $route.params.tag }" :to="{ name: 'Channel', params:{ tag: channel.id } }">
                 <i class="fa fa-tag" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
                 {{ channel.description }}
               </router-link>
@@ -24,7 +25,7 @@
           <p v-show="users.length > 0" class="menu-label">Users</p>
           <ul class="menu-list">
             <li v-for="user in users" :key="user.id">
-              <router-link v-bind:class="{ 'is-active': user.id == $route.query.user }" :to="{ name: 'Channel', query:{ user: user.id } }">
+              <router-link v-bind:class="{ 'is-active': user.id == $route.params.user }" :to="{ name: 'BrowseProfile', params:{ user: user.id } }">
                 <i class="fa fa-user" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
                 {{ user.username }}
               </router-link>
@@ -36,6 +37,7 @@
         <router-view></router-view>
       </div>
     </div>
+  </section>
 </template>
 
 <script>

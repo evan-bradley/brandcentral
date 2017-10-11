@@ -2,14 +2,7 @@
   <div class="column is-10">
     <div class="column is-12 columns is-multiline">
       <div class="column is-12 is-size-5">
-        <h1 class="title is-size-2.5">Edit your profile</h1>
-        <div class="field">
-          <label class="label">Username</label>
-          <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"/>
-          </div>
-          <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
-        </div>
+        <h1 class="title is-size-2.5">Profile</h1>
         <div class="field">
           <label class="label">First Name</label>
           <div class="control">
@@ -23,18 +16,21 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Email</label>
+          <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.Email" name="email" v-model="EditedUser.Email" v-validate="{ required: true, email: true }"/>
+            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"
+            />
           </div>
-          <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
-        </div>        
+          <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
+        </div>
         <button class="button is-primary" @click="Update">Update profile</button>
         <router-link class="button is-pulled-right" :to="{ name: 'Profile' }">Cancel</router-link>
       </div>
     </div>
   </div>
 </template>
+
+
 
 <script>
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
@@ -76,11 +72,6 @@ export default {
       if (this.$store.state.User.LastName !== this.EditedUser.LastName) {
         updateInfo.lastName = this.EditedUser.LastName
         this.$store.state.User.LastName = this.EditedUser.LastName
-      }
-
-      if (this.$store.state.User.Email !== this.EditedUser.Email) {
-        updateInfo.email = this.EditedUser.Email
-        this.$store.state.User.Email = this.EditedUser.Email
       }
 
       // Send a request to the api to update the user's information
