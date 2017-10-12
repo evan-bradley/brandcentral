@@ -32,12 +32,12 @@
 </template>
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 import EditProfile from './EditProfile'
+var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
 export default {
   name: 'ChangePassword',
-  data() {
+  data () {
     return {
       User: this.$store.state.User,
       PasswordChange: new Classes.PasswordVerification()
@@ -47,11 +47,11 @@ export default {
     'EditProfile': EditProfile
   },
   methods: {
-    ChangePassword() {
+    ChangePassword () {
       // Quit if any inputs are invalid
-      this.$validator.validateAll();
+      this.$validator.validateAll()
       if (this.errors.any()) {
-          return
+        return
       }
 
       // TODO: This needs to actually change the password in the database
@@ -60,11 +60,11 @@ export default {
         this.$http.post(`/api/profile/${this.$store.state.User.Id}`, {
           password: this.PasswordChange.NewPassword
         })
-        .then(response => {
-          console.log(response)
-        }, response => {
-          console.log(response)
-        })
+          .then(response => {
+            console.log(response)
+          }, response => {
+            console.log(response)
+          })
       }
 
       this.$router.go(-1)
