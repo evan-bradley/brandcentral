@@ -293,26 +293,29 @@ pool.retrieveUserChannels = user => {
   })
 }
 
-const GET_RAND_PRODUCT_Q = 'select * from (((product inner join prod_tag_assign on product.product_id = prod_tag_assign.product_id) inner join tag on prod_tag_assign.tag_id = tag.tag_id) inner join channel_tag_assign on tag.tag_id = channel_tag_assign.tag_id) where channel_tag_assign.channel_id = ? and product.product_id = ?;'
+const GET_RAND_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ?;'
 pool.getRandomProduct = channel => {
   return new Promise(async (resolve, reject) => {
     if (!channel) {
       reject(new Error('Missing channels'))
     }
 
-    const productCount = await pool.query('SELECT COUNT(*) FROM PRODUCT')
-    const productId = parseInt(Math.random() * (productCount[0].count - 0) + 0, 10)
+    // const productCount = await pool.query('SELECT COUNT(*) FROM PRODUCT')
+    // const productId = parseInt(Math.random() * (productCount[0]['COUNT(*)'] - 0) + 0, 10)
+    // const code = [...(await crypto.randomBytes(6))].map(num => num % 10).join('')
+    // console.log(productId)
     try {
-      const results = await pool.query(GET_RAND_PRODUCT_Q, [ channel, productId ])
+      const results = await pool.query(GET_RAND_PRODUCT_Q, [ channel ])
 
       if (results.length > 0) {
+        const productNum = parseInt(Math.random() * (results.length - 0) + 0, 10)
         const product = {
-          id: results.rows[0].PRODUCT_ID,
-          name: results.rows[0].PROD_NAME,
-          description: results.rows[0].PROD_DESC,
-          pictureUrl: results.rows[0].PROD_PICT_URL,
-          productUrl: results.rows[0].PROD_URL,
-          model: results.rows[0].PROD_MODEL
+          id: results[productNum].PRODUCT_ID,
+          name: results[productNum].PROD_NAME,
+          description: results[productNum].PROD_DESC,
+          pictureUrl: results[productNum].PROD_PICT_URL,
+          productUrl: results[productNum].PROD_URL,
+          model: results[productNum].PROD_MODEL
         }
 
         resolve(product)
@@ -322,6 +325,31 @@ pool.getRandomProduct = channel => {
     } catch (e) {
       reject(e)
     }
+  })
+}
+
+pool.likeProduct = (user, product) => {
+  return new Promise(async (resolve, reject) => {
+  })
+}
+
+pool.unlikeProduct = (user, product) => {
+  return new Promise(async (resolve, reject) => {
+  })
+}
+
+pool.followUser = (follower, followee) => {
+  return new Promise(async (resolve, reject) => {
+  })
+}
+
+pool.unfollowUser = (follower, followee) => {
+  return new Promise(async (resolve, reject) => {
+  })
+}
+
+pool.getFollowing = user => {
+  return new Promise(async (resolve, reject) => {
   })
 }
 

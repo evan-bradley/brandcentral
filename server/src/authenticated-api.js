@@ -133,7 +133,7 @@ router.post('/api/channels/:user', async (req, res) => {
  */
 router.get('/api/channels/:user', async (req, res) => {
   try {
-    if (req.params.user == req.session.userId) {
+    if (parseInt(req.params.user, 10) === parseInt(req.session.userId, 10)) {
       const channels = await db.retrieveUserChannels(req.params.user)
       res.send({
         success: true,
@@ -154,13 +154,79 @@ router.get('/api/product', async (req, res) => {
   try {
     res.send({
       success: true,
-      product: await db.getRandomProduct(req.query.channelId)
+      product: await db.getRandomProduct(req.query.channelId) // , req.query.count
     })
   } catch (e) {
     res.send({
       success: false,
       message: e.message
     })
+  }
+})
+
+router.get('/api/product/:id', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      product: await db.getProduct(req.params.id)
+    })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.post('/api/product/like/:id', async (req, res) => {
+  try {
+    await db.likeProduct(req.session.userId, req.params.id)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.post('/api/product/dislike/:id', async (req, res) => {
+  try {
+    db.dislikeProduct(req.session.userId, req.params.id)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.post('/api/user/follow/:id', async (req, res) => {
+  try {
+    db.followUser(req.session.userId, req.params.id)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.post('/api/user/unfollow/:id', async (req, res) => {
+  try {
+    await db.unfollowUser(req.session.userId, req.params.id)
+    res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.get('/api/user/following/:id', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      following: await db.getFollowing(req.params.id)
+    })
+  } catch (e) {
+    res.send()
   }
 })
 

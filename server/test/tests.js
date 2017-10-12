@@ -69,31 +69,32 @@ describe('HTTP Routes', () => {
 
 const userData = {
   username: 'tester',
-  email: 'test@localhost',
+  email: 'test@null',
   lastName: 'titor',
   firstName: 'john',
   password: 'password'
 }
 let id
-let code
 
 describe('Registering a user', () => {
   it('Should POST to /api/register', () => {
     return new Promise((resolve, reject) => {
-      chai.request(server)
-        .post('/api/register')
-        .send(userData)
-        .end((err, res) => {
-          should.not.exist(err)
-          res.status.should.equal(200)
-          res.body.success.should.equal(true)
-          should.exist(res.body.id)
-          should.exist(res.body.code)
+      try {
+        chai.request(server)
+          .post('/api/register')
+          .send(userData)
+          .end((err, res) => {
+            should.not.exist(err)
+            res.status.should.equal(200)
+            res.body.success.should.equal(true)
+            should.exist(res.body.id)
 
-          id = res.body.id
-          code = res.body.code
-          resolve()
-        })
+            id = res.body.id
+            resolve()
+          })
+      } catch (e) {
+        reject(e)
+      }
     })
   })
 
@@ -113,12 +114,15 @@ describe('Registering a user', () => {
     })
   })
 
-  it('Should POST to /api/verify with a code', () => {
+  it('Should POST to /api/verify with a rigged code', () => {
     return new Promise(async (resolve, reject) => {
+      const user = (await pool.query('select * from user'))[0]
+      user.VERIFIED.should.equal(0)
+
       chai.request(server)
         .post('/api/verify')
         .send({
-          code
+          code: user.VER_CODE
         })
         .end((err, res) => {
           should.not.exist(err)
@@ -188,6 +192,24 @@ describe('Logging in', () => {
         .end((err, res) => {
           should.not.exist(err)
           res.body.success.should.equal(true)
+          // TODO: Check other values
+
+          resolve()
+        })
+    })
+  })
+})
+
+describe('Channel navigation', () => {
+  it('Should GET /api/product', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .get('/api/product?channelId=1')
+        .end((err, res) => {
+          should.not.exist(err)
+          // console.log(res.body)
+          res.body.success.should.equal(true)
+          should.exist(res.body.product)
           // TODO: Check other values
 
           resolve()

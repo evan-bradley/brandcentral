@@ -8,6 +8,7 @@ CREATE DATABASE IF NOT EXISTS BRAND_CENTRAL_TESTING;
 USE BRAND_CENTRAL_TESTING;
 
 SOURCE schema.sql;
+SOURCE seed_db_products.sql;
 
 /* Create database for session storage. */
 CREATE DATABASE IF NOT EXISTS SESSION_STORE;

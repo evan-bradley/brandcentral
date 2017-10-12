@@ -2,20 +2,20 @@
   <div>
     <div class="box">
         <figure class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-            <img :src=item.ImmageURL alt="Placeholder image">
+            <img :src="itemImageURL ? itemImageURL : item.ImmageURL" alt="Placeholder image">
         </figure>
       <hr style="margin: 20px -20px">
       <div class="media">
         <div class="media-content">
           <div :class="[this.DisplayMode ? 'subtitle is-5':'title is-4']">
             <p class="has-text-left is-pulled-left">
-              {{ item.ProductName }}
+              {{ itemName ? itemName : item.ProductName }}
             </p>
           </div>
         </div>
       </div>
       <div class="content has-text-left" v-show="!this.DisplayMode">
-        {{ item.ItemDescription }}
+        {{ itemDescription ? itemDescription : item.ProductDescription  }}
       </div>
     </div>
     <div v-show="!this.DisplayMode">
@@ -62,10 +62,13 @@
 
 <script>
     export default {
-        props: ['item'],
+        props: ['item', 'channel'],
         data() {
             return {
-                DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile'
+                DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
+                itemName: '',
+                itemDescription: '',
+                itemImageURL: ''
             }
         },
         computed:{
@@ -73,12 +76,29 @@
                 return this.item
             }
         },
+      watch: {
+        channel() {
+          this.next()
+          }
+        },
         methods:{
             previous(){
                 console.log('clicked previous')
             },
             next(){
-                console.log('clicked next')
+              this.$http.get(`/api/product?channelId=${this.channel}`)
+                .then(response => { // Success
+                  if (response.data.success) {
+                    this.itemName = response.data.product.name.substring(0, 30)
+                    this.itemDescription = response.data.product.description.substring(0, 80) + "..."
+                    this.itemImageURL = response.data.product.pictureUrl
+                  } else {
+                    this.failureMessage = response.data.message
+                  }
+                }, response => { // Error
+                  console.log(response)
+                  this.failureMessage = response.data.message
+                })
             },
             like(){
                 console.log('liked ' + this.item.ProductName)
@@ -86,6 +106,9 @@
             dislike(){
                 console.log('liked ' + this.item.ProductName)
             }
-        }
+        },
+      mounted() {
+        this.next()
+      }
     }
 </script>
