@@ -1,14 +1,8 @@
 <template>
-  <div class="column is-8 is-offset-2">
+  <div class="column is-10">
     <div class="column is-12 columns is-multiline">
       <div class="column is-12 is-size-5">
-        <h1 class="title is-size-2.5">Edit your profile</h1>
-        <div class="field">
-          <label class="label">Username</label>
-          <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.UserName" v-model="EditedUser.UserName" />
-          </div>
-        </div>
+        <h1 class="title is-size-2.5">Profile</h1>
         <div class="field">
           <label class="label">First Name</label>
           <div class="control">
@@ -22,16 +16,12 @@
           </div>
         </div>
         <div class="field">
-          <label class="label">Email</label>
+          <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.Email" v-model="EditedUser.Email" />
+            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"
+            />
           </div>
-        </div>
-        <div class="field">
-          <label class="label">Password</label>
-          <div class="control">
-            <router-link class="button" :to="{ name: 'ChangePassword' }">Change password</router-link>
-          </div>
+          <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
         </div>
         <button class="button is-primary" @click="Update">Update profile</button>
         <router-link class="button is-pulled-right" :to="{ name: 'Profile' }">Cancel</router-link>
@@ -39,6 +29,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script>
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
@@ -59,9 +51,17 @@ export default {
   },
   methods: {
     Update() {
-      // TODO: This needs to be changed to also update the username
-      const updateInfo = {
-        username: this.$store.state.User.UserName
+      // Quit if any inputs are invalid
+      this.$validator.validateAll();
+      if (this.errors.any()) {
+          return
+      }
+
+      const updateInfo = {}
+
+      if (this.$store.state.User.UserName !== this.EditedUser.UserName) {
+        updateInfo.username = this.EditedUser.UserName
+        this.$store.state.User.UserName = this.EditedUser.UserName
       }
 
       if (this.$store.state.User.FirstName !== this.EditedUser.FirstName) {
@@ -74,13 +74,8 @@ export default {
         this.$store.state.User.LastName = this.EditedUser.LastName
       }
 
-      if (this.$store.state.User.Email !== this.EditedUser.Email) {
-        updateInfo.email = this.EditedUser.Email
-        this.$store.state.User.Email = this.EditedUser.Email
-      }
-
       // Send a request to the api to update the user's information
-      this.$http.post('/api/profile', updateInfo)
+      this.$http.post(`/api/profile/${this.$store.state.User.Id}`, updateInfo)
       .then(response => {
         console.log(response)
         this.User = this.EditedUser

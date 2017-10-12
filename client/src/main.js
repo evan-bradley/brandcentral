@@ -5,7 +5,9 @@ import VueResource from 'vue-resource'
 import App from './App'
 import router from './router'
 import store from './Vuex/states'
+import VeeValidate from 'vee-validate'
 
+Vue.use(VeeValidate)
 Vue.use(VueResource)
 
 Vue.config.productionTip = false

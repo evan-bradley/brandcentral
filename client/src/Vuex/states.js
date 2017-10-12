@@ -7,7 +7,6 @@ var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 export default new Vuex.Store({
   state: {
     loggedIn: false,
-    userName: 'testUser',
     User: new Classes.User()
   },
   mutations: {
@@ -17,7 +16,7 @@ export default new Vuex.Store({
     },
     LogOut (state) {
       state.loggedIn = false
-      state.User = null
+      state.User = new Classes.User()
     }
   },
   getters: {
