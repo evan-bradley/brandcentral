@@ -353,4 +353,22 @@ pool.getFollowing = user => {
   })
 }
 
+const DELETECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
+pool.deleteUserChannel = (user, channel) => {
+    return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(DELETECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
