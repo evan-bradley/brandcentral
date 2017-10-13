@@ -68,7 +68,8 @@
                 DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
                 itemName: '',
                 itemDescription: '',
-                itemImageURL: ''
+                itemImageURL: '',
+                itemID: ''
             }
         },
         computed:{
@@ -92,6 +93,7 @@
                     this.itemName = response.data.product.name.substring(0, 30)
                     this.itemDescription = response.data.product.description.substring(0, 80) + "..."
                     this.itemImageURL = response.data.product.pictureUrl
+                    this.itemID = response.data.product.id
                   } else {
                     this.failureMessage = response.data.message
                   }
@@ -101,7 +103,22 @@
                 })
             },
             like(){
-                console.log('liked ' + this.item.ProductName)
+              const likeInfo = {
+                userID: this.$store.state.User.Id,
+                productID: this.itemID
+              }
+              this.$http.post('/api/product/like/:id', likeInfo)
+                .then(response => { // Success
+                  if (response.data.success) {
+                    console.log(response)
+                    this.failureMessage = response.data.message
+                    console.log('liked ' + this.itemName)
+                    this.next()
+                  }
+                }, response => { // Error
+                  console.log(response)
+                  this.failureMessage = response.data.message
+                })
             },
             dislike(){
                 console.log('liked ' + this.item.ProductName)

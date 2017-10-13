@@ -328,13 +328,27 @@ pool.getRandomProduct = channel => {
   })
 }
 
+const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
 pool.likeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
+      if (!user || !product) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+        await pool.query(LIKE_Q, [user, product])
+        resolve()
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
 pool.unlikeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
+
   })
 }
 

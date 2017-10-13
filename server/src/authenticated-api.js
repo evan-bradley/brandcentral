@@ -177,12 +177,15 @@ router.get('/api/product/:id', async (req, res) => {
 
 router.post('/api/product/like/:id', async (req, res) => {
   try {
-    await db.likeProduct(req.session.userId, req.params.id)
+    await db.likeProduct(req.body.userID, req.body.productID)
     res.send({
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
