@@ -177,7 +177,7 @@ router.get('/api/product/:id', async (req, res) => {
 
 router.post('/api/product/like/:id', async (req, res) => {
   try {
-    await db.likeProduct(req.body.userID, req.body.productID)
+    await db.likeProduct(req.session.userId, req.params.id)
     res.send({
       success: true
     })
@@ -191,7 +191,7 @@ router.post('/api/product/like/:id', async (req, res) => {
 
 router.post('/api/product/dislike/:id', async (req, res) => {
   try {
-    await db.dislikeProduct(req.body.userID, req.body.productID)
+    await db.dislikeProduct(req.session.userId, req.params.id)
     res.send({
     success: true
   })

@@ -103,11 +103,7 @@
                 })
             },
             like(){
-              const likeInfo = {
-                userID: this.$store.state.User.Id,
-                productID: this.itemID
-              }
-              this.$http.post('/api/product/like/:id', likeInfo)
+              this.$http.post(`/api/product/like/${this.itemID}`)
                 .then(response => { // Success
                   if (response.data.success) {
                     console.log(response)
@@ -121,11 +117,7 @@
                 })
             },
             dislike(){
-              const dislikeInfo = {
-                userID: this.$store.state.User.Id,
-                productID: this.itemID
-              }
-              this.$http.post('/api/product/dislike/:id', dislikeInfo)
+              this.$http.post(`/api/product/dislike/${this.itemID}`)
                 .then(response => { // Success
                   if (response.data.success) {
                     console.log(response)
