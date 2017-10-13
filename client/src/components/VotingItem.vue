@@ -121,7 +121,22 @@
                 })
             },
             dislike(){
-                console.log('liked ' + this.item.ProductName)
+              const dislikeInfo = {
+                userID: this.$store.state.User.Id,
+                productID: this.itemID
+              }
+              this.$http.post('/api/product/dislike/:id', dislikeInfo)
+                .then(response => { // Success
+                  if (response.data.success) {
+                    console.log(response)
+                    this.failureMessage = response.data.message
+                    console.log('disliked ' + this.itemName)
+                    this.next()
+                  }
+                }, response => { // Error
+                  console.log(response)
+                  this.failureMessage = response.data.message
+                })
             }
         },
       mounted() {
