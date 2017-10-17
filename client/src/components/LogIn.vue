@@ -84,7 +84,7 @@ export default {
             this.user.Id = response.data.id
             this.user.FirstName = response.data.firstName
             this.user.LastName = response.data.lastName
-            this.user.Email = response.data.email
+            this.user.Email = response.data.emai
             this.$store.commit('setUser', this.user)
             this.$router.push({ name: 'Browse' })
           }else{

@@ -75,7 +75,7 @@ pool.registerUser = info => {
 }
 
 const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
-const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFICATION = ? WHERE USER_EMAIL = ?;'
+const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VER_TOKEN = ? WHERE USER_EMAIL = ?;'
 pool.CheckNewEmail = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.NewEmail) {
@@ -143,6 +143,33 @@ pool.loginUser = info => {
       reject(e)
     }
   })
+}
+
+const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
+pool.verifyPassword = (user, pass) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(GETPASSHASH_Q, [ user ])
+
+    if (results.length === 0) {
+    // login failure
+    reject(new Error('user id invalid'))
+    return
+  }
+
+  const res = await bcrypt.compare(pass.password, results[0].USER_PASS_HASH)
+
+  if (res) {
+    // successful login
+    resolve()
+  } else {
+    // login failure
+    reject(new Error('password invalid'))
+  }
+} catch (e) {
+    reject(e)
+  }
+})
 }
 
 pool.updateProfile = info => {

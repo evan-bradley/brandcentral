@@ -52,6 +52,9 @@
           if (this.errors.any()) {
             return
           }
+          const PassInfo = {
+            password: this.password
+          }
 
           const EmailChangeInfo = {
             id: this.$store.state.User.Id,
@@ -59,24 +62,31 @@
             currentEmail: this.$store.state.User.Email,
             password: this.password
           }
-          if (this.$store.state.User.Password === this.password) {
-            // Send a request to the api to update the user's information
-            this.$http.post(`/api/profile/ChangeEmail/${this.$store.state.User.Id}`, EmailChangeInfo)
-              .then(response => {
-                if (response.body.success) {
-                    this.$store.state.User.Email = EmailChangeInfo.NewEmail
-                  this.$router.push({ name: 'EditProfile' })
-                } else {
-                  console.log(response)
-                  this.failureMessage = response.data.message
-                }
+          this.$http.post('/api/verify/password', PassInfo)
+            .then(response => {
+              if (response.data.success) {
+                // Send a request to the api to update the user's information
+                this.$http.post(`/api/profile/ChangeEmail/${this.$store.state.User.Id}`, EmailChangeInfo)
+                  .then(response => {
+                    if (response.body.success) {
+                      this.$store.state.User.Email = EmailChangeInfo.NewEmail
+                      this.$router.push({name: 'EditProfile'})
+                    } else {
+                      console.log(response)
+                      this.failureMessage = response.data.message
+                    }
 
-              }, response => {
+                  }, response => {
+                    this.failureMessage = response.data.message
+                    console.log(response)
+                  })
+              } else {
                 console.log(response)
-              })
-          }else{
-            this.failureMessage = 'Incorrect Password'
-          }
+                this.failureMessage = response.data.message
+              }
+            }, response => { // Failure
+              this.failureMessage = response.data.message
+            })
         }
       }
     }
