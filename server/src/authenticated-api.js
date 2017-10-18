@@ -226,10 +226,7 @@ router.get('/api/user/following/:id', async (req, res) => {
       following: await db.getFollowing(req.params.id)
     })
   } catch (e) {
-    res.send(
-      success: false,
-      message: e.message
-    )
+    res.send()
   }
 })
 
