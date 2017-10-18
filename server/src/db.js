@@ -374,9 +374,21 @@ pool.unfollowUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
   })
 }
-
+const FOLLOWING_Q = `SELECT USER_FOLLOWED_ID WHERE FOLLOWER_ID = ?`
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
+      if (!user) {
+      reject(new Error('Missing user id'))
+      return
+    }
+
+    try {
+      const results = await pool.query(FOLLOWING_Q, [user])
+      resolve(results)
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
