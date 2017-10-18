@@ -11,8 +11,7 @@
         <div class="field">
           <label class="label">New Email</label>
           <div class="control">
-            <input class="input" type="text" placeholder="Email" name="email" v-model="newEmail" v-validate="{ required: true, email: true}"
-            />
+            <input class="input" type="text" placeholder="Email" name="email" v-model="email" v-validate="{ required: true, email: true}"/>
           </div>
           <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
         </div>
@@ -34,39 +33,50 @@
   export default {
     data () {
       return {
-        newEmail: '',
+        email: '',
         password: '',
         user: this.$store.state.User,
         failureMessage: ''
       }
     },
-
     methods: {
       changeEmail () {
-        // Quit if any inputs are invalid
         this.$validator.validateAll()
         if (this.errors.any()) {
           return
         }
-
-        const body = {
+        const passwordVerificationBody = {
+          password: this.password
+        }
+        const emailModificationBody = {
           id: this.user.Id,
-          NewEmail: this.newEmail,
+          NewEmail: this.email,
           currentEmail: this.user.Email,
           password: this.password
         }
-
-        this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, body)
+        // TODO: We should combine these two requests into one.
+        this.$http.post('/api/verify/password', passwordVerificationBody)
           .then(response => {
-            if (response.body.success) {
-              this.user.Email = body.NewEmail
-              this.$router.push({ name: 'EditProfile' })
+            if (response.data.success) {
+              this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, emailModificationBody)
+                .then(response => {
+                  if (response.body.success) {
+                    this.user.Email = emailModificationBody.NewEmail
+                    this.$router.push({name: 'EditProfile'})
+                  } else {
+                    console.log(response)
+                    this.failureMessage = response.data.message
+                  }
+                }, response => {
+                  this.failureMessage = response.data.message
+                  console.log(response)
+                })
             } else {
               console.log(response)
               this.failureMessage = response.data.message
             }
-          }, response => {
-            console.log(response)
+          }, response => { // Failure
+            this.failureMessage = response.data.message
           })
       }
     }

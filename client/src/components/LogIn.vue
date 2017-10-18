@@ -64,7 +64,6 @@
       'ResetPassword': ResetPassword,
       'Register': Register
     },
-
     methods: {
       ...mapMutations([
         'setUser'

@@ -39,7 +39,7 @@
     name: 'Navbar',
     data () {
       return {
-        User: this.$store.state.User
+        user: this.$store.state.User
       }
     },
     methods: {

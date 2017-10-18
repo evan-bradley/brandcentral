@@ -87,7 +87,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
       text: 'Hello, please click this link to verify your new email:\n' // plain text body
     }
 
-    NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
+    NewVerifyEmail.text += `http://localhost:8080/verify?token=${test.token}`
     console.log(NewVerifyEmail)
 
     transporter.sendMail(NewVerifyEmail, (error, info) => {
@@ -227,6 +227,22 @@ router.get('/api/user/following/:id', async (req, res) => {
     })
   } catch (e) {
     res.send()
+  }
+})
+
+router.post('/api/verify/password', async (req, res) => {
+  try {
+    await db.verifyPassword(req.session.userId, req.body)
+  // console.log('Logged in', results.id, req.session.id)
+  res.send({
+    success: true,
+  })
+  } catch (e) {
+    console.log(e)
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
