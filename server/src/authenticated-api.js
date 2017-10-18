@@ -129,23 +129,6 @@ router.post('/api/channels/:user', async (req, res) => {
 })
 
 /*
- * delete a user's channel.
- */
-router.post('/api/channels/delete/:cid', async (req, res) => {
-  try {
-    await db.deleteUserChannel(req.session.userId, req.params.cid)
-    res.send({
-    success: true
-  })
-} catch (e) {
-  res.send({
-    success: false,
-    message: e.message
-  })
-}
-})
-
-/*
  * Retrieve user's channels.
  */
 router.get('/api/channels/:user', async (req, res) => {
@@ -244,6 +227,40 @@ router.get('/api/user/following/:id', async (req, res) => {
     })
   } catch (e) {
     res.send()
+  }
+})
+
+/*
+ * unsubscribe to a user's channel.
+ */
+router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
+    try {
+      await db.unsubscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+/*
+ * subscribe to a channel.
+ */
+router.post('/api/channels/subscribe/:cid', async (req, res) => {
+    try {
+      await db.subscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
