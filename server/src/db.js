@@ -364,14 +364,39 @@ pool.unlikeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
   })
 }
-
+const FOLLOW_Q = `INSERT INTO FOLLOWING (FOLLOWER_ID, USER_FOLLOWED_ID) VALUES(?, ?)`
 pool.followUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
+    if (!follower || !followee) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(FOLLOW_Q, [follower, followee])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+
   })
 }
-
+const UNFOLLOW_Q = `DELETE FROM FOLLOWING WHERE FOLLOWER_ID = ? AND USER_FOLLOWED_ID = ?`
 pool.unfollowUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
+    if (!follower || !followee) {
+    reject(new Error('Missing a required field'))
+    return
+  }
+
+    try {
+      await pool.query(UNFOLLOW_Q, [follower, followee])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
