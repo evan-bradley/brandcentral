@@ -39,28 +39,28 @@
 <script>
   export default{
     name: 'Interests',
-    data() {
+    data () {
       return {
         user: this.$store.state.User,
         channels: [],
         selectedChannels: []
       }
     },
-    created() {
-      this.loadChanneld()
+    created () {
+      this.loadChannels()
     },
     methods: {
-      loadChanneld() {
+      loadChannels () {
         this.$http.get('/api/channels/onboard')
-        .then(response => {
-          if (response.data.success) {
-            this.channels = response.data.channels
-          }
-        }, response => {
+          .then(response => {
+            if (response.data.success) {
+              this.channels = response.data.channels
+            }
+          }, response => {
           // Could not get any channels
-        })
+          })
       },
-      toggleChannelSelection(channel) {
+      toggleChannelSelection (channel) {
         if (this.selectedChannels.includes(channel.CHANNEL_ID)) {
           var deleteIndex = this.selectedChannels.indexOf(channel.CHANNEL_ID)
           this.selectedChannels.splice(deleteIndex, 1)
@@ -68,7 +68,7 @@
           this.selectedChannels.push(channel.CHANNEL_ID)
         }
       },
-      submitChannels() {
+      submitChannels () {
         if (!this.canSubmitChannels()) return
 
         // Send the channels that the user selected to the server
@@ -76,17 +76,17 @@
           channels: this.selectedChannels
         }
         this.$http.post(`/api/channels/${this.user.Id}`, body)
-        .then(response => {
-          if (response.data.success) {
-            this.$router.push({ name: 'Browse' })
-          }
-        }, response => {
+          .then(response => {
+            if (response.data.success) {
+              this.$router.push({ name: 'Browse' })
+            }
+          }, response => {
           // channels could not be submitted
-        })
+          })
       },
-      canSubmitChannels(){
+      canSubmitChannels () {
         if (this.selectedChannels.length >= 1) return true
-      },
+      }
     },
     filters: {
       capitalize: function (value) {

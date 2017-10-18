@@ -42,36 +42,36 @@
 
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-var md5 = require('md5');
-import EditProfile from './EditProfile'
-import VotingItem from './VotingItem.vue'
+  import EditProfile from './EditProfile'
+  import VotingItem from './VotingItem.vue'
+  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var md5 = require('md5')
 
-export default {
+  export default {
     name: 'Profile',
-    data() {
-        return {
-            User: this.$store.state.User,
-            pictures: []
-        }
+    data () {
+      return {
+        User: this.$store.state.User,
+        pictures: []
+      }
     },
     computed: {
-        likedItems() {
-            return [
-                new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61CwVYR-nYL._SX522_.jpg'),
-                new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61bopQUes6L._UY679_.jpg'),
-                new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/71hS1%2BG7XRL._SY679_.jpg')
-            ] 
-        }
+      likedItems () {
+        return [
+          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61CwVYR-nYL._SX522_.jpg'),
+          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61bopQUes6L._UY679_.jpg'),
+          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/71hS1%2BG7XRL._SY679_.jpg')
+        ]
+      }
     },
     components: {
-        'EditProfile': EditProfile,
-        'VotingItem': VotingItem
+      'EditProfile': EditProfile,
+      'VotingItem': VotingItem
     },
     methods: {
-        hash(str) {
-            return md5(str)
-        }
+      hash (str) {
+        return md5(str)
+      }
     }
-}
+  }
 </script>

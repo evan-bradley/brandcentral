@@ -6,19 +6,19 @@
         <div class="field">
           <label class="label">First Name</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.FirstName" v-model="EditedUser.FirstName" />
+            <input class="input" type="text" v-bind:placeholder="user.FirstName" v-model="editedUser.FirstName" />
           </div>
         </div>
         <div class="field">
           <label class="label">Last Name</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.LastName" v-model="EditedUser.LastName" />
+            <input class="input" type="text" v-bind:placeholder="user.LastName" v-model="editedUser.LastName" />
           </div>
         </div>
         <div class="field">
           <label class="label">Username</label>
           <div class="control">
-            <input class="input" type="text" v-bind:placeholder="User.UserName" name="username" v-model="EditedUser.UserName" v-validate="{ required: true }"
+            <input class="input" type="text" v-bind:placeholder="user.UserName" name="username" v-model="editedUser.UserName" v-validate="{ required: true }"
             />
           </div>
           <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
@@ -33,57 +33,56 @@
 
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-import Profile from './Profile'
-import ChangePassword from './ChangePassword'
+  /* global _ */
+  import Profile from './Profile'
+  import ChangePassword from './ChangePassword'
 
-export default {
-  name: 'EditProfile',
-  data() {
-    return {
-      User: this.$store.state.User,
-      EditedUser: _.cloneDeep(this.$store.state.User)
-    }
-  },
-  components: {
-    'Profile': Profile,
-    'ChangePassword': ChangePassword
-  },
-  methods: {
-    Update() {
-      // Quit if any inputs are invalid
-      this.$validator.validateAll();
-      if (this.errors.any()) {
+  export default {
+    name: 'EditProfile',
+    data () {
+      return {
+        user: this.$store.state.User,
+        editedUser: _.cloneDeep(this.$store.state.User)
+      }
+    },
+    components: {
+      'Profile': Profile,
+      'ChangePassword': ChangePassword
+    },
+    methods: {
+      Update () {
+        // Quit if any inputs are invalid
+        this.$validator.validateAll()
+        if (this.errors.any()) {
           return
+        }
+
+        const updateInfo = {}
+
+        if (this.user.UserName !== this.editedUser.UserName) {
+          updateInfo.username = this.editedUser.UserName
+          this.user.UserName = this.editedUser.UserName
+        }
+
+        if (this.user.FirstName !== this.editedUser.FirstName) {
+          updateInfo.firstName = this.editedUser.FirstName
+          this.user.FirstName = this.editedUser.FirstName
+        }
+
+        if (this.user.LastName !== this.editedUser.LastName) {
+          updateInfo.lastName = this.editedUser.LastName
+          this.user.LastName = this.editedUser.LastName
+        }
+
+        // Send a request to the api to update the user's information
+        this.$http.post(`/api/profile/${this.user.Id}`, updateInfo)
+          .then(response => {
+            console.log(response)
+            this.user = this.editedUser
+          }, response => {
+            console.log(response)
+          })
       }
-
-      const updateInfo = {}
-
-      if (this.$store.state.User.UserName !== this.EditedUser.UserName) {
-        updateInfo.username = this.EditedUser.UserName
-        this.$store.state.User.UserName = this.EditedUser.UserName
-      }
-
-      if (this.$store.state.User.FirstName !== this.EditedUser.FirstName) {
-        updateInfo.firstName = this.EditedUser.FirstName
-        this.$store.state.User.FirstName = this.EditedUser.FirstName
-      }
-
-      if (this.$store.state.User.LastName !== this.EditedUser.LastName) {
-        updateInfo.lastName = this.EditedUser.LastName
-        this.$store.state.User.LastName = this.EditedUser.LastName
-      }
-
-      // Send a request to the api to update the user's information
-      this.$http.post(`/api/profile/${this.$store.state.User.Id}`, updateInfo)
-      .then(response => {
-        console.log(response)
-        this.User = this.EditedUser
-      }, response => {
-        console.log(response)
-      })
     }
   }
-}
-
 </script>
