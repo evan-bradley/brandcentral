@@ -280,6 +280,9 @@ router.get('/api/user/likedproducts', async (req, res) => {
     try {
       res.send({
       success: true,
+      page: req.query.page,
+      productsPer: req.query.productsPer,
+      totalProducts: await db.getNumLikedProducts(req.session.userId),
       likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
   })
   } catch (e) {

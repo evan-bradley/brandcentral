@@ -441,7 +441,18 @@ pool.getFollowing = user => {
 
     try {
       const results = await pool.query(FOLLOWING_Q, [user])
-      resolve(results)
+      var following = new Array[results.length]
+      if (results.length > 0) {
+        for (i = 0; i < results.length; i++) {
+          const userObject = {
+            username: results[i].USERNAME,
+            id: results[i].FOLLOWING.USER_FOLLOWED_ID
+          }
+          following[i] = userObject
+        }
+
+        resolve(following)
+      } else{resolve()}
 
     } catch (e) {
       reject(e)
@@ -460,7 +471,7 @@ pool.getLikedProducts = (user, page, productsPer) => {
         const startproduct = ((page - 1)*productsPer)
       const endproduct = (page*productsPer) - 1
       const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
-      var productsarray = new Array[info.numOfProducts]
+      var productsarray = new Array[results.length]
       if (results.length > 0) {
         for (i = 0; i < results.length; i++) {
           const product = {
@@ -481,6 +492,24 @@ pool.getLikedProducts = (user, page, productsPer) => {
       reject(e)
     }
   })
+}
+const NUMLIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ?'
+pool.getNumLikedProducts = user => {
+  return new Promise(async (resolve, reject) => {
+    if (!user) {
+    reject(new Error('Missing required field'))
+    return
+  }
+
+  try {
+    const results = await pool.query(NUMLIKEDPRODUCTS_Q, [user])
+    var productsarray = new Array[results.length]
+    resolve(results.length)
+
+  } catch (e) {
+    reject(e)
+  }
+})
 }
 
 const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
