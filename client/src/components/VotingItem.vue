@@ -61,54 +61,78 @@
 
 
 <script>
-  export default {
-    props: ['item', 'channel'],
-    data () {
-      return {
-        displayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
-        itemName: '',
-        itemDescription: '',
-        itemImageURL: ''
-      }
-    },
-    computed: {
-      CurrentItem: () => {
-        return this.item
-      }
-    },
-    watch: {
-      channel () {
+    export default {
+      props: ['item', 'channel'],
+      data () {
+        return {
+          DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
+          itemName: '',
+          itemDescription: '',
+          itemImageURL: '',
+          itemID: ''
+        }
+      },
+      computed: {
+        CurrentItem: () => {
+          return this.item
+        }
+      },
+      watch: {
+        channel () {
+          this.next()
+        }
+      },
+      methods: {
+        previous () {
+          console.log('clicked previous')
+        },
+        next () {
+          this.$http.get(`/api/product?channelId=${this.channel}`)
+            .then(response => { // Success
+              if (response.data.success) {
+                this.itemName = response.data.product.name.substring(0, 30)
+                this.itemDescription = response.data.product.description.substring(0, 80) + "..."
+                this.itemImageURL = response.data.product.pictureUrl
+                this.itemID = response.data.product.id
+              } else {
+                this.failureMessage = response.data.message
+              }
+            }, response => { // Error
+              console.log(response)
+              this.failureMessage = response.data.message
+            })
+        },
+        like () {
+          this.$http.post(`/api/product/like/${this.itemID}`)
+            .then(response => { // Success
+              if (response.data.success) {
+                console.log(response)
+                this.failureMessage = response.data.message
+                console.log('liked ' + this.itemName)
+                this.next()
+              }
+            }, response => { // Error
+              console.log(response)
+              this.failureMessage = response.data.message
+            })
+        },
+        dislike () {
+          this.$http.post(`/api/product/dislike/${this.itemID}`)
+            .then(response => { // Success
+              if (response.data.success) {
+                console.log(response)
+                this.failureMessage = response.data.message
+                console.log('disliked ' + this.itemName)
+                this.next()
+              }
+            }, response => { // Error
+              console.log(response)
+              this.failureMessage = response.data.message
+            })
+        }
+      },
+      mounted () {
         this.next()
       }
-    },
-    methods: {
-      previous () {
-        console.log('clicked previous')
-      },
-      next () {
-        this.$http.get(`/api/product?channelId=${this.channel}`)
-          .then(response => { // Success
-            if (response.data.success) {
-              this.itemName = response.data.product.name.substring(0, 30)
-              this.itemDescription = response.data.product.description.substring(0, 80) + '...'
-              this.itemImageURL = response.data.product.pictureUrl
-            } else {
-              this.failureMessage = response.data.message
-            }
-          }, response => { // Error
-            console.log(response)
-            this.failureMessage = response.data.message
-          })
-      },
-      like () {
-        console.log('liked ' + this.item.ProductName)
-      },
-      dislike () {
-        console.log('liked ' + this.item.ProductName)
-      }
-    },
-    mounted () {
-      this.next()
     }
-  }
 </script>

@@ -182,18 +182,24 @@ router.post('/api/product/like/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
 router.post('/api/product/dislike/:id', async (req, res) => {
   try {
-    db.dislikeProduct(req.session.userId, req.params.id)
+    await db.dislikeProduct(req.session.userId, req.params.id)
     res.send({
-      success: true
-    })
-  } catch (e) {
-    res.send()
+    success: true
+  })
+} catch (e) {
+  res.send({
+    success: false,
+    message: e.message
+  })
   }
 })
 
