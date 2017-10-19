@@ -210,7 +210,10 @@ router.post('/api/user/follow/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send(
+      success: false,
+      message: e.message
+    )
   }
 })
 
@@ -221,7 +224,10 @@ router.post('/api/user/unfollow/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send(
+      success: false,
+      message: e.message
+    )
   }
 })
 
