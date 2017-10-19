@@ -210,10 +210,7 @@ router.post('/api/user/follow/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send(
-      success: false,
-      message: e.message
-    )
+    res.send()
   }
 })
 
