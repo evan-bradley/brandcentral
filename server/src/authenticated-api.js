@@ -221,10 +221,7 @@ router.post('/api/user/unfollow/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send(
-      success: false,
-      message: e.message
-    )
+    res.send()
   }
 })
 
