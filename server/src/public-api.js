@@ -53,7 +53,7 @@ router.post('/api/register', async (req, res) => {
 
     req.session.userId = results.insertId
 
-    let registerEmail = {
+    const registerEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
       to: req.body.email,
       subject: 'Hello ✔', // Subject line
@@ -88,7 +88,7 @@ router.post('/api/password/reset', async (req, res) => {
       res.send(JSON.stringify({ success: true }))
     } else {
       const token = await db.generatePasswordResetToken(req.body.email)
-      let resetEmail = {
+      const resetEmail = {
         from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
         to: req.body.email,
         subject: 'Reset Password ✔', // Subject line

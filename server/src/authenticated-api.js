@@ -67,7 +67,7 @@ router.get('/api/logout', async (req, res) => {
 router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
   try {
     const test = await db.CheckNewEmail(req.body)
-    let OldEmail = {
+    const OldEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
       to: req.body.currentEmail,
       subject: 'Email Change ✔', // Subject line
@@ -80,7 +80,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
       }
     })
 
-    let NewVerifyEmail = {
+    const NewVerifyEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
       to: req.body.NewEmail,
       subject: 'Hello ✔', // Subject line
@@ -193,13 +193,13 @@ router.post('/api/product/dislike/:id', async (req, res) => {
   try {
     await db.dislikeProduct(req.session.userId, req.params.id)
     res.send({
-    success: true
-  })
-} catch (e) {
-  res.send({
-    success: false,
-    message: e.message
-  })
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
@@ -240,9 +240,9 @@ router.get('/api/user/following/:id', async (req, res) => {
  * unsubscribe to a user's channel.
  */
 router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
-    try {
-      await db.unsubscribeChannel(req.session.userId, req.params.cid)
-      res.send({
+  try {
+    await db.unsubscribeChannel(req.session.userId, req.params.cid)
+    res.send({
       success: true
     })
   } catch (e) {
@@ -257,34 +257,34 @@ router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
  * subscribe to a channel.
  */
 router.post('/api/channels/subscribe/:cid', async (req, res) => {
-    try {
-      await db.subscribeChannel(req.session.userId, req.params.cid)
-      res.send({
+  try {
+    await db.subscribeChannel(req.session.userId, req.params.cid)
+    res.send({
       success: true
     })
   } catch (e) {
     res.send({
       success: false,
       message: e.message
-  })
-}
+    })
+  }
 })
 
 router.get('/api/user/likedproducts', async (req, res) => {
-    if(req.query.page ===undefined){
-       req.query.page = 1
-      }
-    if(req.query.productsPer ===undefined){
-      req.query.productsPer = 10
-    }
-    try {
-      res.send({
+  if (req.query.page === undefined) {
+    req.query.page = 1
+  }
+  if (req.query.productsPer === undefined) {
+    req.query.productsPer = 10
+  }
+  try {
+    res.send({
       success: true,
       page: req.query.page,
       productsPer: req.query.productsPer,
       totalProducts: await db.getNumLikedProducts(req.session.userId),
       likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
-  })
+    })
   } catch (e) {
     res.send()
   }
@@ -293,10 +293,10 @@ router.get('/api/user/likedproducts', async (req, res) => {
 router.post('/api/verify/password', async (req, res) => {
   try {
     await db.verifyPassword(req.session.userId, req.body)
-  // console.log('Logged in', results.id, req.session.id)
-  res.send({
-    success: true,
-  })
+    // console.log('Logged in', results.id, req.session.id)
+    res.send({
+      success: true
+    })
   } catch (e) {
     console.log(e)
     res.send({
