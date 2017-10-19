@@ -16,7 +16,7 @@ const pool = mysql.createPool({
   'connectionLimit': 5,
   'host': 'localhost',
   'user': 'root',
-  'password': '',
+  'password': 'Mickey26!',
   'database': 'BRAND_CENTRAL_TESTING',
   'waitForConnections': true,
   'timezone': 'utc',
@@ -76,6 +76,8 @@ const userData = {
 }
 let id
 
+let sessionID
+
 describe('Registering a user', () => {
   it('Should POST to /api/register', () => {
     return new Promise((resolve, reject) => {
@@ -90,6 +92,7 @@ describe('Registering a user', () => {
             should.exist(res.body.id)
 
             id = res.body.id
+            sessionID = res.session.userId
             resolve()
           })
       } catch (e) {
@@ -214,6 +217,63 @@ describe('Channel navigation', () => {
 
           resolve()
         })
+    })
+  })
+})
+const likeData = {
+  productID: '15',
+  productName: 'testname',
+  userID: '5'
+}
+describe('Liking a product', () => {
+  it('Should POST to /api/product/like/:id', () => {
+      return new Promise((resolve, reject) => {
+        chai.request(server)
+        .post(`/api/product/like/${likeData.productID}`)
+        .send({
+          //id: likeData.productID
+          //uid: sessionID
+        })
+        .end((err, res) => {
+        should.not.exist(err)
+      res.body.success.should.equal(true)
+      resolve()
+    })
+  })
+})
+it('Should create a new like', () => {
+  return new Promise(async (resolve, reject) => {
+    const like = (await pool.query('select * from likes'))[0]
+    should.exist(like)
+    like.USER_ID.should.equal(sessionID)
+    like.PRODUCT_ID.should.equal(likeData.productID)
+    resolve()
+    })
+  })
+})
+
+describe('Disliking a product', () => {
+  it('Should POST to /api/product/dislike/:id', () => {
+      return new Promise((resolve, reject) => {
+        chai.request(server)
+        .post(`/api/product/dislike/${likeData.productID}`)
+        .send({
+          //pid: productData.productID
+        })
+        .end((err, res) => {
+        should.not.exist(err)
+      res.body.success.should.equal(true)
+      resolve()
+    })
+  })
+})
+it('Should create a new dislike', () => {
+  return new Promise(async (resolve, reject) => {
+    const dislike = (await pool.query('select * from dislikes'))[0]
+    should.exist(dislike)
+    dislike.USER_ID.should.equal(sessionID)
+    dislike.PRODUCT_ID.should.equal(likeData.productID)
+    resolve()
     })
   })
 })

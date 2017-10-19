@@ -42,7 +42,7 @@
 
 <script>
   export default {
-    data() {
+    data () {
       return {
         user: this.$store.state.User,
         searchText: '',
@@ -50,14 +50,14 @@
         users: [{
           id: 13,
           username: 'jpherkness'
-        }],
+        }]
       }
     },
-    created() {
+    created () {
       this.loadChannels()
     },
     methods: {
-      loadChannels() {
+      loadChannels () {
         this.$http.get(`/api/channels/${this.user.Id}`)
           .then(response => {
             if (response.data.success) {

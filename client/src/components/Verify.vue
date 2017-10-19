@@ -36,46 +36,46 @@
 </template>
 
 <script>
-export default {
-    data() {
-        return {
-            VerifyDisplayFlags: {
-                Loading: true,
-                Failed: false
-            },
-            code: '',
-            failureMessage: ''
-        }
+  export default {
+    data () {
+      return {
+        VerifyDisplayFlags: {
+          Loading: true,
+          Failed: false
+        },
+        code: '',
+        failureMessage: ''
+      }
     },
-    mounted() {
+    mounted () {
       this.verify()
     },
     methods: {
-        verify() {
-            const token = this.$route.query.token
-            const code = this.$route.query.code
-            var body = {}
-            if(token) {
-                body.token = token
-            } else if(code && code.length == 6) {
-                body.code = code
-            } else if(this.code.length == 6) {
-                body.code = this.code
-            } else {
-                // stop if neither the code or token is provided
-                return
-            }
-            this.$http.post(`/api/verify`, body)
-                .then(response => {
-                    if (response.body.success) {
-                        this.$router.push({ name: 'Interests' })
-                    } else {
-                        failureMessage = response.body.message
-                    }
-                }, response => {
-                    console.log(response)
-                })
+      verify () {
+        const token = this.$route.query.token
+        const code = this.$route.query.code
+        var body = {}
+        if (token) {
+          body.token = token
+        } else if (code && code.length === 6) {
+          body.code = code
+        } else if (this.code.length === 6) {
+          body.code = this.code
+        } else {
+          // stop if neither the code or token is provided
+          return
         }
+        this.$http.post(`/api/verify`, body)
+          .then(response => {
+            if (response.body.success) {
+              this.$router.push({ name: 'Interests' })
+            } else {
+              this.failureMessage = response.body.message
+            }
+          }, response => {
+            console.log(response)
+          })
+      }
     }
-}
+  }
 </script>

@@ -355,13 +355,44 @@ pool.getRandomProduct = channel => {
   })
 }
 
+const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
 pool.likeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
+      if (!user || !product) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+        await pool.query(LIKE_Q, [user, product])
+        resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+const DISLIKE_Q = `INSERT INTO DISLIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
+pool.dislikeProduct = (user, product) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !product) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(DISLIKE_Q, [user, product])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
 pool.unlikeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
+
   })
 }
 const FOLLOW_Q = `INSERT INTO FOLLOWING (FOLLOWER_ID, USER_FOLLOWED_ID) VALUES(?, ?)`
@@ -400,8 +431,91 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
+const FOLLOWING_Q = 'SELECT USERNAME AND FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
+      if (!user) {
+      reject(new Error('Missing user id'))
+      return
+    }
+
+    try {
+      const results = await pool.query(FOLLOWING_Q, [user])
+      resolve(results)
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
+pool.getLikedProducts = (user, page, productsPer) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !info) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+        const startproduct = ((page - 1)*productsPer)
+      const endproduct = (page*productsPer) - 1
+      const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
+      var productsarray = new Array[info.numOfProducts]
+      if (results.length > 0) {
+        for (i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT.PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL
+          }
+          productsarray[i] = product
+        }
+
+        resolve(productsarray)
+      } else{resolve()}
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
+pool.unsubscribeChannel = (user, channel) => {
+    return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(UNSUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const SUBSCRIBECHANNEL_Q = 'INSERT INTO CHANNEL_USER_ASSIGN (USER_ID, CHANNEL_ID) VALUES(?, ?)'
+pool.subscribeChannel = (user, channel) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(SUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 

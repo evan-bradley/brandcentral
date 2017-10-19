@@ -182,18 +182,24 @@ router.post('/api/product/like/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
 router.post('/api/product/dislike/:id', async (req, res) => {
   try {
-    db.dislikeProduct(req.session.userId, req.params.id)
+    await db.dislikeProduct(req.session.userId, req.params.id)
     res.send({
-      success: true
-    })
-  } catch (e) {
-    res.send()
+    success: true
+  })
+} catch (e) {
+  res.send({
+    success: false,
+    message: e.message
+  })
   }
 })
 
@@ -231,6 +237,57 @@ router.get('/api/user/following/:id', async (req, res) => {
       success: true,
       following: await db.getFollowing(req.params.id)
     })
+  } catch (e) {
+    res.send()
+  }
+})
+
+/*
+ * unsubscribe to a user's channel.
+ */
+router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
+    try {
+      await db.unsubscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+/*
+ * subscribe to a channel.
+ */
+router.post('/api/channels/subscribe/:cid', async (req, res) => {
+    try {
+      await db.subscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+  })
+}
+})
+
+router.get('/api/user/likedproducts', async (req, res) => {
+    if(req.query.page ===undefined){
+       req.query.page = 1
+      }
+    if(req.query.productsPer ===undefined){
+      req.query.productsPer = 10
+    }
+    try {
+      res.send({
+      success: true,
+      likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
+  })
   } catch (e) {
     res.send()
   }

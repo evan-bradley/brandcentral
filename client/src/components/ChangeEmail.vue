@@ -11,8 +11,7 @@
         <div class="field">
           <label class="label">New Email</label>
           <div class="control">
-            <input class="input" type="text" placeholder="Email" name="email" v-model="EnteredEmail" v-validate="{ required: true, email: true}"
-            />
+            <input class="input" type="text" placeholder="Email" name="email" v-model="email" v-validate="{ required: true, email: true}"/>
           </div>
           <p class="help is-danger" v-show="errors.has('email')">{{ errors.first('email') }}</p>
         </div>
@@ -22,7 +21,7 @@
             <input class="input" type="password" placeholder="Password" v-model="password" />
           </div>
         </div>
-        <button class="button is-primary" @click="ChangeEmail">Change email address</button>
+        <button class="button is-primary" @click="changeEmail">Change email address</button>
         <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
       </div>
     </div>
@@ -31,63 +30,55 @@
 
 
 <script>
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-  import EditProfile from './EditProfile'
-    export default {
-        data(){
-            return {
-                EnteredEmail: '',
-                password: '',
-                User: this.$store.state.User,
-                EditedUser: _.cloneDeep(this.$store.state.User),
-                PasswordChange: new Classes.PasswordVerification(),
-                failureMessage: ''
-            }
-        },
-
-      methods: {
-        ChangeEmail() {
-          // Quit if any inputs are invalid
-          this.$validator.validateAll();
-          if (this.errors.any()) {
-            return
-          }
-          const PassInfo = {
-            password: this.password
-          }
-
-          const EmailChangeInfo = {
-            id: this.$store.state.User.Id,
-            NewEmail: this.EnteredEmail,
-            currentEmail: this.$store.state.User.Email,
-            password: this.password
-          }
-          this.$http.post('/api/verify/password', PassInfo)
-            .then(response => {
-              if (response.data.success) {
-                // Send a request to the api to update the user's information
-                this.$http.post(`/api/profile/ChangeEmail/${this.$store.state.User.Id}`, EmailChangeInfo)
-                  .then(response => {
-                    if (response.body.success) {
-                      this.$store.state.User.Email = EmailChangeInfo.NewEmail
-                      this.$router.push({name: 'EditProfile'})
-                    } else {
-                      console.log(response)
-                      this.failureMessage = response.data.message
-                    }
-
-                  }, response => {
-                    this.failureMessage = response.data.message
-                    console.log(response)
-                  })
-              } else {
-                console.log(response)
-                this.failureMessage = response.data.message
-              }
-            }, response => { // Failure
-              this.failureMessage = response.data.message
-            })
+  export default {
+    data () {
+      return {
+        email: '',
+        password: '',
+        user: this.$store.state.User,
+        failureMessage: ''
+      }
+    },
+    methods: {
+      changeEmail () {
+        this.$validator.validateAll()
+        if (this.errors.any()) {
+          return
         }
+        const passwordVerificationBody = {
+          password: this.password
+        }
+        const emailModificationBody = {
+          id: this.user.Id,
+          NewEmail: this.email,
+          currentEmail: this.user.Email,
+          password: this.password
+        }
+        // TODO: We should combine these two requests into one.
+        this.$http.post('/api/verify/password', passwordVerificationBody)
+          .then(response => {
+            if (response.data.success) {
+              this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, emailModificationBody)
+                .then(response => {
+                  if (response.body.success) {
+                    this.user.Email = emailModificationBody.NewEmail
+                    this.$router.push({name: 'EditProfile'})
+                  } else {
+                    console.log(response)
+                    this.failureMessage = response.data.message
+                  }
+                }, response => {
+                  this.failureMessage = response.data.message
+                  console.log(response)
+                })
+            } else {
+              console.log(response)
+              this.failureMessage = response.data.message
+            }
+          }, response => { // Failure
+            this.failureMessage = response.data.message
+          })
       }
     }
+  }
 </script>
