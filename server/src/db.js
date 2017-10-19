@@ -395,7 +395,7 @@ pool.getLikedProducts = (user, info) => {
       if (results.length > 0) {
         for (i = 0; i < results.length; i++) {
           const product = {
-            id: results[i].PRODUCT_ID,
+            id: results[i].PRODUCT.PRODUCT_ID,
             name: results[i].PROD_NAME,
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
