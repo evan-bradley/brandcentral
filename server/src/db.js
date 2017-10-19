@@ -392,5 +392,39 @@ pool.getFollowing = user => {
     }
   })
 }
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
+pool.getLikedProducts = (user, page, productsPer) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !info) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+        const startproduct = ((page - 1)*productsPer)
+      const endproduct = (page*productsPer) - 1
+      const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
+      var productsarray = new Array[info.numOfProducts]
+      if (results.length > 0) {
+        for (i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT.PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL
+          }
+          productsarray[i] = product
+        }
+
+        resolve(productsarray)
+      } else{resolve()}
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
 module.exports = pool

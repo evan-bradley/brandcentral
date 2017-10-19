@@ -230,6 +230,23 @@ router.get('/api/user/following/:id', async (req, res) => {
   }
 })
 
+router.get('/api/user/likedproducts', async (req, res) => {
+    if(req.query.page ===undefined){
+       req.query.page = 1
+      }
+    if(req.query.productsPer ===undefined){
+      req.query.productsPer = 10
+    }
+    try {
+      res.send({
+      success: true,
+      likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
+  })
+  } catch (e) {
+    res.send()
+  }
+})
+
 router.post('/api/verify/password', async (req, res) => {
   try {
     await db.verifyPassword(req.session.userId, req.body)
