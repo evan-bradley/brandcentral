@@ -5,7 +5,7 @@
 
 require('dotenv').config()
 const cp = require("child_process")
-const commandPassword = `mysql -u${process.env.DB_USER} -p ${process.env.DB_PASS} < ${process.argv[2]}.sql`
+const commandPassword = `mysql -u${process.env.DB_USER} -p${process.env.DB_PASS} < ${process.argv[2]}.sql`
 const commandNoPassword = `mysql -u${process.env.DB_USER} < ${process.argv[2]}.sql`
 cp.exec(process.env.DB_PASS === '' ? commandNoPassword : commandPassword,
     function(error,stdout,stderr) {

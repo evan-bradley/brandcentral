@@ -91,7 +91,7 @@
             .then(response => { // Success
               if (response.data.success) {
                 this.itemName = response.data.product.name.substring(0, 30)
-                this.itemDescription = response.data.product.description.substring(0, 80) + "..."
+                this.itemDescription = response.data.product.description.substring(0, 80) + '...'
                 this.itemImageURL = response.data.product.pictureUrl
                 this.itemID = response.data.product.id
               } else {
