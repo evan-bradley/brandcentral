@@ -263,6 +263,12 @@ router.post('/api/channels/subscribe/:cid', async (req, res) => {
       success: true
     })
   } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+  })
+}
+})
 
 router.get('/api/user/likedproducts', async (req, res) => {
     if(req.query.page ===undefined){
