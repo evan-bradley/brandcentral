@@ -33,29 +33,28 @@
 </template>
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-var md5 = require('md5')
+  var md5 = require('md5')
 
-export default {
-  name: 'Navbar',
-  data() {
-    return {
-      User: this.$store.state.User
-    }
-  },
-  methods: {
-    signOut() {
-      this.$http.get('/api/logout')
-      .then(response => {
-        this.$store.commit('LogOut')
-        this.$router.push({ name: 'Login' })
-      }, response => {
-        console.log(response)
-      })
+  export default {
+    name: 'Navbar',
+    data () {
+      return {
+        user: this.$store.state.User
+      }
     },
-    hash(str) {
-      return md5(str)
+    methods: {
+      signOut () {
+        this.$http.get('/api/logout')
+          .then(response => {
+            this.$store.commit('LogOut')
+            this.$router.push({ name: 'Login' })
+          }, response => {
+            console.log(response)
+          })
+      },
+      hash (str) {
+        return md5(str)
+      }
     }
   }
-}
 </script>

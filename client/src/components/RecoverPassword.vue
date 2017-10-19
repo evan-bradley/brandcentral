@@ -92,9 +92,9 @@
       }
     },
     methods: {
-      sendEmail() {
+      sendEmail () {
         // Quit if any inputs are invalid
-        this.$validator.validateAll();
+        this.$validator.validateAll()
         if (this.errors.any()) {
           return
         }
@@ -112,23 +112,23 @@
             this.failureMessage = response.data.message
           })
       },
-      reset() {
+      reset () {
         if (!this.$route.query.token) return
 
         // Quit if any inputs are invalid
-        this.$validator.validateAll();
+        this.$validator.validateAll()
         if (this.errors.any()) {
           return
         }
- 
+
         var body = {
           token: this.$route.query.token,
           newPassword: this.NewPassword
         }
 
         this.$http.post(`/api/password/reset`, body)
-        .then(response => { // Success
-          if (response.body.success) {
+          .then(response => { // Success
+            if (response.body.success) {
               this.$router.push({ name: 'Login' })
             } else {
               this.failureMessage = response.data.message

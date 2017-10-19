@@ -136,24 +136,24 @@ router.beforeEach((to, from, next) => {
     to.path.indexOf('/reset') === -1) {
     // Check to see if a session exists for the user
     Vue.http.get('/api/authenticated')
-    .then(response => {
-      if (response.data.authenticated) {
+      .then(response => {
+        if (response.data.authenticated) {
         // Store the user from the existing session
-        var user = new Classes.User()
-        user.Id = response.data.user.id
-        user.UserName = response.data.user.username
-        user.Email = response.data.user.email
-        user.FirstName = response.data.user.firstName
-        user.LastName = response.data.user.lastName
-        router.app.$store.commit('setUser', user)
-        next()
-      } else {
+          var user = new Classes.User()
+          user.Id = response.data.user.id
+          user.UserName = response.data.user.username
+          user.Email = response.data.user.email
+          user.FirstName = response.data.user.firstName
+          user.LastName = response.data.user.lastName
+          router.app.$store.commit('setUser', user)
+          next()
+        } else {
+          next({ path: '/login' })
+        }
+      }, response => {
+        console.log(response)
         next({ path: '/login' })
-      }
-    }, response => {
-      console.log(response)
-      next({ path: '/login' })
-    })
+      })
   } else {
     next()
   }
