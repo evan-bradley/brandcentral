@@ -1,5 +1,5 @@
 <template>
-  <section class="hero">
+  <div class="hero is-fullheight">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
@@ -35,61 +35,65 @@
               Don't have an account?
               <router-link :to="{ name: 'Register' }"><u>Register</u></router-link>
             </p>
+            <p class="has-text-centered">
+              Forgot your password?
+              <router-link :to="{name: 'ResetPassword', params:{token: '/'}}"><u>Reset Password</u></router-link>
+            </p>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-var router = require('../router/index')
-import Register from './Register'
-import { mapMutations } from 'vuex'
+  import Register from './Register'
+  import ResetPassword from './RecoverPassword'
+  import { mapMutations } from 'vuex'
+  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
-export default {
-  name: 'LogIn',
-  data() {
-    return {
-      user: new Classes.User(),
-      failureMessage: ''
-    }
-  },
-  components: {
-    'Register': Register
-  },
-  methods: {
-    ...mapMutations([
-      'setUser'
-    ]),
-    login() {
-      if (this.user.UserName !== '' && this.user.Password !== '') {
-        const loginInfo = {
-          username: this.user.UserName,
-          password: this.user.Password
-        }
-
-        this.$http.post('/api/login', loginInfo)
-        .then(response => { // Success
-          if (response.data.success) {
-            this.user.Id = response.data.id
-            this.user.FirstName = response.data.firstName
-            this.user.LastName = response.data.lastName
-            this.user.Email = response.data.email
-            this.setUser(this.user)
-            this.$router.push({ name: 'Home' })
-          }else{
-            this.failureMessage = response.data.message
-          }
-        }, response => { // Failure
-          this.failureMessage = response.data.message
-        })
+  export default {
+    name: 'LogIn',
+    data () {
+      return {
+        user: new Classes.User(),
+        failureMessage: ''
       }
-      else{
-        this.failureMessage = 'Username or password cannot be blank'
+    },
+    components: {
+      'ResetPassword': ResetPassword,
+      'Register': Register
+    },
+    methods: {
+      ...mapMutations([
+        'setUser'
+      ]),
+      login () {
+        if (this.user.UserName !== '' && this.user.Password !== '') {
+          const loginInfo = {
+            username: this.user.UserName,
+            password: this.user.Password
+          }
+
+          this.$http.post('/api/login', loginInfo)
+            .then(response => { // Success
+              if (response.data.success) {
+                this.user.Id = response.data.id
+                this.user.FirstName = response.data.firstName
+                this.user.LastName = response.data.lastName
+                this.user.Email = response.data.email
+                this.$store.commit('setUser', this.user)
+                this.$router.push({ name: 'Browse' })
+              } else {
+                this.failureMessage = response.data.message
+              }
+            }, response => { // Failure
+              this.failureMessage = response.data.message
+            })
+        } else {
+          this.failureMessage = 'Username or password cannot be blank'
+        }
       }
     }
   }
-}
 </script>

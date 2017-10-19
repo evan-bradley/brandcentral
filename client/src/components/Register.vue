@@ -1,5 +1,5 @@
 <template>
-    <section class="hero is-fullheight">
+  <div class="hero is-fullheight">
     <div class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">
@@ -57,7 +57,7 @@
               </div>
               <hr>
               <div class="control">
-                <button class="button is-primary" @click="Register">Register</button>
+                <button class="button is-primary" @click="register">Register</button>
               </div>
             </div>
             <p class="has-text-centered">
@@ -68,59 +68,59 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
-export default {
+  export default {
     name: 'Register',
-    data() {
-        return {
-            user: new Classes.User(),
-            confirmPassword: '',
-            failureMessage: ''
-        }
+    data () {
+      return {
+        user: new Classes.User(),
+        confirmPassword: '',
+        failureMessage: ''
+      }
     },
     methods: {
-        Register() {
-            // Quit if any inputs are invalid
-            this.$validator.validateAll();
-            if (this.errors.any()) {
-                return
-            }
-
-            // Basic validation
-            if (this.user.UserName == ''){
-              this.failureMessage = 'Username cannot be blank'
-              return
-            }
-            if (this.user.Password !== this.confirmPassword){
-              this.failureMessage = 'Passwords must match'
-              return
-            }
-            // Everything looks okay
-            const registration = {
-                username: this.user.UserName,
-                firstName: this.user.FirstName,
-                lastName: this.user.LastName,
-                password: this.user.Password,
-                email: this.user.Email,
-            }
-            this.$http.post('/api/register', registration)
-                .then(response => { // Success
-                    if (response.data.success) {
-                      this.$router.push({ name: 'Login' })
-                    } else {
-                      console.log(response)
-                      this.failureMessage = response.data.message
-                    }
-                }, response => { // Error
-                    console.log(response)
-                    this.failureMessage = response.data.message
-                })
+      register () {
+        // Quit if any inputs are invalid
+        this.$validator.validateAll()
+        if (this.errors.any()) {
+          return
         }
+
+        // Basic validation
+        if (this.user.UserName === '') {
+          this.failureMessage = 'Username cannot be blank'
+          return
+        }
+        if (this.user.Password !== this.confirmPassword) {
+          this.failureMessage = 'Passwords must match'
+          return
+        }
+        // Everything looks okay
+        const registration = {
+          username: this.user.UserName,
+          firstName: this.user.FirstName,
+          lastName: this.user.LastName,
+          password: this.user.Password,
+          email: this.user.Email
+        }
+        this.$http.post('/api/register', registration)
+          .then(response => { // Success
+            if (response.data.success) {
+              this.$router.push({ name: 'Verify' })
+            } else {
+              console.log(response)
+              this.failureMessage = response.data.message
+            }
+          }, response => { // Error
+            console.log(response)
+            this.failureMessage = response.data.message
+          })
+      }
     }
-}
+  }
 </script>
