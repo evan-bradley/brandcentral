@@ -380,7 +380,7 @@ pool.getFollowing = user => {
   })
 }
 const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
-pool.getLikedProducts = (user, info) => {
+pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
       if (!user || !info) {
       reject(new Error('Missing required field'))
@@ -388,8 +388,8 @@ pool.getLikedProducts = (user, info) => {
     }
 
     try {
-        const startproduct = ((info.pgNum - 1)*info.numOfProducts)
-      const endproduct = (info.pgNum*info.numOfProducts) - 1
+        const startproduct = ((page - 1)*productsPer)
+      const endproduct = (page*productsPer) - 1
       const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
       var productsarray = new Array[info.numOfProducts]
       if (results.length > 0) {
@@ -406,7 +406,7 @@ pool.getLikedProducts = (user, info) => {
         }
 
         resolve(productsarray)
-      }
+      } else{resolve()}
 
     } catch (e) {
       reject(e)
