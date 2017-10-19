@@ -87,7 +87,7 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
       text: 'Hello, please click this link to verify your new email:\n' // plain text body
     }
 
-    NewVerifyEmail.text += `http://localhost:8080/verify/${test.token}`
+    NewVerifyEmail.text += `http://localhost:8080/verify?token=${test.token}`
     console.log(NewVerifyEmail)
 
     transporter.sendMail(NewVerifyEmail, (error, info) => {
@@ -233,6 +233,67 @@ router.get('/api/user/following/:id', async (req, res) => {
     })
   } catch (e) {
     res.send()
+  }
+})
+
+/*
+ * unsubscribe to a user's channel.
+ */
+router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
+    try {
+      await db.unsubscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+/*
+ * subscribe to a channel.
+ */
+router.post('/api/channels/subscribe/:cid', async (req, res) => {
+    try {
+      await db.subscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+
+router.get('/api/user/likedproducts', async (req, res) => {
+    if(req.query.page ===undefined){
+       req.query.page = 1
+      }
+    if(req.query.productsPer ===undefined){
+      req.query.productsPer = 10
+    }
+    try {
+      res.send({
+      success: true,
+      likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
+  })
+  } catch (e) {
+    res.send()
+  }
+})
+
+router.post('/api/verify/password', async (req, res) => {
+  try {
+    await db.verifyPassword(req.session.userId, req.body)
+  // console.log('Logged in', results.id, req.session.id)
+  res.send({
+    success: true,
+  })
+  } catch (e) {
+    console.log(e)
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 

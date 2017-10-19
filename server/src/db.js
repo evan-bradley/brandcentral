@@ -75,7 +75,7 @@ pool.registerUser = info => {
 }
 
 const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
-const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VERIFICATION = ? WHERE USER_EMAIL = ?;'
+const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VER_TOKEN = ? WHERE USER_EMAIL = ?;'
 pool.CheckNewEmail = info => {
   return new Promise(async (resolve, reject) => {
     if (!info.NewEmail) {
@@ -143,6 +143,33 @@ pool.loginUser = info => {
       reject(e)
     }
   })
+}
+
+const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
+pool.verifyPassword = (user, pass) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(GETPASSHASH_Q, [ user ])
+
+    if (results.length === 0) {
+    // login failure
+    reject(new Error('user id invalid'))
+    return
+  }
+
+  const res = await bcrypt.compare(pass.password, results[0].USER_PASS_HASH)
+
+  if (res) {
+    // successful login
+    resolve()
+  } else {
+    // login failure
+    reject(new Error('password invalid'))
+  }
+} catch (e) {
+    reject(e)
+  }
+})
 }
 
 pool.updateProfile = info => {
@@ -379,8 +406,91 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
+const FOLLOWING_Q = 'SELECT USERNAME AND FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
+      if (!user) {
+      reject(new Error('Missing user id'))
+      return
+    }
+
+    try {
+      const results = await pool.query(FOLLOWING_Q, [user])
+      resolve(results)
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
+pool.getLikedProducts = (user, page, productsPer) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !info) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+        const startproduct = ((page - 1)*productsPer)
+      const endproduct = (page*productsPer) - 1
+      const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
+      var productsarray = new Array[info.numOfProducts]
+      if (results.length > 0) {
+        for (i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT.PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL
+          }
+          productsarray[i] = product
+        }
+
+        resolve(productsarray)
+      } else{resolve()}
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
+pool.unsubscribeChannel = (user, channel) => {
+    return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(UNSUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const SUBSCRIBECHANNEL_Q = 'INSERT INTO CHANNEL_USER_ASSIGN (USER_ID, CHANNEL_ID) VALUES(?, ?)'
+pool.subscribeChannel = (user, channel) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(SUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 

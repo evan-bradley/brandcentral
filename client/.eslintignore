@@ -1,4 +1,3 @@
 build/*.js
 config/*.js
-*.vue
 src/TypeScriptFolder/Compliled/*.js
