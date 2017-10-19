@@ -237,7 +237,6 @@ router.get('/api/user/likedproducts', async (req, res) => {
     if(req.query.productsPer ===undefined){
       req.query.productsPer = 10
     }
-    productsPer = req.query.productsPer || 10
     try {
       res.send({
       success: true,
