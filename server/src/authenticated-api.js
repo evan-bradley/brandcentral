@@ -230,6 +230,17 @@ router.get('/api/user/following/:id', async (req, res) => {
   }
 })
 
+router.get('/api/user/likedproducts', async (req, res) => {
+    try {
+      res.send({
+      success: true,
+      likedproducts: await db.getLikedProducts(req.session.userId, req.body)
+  })
+  } catch (e) {
+    res.send()
+  }
+})
+
 router.post('/api/verify/password', async (req, res) => {
   try {
     await db.verifyPassword(req.session.userId, req.body)

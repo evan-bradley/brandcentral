@@ -379,5 +379,24 @@ pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
   })
 }
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
+pool.getLikedProducts = (user, info) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !info) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+        const startproduct = ((info.pgNum - 1)*info.numOfProducts)
+      const endproduct = (info.pgNum*info.numOfProducts) - 1
+      const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
+      resolve(results)
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
 module.exports = pool
