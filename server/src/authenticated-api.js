@@ -230,6 +230,34 @@ router.get('/api/user/following/:id', async (req, res) => {
   }
 })
 
+/*
+ * unsubscribe to a user's channel.
+ */
+router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
+    try {
+      await db.unsubscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+/*
+ * subscribe to a channel.
+ */
+router.post('/api/channels/subscribe/:cid', async (req, res) => {
+    try {
+      await db.subscribeChannel(req.session.userId, req.params.cid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+
 router.get('/api/user/likedproducts', async (req, res) => {
     if(req.query.page ===undefined){
        req.query.page = 1

@@ -427,4 +427,40 @@ pool.getLikedProducts = (user, page, productsPer) => {
   })
 }
 
+const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
+pool.unsubscribeChannel = (user, channel) => {
+    return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(UNSUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const SUBSCRIBECHANNEL_Q = 'INSERT INTO CHANNEL_USER_ASSIGN (USER_ID, CHANNEL_ID) VALUES(?, ?)'
+pool.subscribeChannel = (user, channel) => {
+  return new Promise(async (resolve, reject) => {
+      if (!user || !channel) {
+      reject(new Error('Missing a required field'))
+      return
+    }
+
+    try {
+      await pool.query(SUBSCRIBECHANNEL_Q, [user, channel])
+      resolve()
+
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
