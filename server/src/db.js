@@ -375,8 +375,21 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
+const FOLLOWING_Q = 'SELECT USERNAME AND FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
+      if (!user) {
+      reject(new Error('Missing user id'))
+      return
+    }
+
+    try {
+      const results = await pool.query(FOLLOWING_Q, [user])
+      resolve(results)
+
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
