@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "./node_modules/.bin/mocha --exit test/tests.js",
-    "init-db": "cd db && mysql -uroot < setup.sql && cd ../ && echo '\\033[0;32mDATABASES INITIALIZED'",
-    "uninit-db": "cd db && mysql -uroot < teardown.sql && cd ../ && echo '\\033[0;31mDATABASES DROPPED'"
+    "init-db": "cd db && node execdb.js setup && cd ../",
+    "uninit-db": "cd db && node execdb.js teardown && cd ../"
   },
   "repository": {
     "type": "git",
