@@ -391,7 +391,22 @@ pool.getLikedProducts = (user, info) => {
         const startproduct = ((info.pgNum - 1)*info.numOfProducts)
       const endproduct = (info.pgNum*info.numOfProducts) - 1
       const results = await pool.query(LIKEDPRODUCTS_Q, [user, startproduct, endproduct ])
-      resolve(results)
+      var productsarray = new Array[info.numOfProducts]
+      if (results.length > 0) {
+        for (i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL
+          }
+          productsarray[i] = product
+        }
+
+        resolve(productsarray)
+      }
 
     } catch (e) {
       reject(e)
