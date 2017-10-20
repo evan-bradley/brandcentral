@@ -55,10 +55,10 @@
     methods: {
       changePassword () {
         // Quit if any inputs are invalid
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
+        // this.$validator.validateAll()
+        // if (this.errors.any()) {
+        //   return
+        // }
         const passwordVerificationBody = {
           password: this.passwordVerification.CurrentPassword
         }

@@ -18,19 +18,21 @@ describe('Register', () => {
     component = new Vue(Register).$mount()
   })
 
-  it('data is a function and returns blanks', () => {
-    expect(typeof Register.data).to.equal('function')
-    const data = Register.data()
-    const newUser = new Classes.User()
-    expect(data.user).to.deep.equal(newUser)
-    expect(data.confirmPassword).to.equal('')
-    expect(data.failureMessage).to.equal('')
+  describe('Register - data', () => {
+    it('data is a function and returns blanks', () => {
+      expect(typeof Register.data).to.equal('function')
+      const data = Register.data()
+      const newUser = new Classes.User()
+      expect(data.user).to.deep.equal(newUser)
+      expect(data.confirmPassword).to.equal('')
+      expect(data.failureMessage).to.equal('')
+    })
   })
 
-  describe('register', () => {
+  describe('Register - register', () => {
     const newUser = new Classes.User()
 
-    it('should be a function', () => {
+    it('register is a function', () => {
       expect(typeof Register.methods.register).to.equal('function')
     })
 
@@ -48,7 +50,7 @@ describe('Register', () => {
     //   })
     // })
 
-    it('should display error when no username is provided', () => {
+    it('register should display error when no username is provided', () => {
       expect(component.user).to.deep.equal(newUser)
       expect(component.confirmPassword).to.equal('')
       expect(component.failureMessage).to.equal('')
@@ -58,7 +60,7 @@ describe('Register', () => {
       expect(component._data.failureMessage).to.equal('Username cannot be blank')
     })
 
-    it('should display error when passwords do not match', () => {
+    it('register should display error when passwords do not match', () => {
       expect(component.user).to.deep.equal(newUser)
 
       component.user.UserName = 'test'
@@ -70,7 +72,7 @@ describe('Register', () => {
       expect(component._data.failureMessage).to.equal('Passwords must match')
     })
 
-    it('should not display an error when all inputs are valid', () => {
+    it('register should not display an error when all inputs are valid', () => {
       let component = new Vue(Register).$mount()
       component.failureMessage = ''
       expect(component.user).to.deep.equal(newUser)

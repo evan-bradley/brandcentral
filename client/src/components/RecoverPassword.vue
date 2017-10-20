@@ -94,10 +94,10 @@
     methods: {
       sendEmail () {
         // Quit if any inputs are invalid
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
+        // this.$validator.validateAll()
+        // if (this.errors.any()) {
+        //   return
+        // }
 
         this.$http.post('/api/password/reset', {
           email: this.Email
@@ -116,10 +116,10 @@
         if (!this.$route.query.token) return
 
         // Quit if any inputs are invalid
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
+        // this.$validator.validateAll()
+        // if (this.errors.any()) {
+        //   return
+        // }
 
         var body = {
           token: this.$route.query.token,

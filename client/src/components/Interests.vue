@@ -61,6 +61,8 @@
           })
       },
       toggleChannelSelection (channel) {
+        console.log(this.selectedChannels)
+        console.log(channel)
         if (this.selectedChannels.includes(channel.CHANNEL_ID)) {
           var deleteIndex = this.selectedChannels.indexOf(channel.CHANNEL_ID)
           this.selectedChannels.splice(deleteIndex, 1)

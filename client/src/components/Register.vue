@@ -86,10 +86,10 @@
     methods: {
       register () {
         // Quit if any inputs are invalid
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
+        // this.$validator.validateAll()
+        // if (this.errors.any()) {
+        //   return
+        // }
 
         // Basic validation
         if (this.user.UserName === '') {

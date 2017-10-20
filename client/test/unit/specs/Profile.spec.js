@@ -39,34 +39,36 @@ describe('Profile', () => {
     Profile.$store = store
   })
 
-  it('data is a function and returns blanks', () => {
-    expect(typeof Profile.data).to.equal('function')
-    const data = Profile.data()
-    const newUser = new Classes.User()
-    expect(data.User).to.deep.equal(newUser)
+  describe('Profile - data', () => {
+    it('data is a function and returns blanks', () => {
+      expect(typeof Profile.data).to.equal('function')
+      const data = Profile.data()
+      const newUser = new Classes.User()
+      expect(data.User).to.deep.equal(newUser)
+    })
   })
 
-  describe('hash', () => {
+  describe('Profile - hash', () => {
     var testEmail = 'test@gmail.com'
     var hashValue = '1aedb8d9dc4751e229a335e371db8058'
 
-    it('should be a function', () => {
+    it('hash is a function', () => {
       expect(typeof component.hash).to.equal('function')
     })
 
-    it('should be unique', () => {
+    it('the hash should be unique', () => {
       const firstHash = component.hash('testing')
       const secondHash = component.hash('not testing')
       expect(firstHash).to.not.equal(secondHash)
     })
 
-    it('should be reproducible', () => {
+    it('the hash should be reproducible', () => {
       const firstHash = component.hash('testing')
       const secondHash = component.hash('testing')
       expect(firstHash).to.equal(secondHash)
     })
 
-    it('should generate an md5 hash', () => {
+    it('the hash should generate an md5 hash', () => {
       expect(component.hash(testEmail)).to.equal(hashValue)
     })
   })

@@ -41,10 +41,10 @@
     },
     methods: {
       changeEmail () {
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
+        // this.$validator.validateAll()
+        // if (this.errors.any()) {
+        //   return
+        // }
         const passwordVerificationBody = {
           password: this.password
         }
