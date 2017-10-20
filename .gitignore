@@ -17,3 +17,6 @@
 /web/bundles/
 /client/node_modules
 *.ini
+.DS_Store
+*.css
+*.css.map

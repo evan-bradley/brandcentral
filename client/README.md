@@ -2,6 +2,10 @@
 
 > A Vue.js project
 
+### Custom Build    
+
+npm run dev -> will now build css. if this fails make sure you have node-sass installed.
+
 ## Build Setup
 
 ``` bash
