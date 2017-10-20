@@ -503,7 +503,7 @@ pool.getNumLikedProducts = user => {
   })
 }
 
-const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE CHANNEL_ID = ? AND USER_ID = ?;'
+const UNSUBSCRIBECHANNEL_Q = 'DELETE FROM CHANNEL_USER_ASSIGN WHERE USER_ID = ? AND CHANNEL_ID = ?'
 pool.unsubscribeChannel = (user, channel) => {
   return new Promise(async (resolve, reject) => {
     if (!user || !channel) {

@@ -51,6 +51,29 @@ const pool = mysql.createPool({
   'multipleStatements': 'true'
 })
 
+const userData = {
+  username: 'tester',
+  email: 'test@null',
+  lastName: 'titor',
+  firstName: 'john',
+  password: 'password'
+}
+const followedUserData = {
+  username: 'tester0',
+  email: 'test0@null',
+  lastName: 'titor',
+  firstName: 'john',
+  password: 'password'
+}
+let userId
+let cookie
+const likeData = {
+  productID: '15',
+  productName: 'testname'
+}
+const channelId = 1
+let followedUserId
+
 lint(paths, options)
 
 describe('HTTP Routes', () => {
@@ -71,39 +94,7 @@ describe('HTTP Routes', () => {
         done()
       })
   })
-
-  /* it('Should POST /api/register', (done) => {
-    chai.request(server)
-    .post('/api/register')
-    .end((err, res) => {
-      should.not.exist(err)
-      res.status.should.equal(200)
-      done()
-    })
-  })
-
-  it('Should POST /api/login', (done) => {
-    chai.request(server)
-    .post('/api/login')
-    .end((err, res) => {
-      should.not.exist(err)
-      res.status.should.equal(200)
-      done()
-    })
-  }) */
 })
-
-const userData = {
-  username: 'tester',
-  email: 'test@null',
-  lastName: 'titor',
-  firstName: 'john',
-  password: 'password'
-}
-
-let userId
-
-let cookie
 
 describe('Registering a user', () => {
   it('Should POST to /api/register', () => {
@@ -253,12 +244,6 @@ describe('Channel navigation', () => {
   })
 })
 
-const likeData = {
-  productID: '15',
-  productName: 'testname',
-  userID: '5'
-}
-
 describe('Liking a product', () => {
   it('Should POST to /api/product/like/:id', () => {
     return new Promise((resolve, reject) => {
@@ -309,6 +294,139 @@ describe('Disliking a product', () => {
         should.exist(dislike)
         dislike.USER_ID.should.equal(userId)
         dislike.PRODUCT_ID.should.equal(parseInt(likeData.productID, 10))
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+})
+
+describe('Following a user', () => {
+  it('Should create a new user', () => {
+    return new Promise((resolve, reject) => {
+      try {
+        chai.request(server)
+          .post('/api/register')
+          .send(followedUserData)
+          .end((err, res) => {
+            should.not.exist(err)
+            res.status.should.equal(200)
+            res.body.success.should.equal(true)
+            should.exist(res.body.id)
+
+            followedUserId = res.body.id
+            resolve()
+          })
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+
+  it('Should POST to /api/user/follow/:id', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .post(`/api/user/follow/${followedUserId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  it('Should follow a user', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const follow = (await pool.query('select * from following'))[0]
+        should.exist(follow)
+        follow.FOLLOWER_ID.should.equal(userId)
+        follow.USER_FOLLOWED_ID.should.equal(followedUserId)
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+})
+
+describe('Unfollowing a user', () => {
+  it('Should POST to /api/user/unfollow/:id', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .post(`/api/user/unfollow/${followedUserId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  it('Should unfollow a user', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const follow = (await pool.query('select * from following'))[0]
+        should.not.exist(follow)
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+})
+
+describe('Subscribing to a channel', () => {
+  it('Should POST to /api/channels/subscribe/:cid', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .post(`/api/channels/subscribe/${channelId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  it('Should subscribe to a channel', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const subscribe = (await pool.query('select * from channel_user_assign'))[0]
+        should.exist(subscribe)
+        subscribe.CHANNEL_ID.should.equal(channelId)
+        subscribe.USER_ID.should.equal(userId)
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+})
+
+describe('Unsubscribing from a channel', () => {
+  it('Should POST to /api/channels/unsubscribe/:cid', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .post(`/api/channels/unsubscribe/${channelId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  it('Should unsubscribe from a channel', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const subscribe = (await pool.query('select * from channel_user_assign'))[0]
+        should.not.exist(subscribe)
         resolve()
       } catch (e) {
         reject(e)
