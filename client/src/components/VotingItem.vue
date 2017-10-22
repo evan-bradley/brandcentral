@@ -65,7 +65,7 @@
       props: ['item', 'channel'],
       data () {
         return {
-          DisplayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
+          displayMode: this.$route.name === 'Profile' || this.$route.name === 'BrowseProfile',
           itemName: '',
           itemDescription: '',
           itemImageURL: '',
@@ -106,7 +106,6 @@
           this.$http.post(`/api/product/like/${this.itemID}`)
             .then(response => { // Success
               if (response.data.success) {
-                console.log(response)
                 this.failureMessage = response.data.message
                 console.log('liked ' + this.itemName)
                 this.next()
@@ -120,7 +119,6 @@
           this.$http.post(`/api/product/dislike/${this.itemID}`)
             .then(response => { // Success
               if (response.data.success) {
-                console.log(response)
                 this.failureMessage = response.data.message
                 console.log('disliked ' + this.itemName)
                 this.next()

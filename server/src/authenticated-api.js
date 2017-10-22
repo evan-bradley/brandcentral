@@ -270,6 +270,23 @@ router.post('/api/channels/subscribe/:cid', async (req, res) => {
   }
 })
 
+/*
+ * Retrieve user's channels.
+ */
+router.get('/api/channel/:id', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      channel: await db.getChannel(req.params.id)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
 router.get('/api/user/likedproducts', async (req, res) => {
   if (req.query.page === undefined) {
     req.query.page = 1

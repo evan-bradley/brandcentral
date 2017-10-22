@@ -486,6 +486,26 @@ pool.getLikedProducts = (user, page, productsPer) => {
     }
   })
 }
+
+const CHANNEL_Q = 'SELECT * FROM CHANNEL WHERE CHANNEL_ID = ?'
+pool.getChannel = (channelId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(CHANNEL_Q, [ channelId ])
+      if (results.length > 0) {
+        const channel = {
+          id: results[0].CHANNEL_ID,
+          name: results[0].CHANNEL_NAME,
+        }
+
+        resolve(channel)
+      } else { resolve() }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 const NUMLIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ?'
 pool.getNumLikedProducts = user => {
   return new Promise(async (resolve, reject) => {
