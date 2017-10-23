@@ -44,8 +44,9 @@ const router = new Router({
       ]
     },
     {
-      path: '/profile',
+      path: '/profile/:userId',
       name: 'Profile',
+      props: true,
       component: Profile
     },
     {
