@@ -13,7 +13,7 @@
             No results found
             <hr style="margin-right: -20px; margin-left: -20px;">
           </div>
-          <p v-show="channels.length > 0" class="menu-label">Channels</p>
+          <p v-show="this.$store.state.channels.length > 0" class="menu-label">Channels</p>
           <ul class="menu-list">
             <li v-for="channel in this.$store.state.channels" :key="channel.id">
               <router-link v-bind:class="{ 'is-active': channel.id == $route.params.channelId }" :to="{ name: 'Channel', params:{ channelId: channel.id } }">
@@ -22,10 +22,10 @@
               </router-link>
             </li>
           </ul>
-          <p v-show="users.length > 0" class="menu-label">Users</p>
+          <p v-show="this.$store.state.followedUsers.length > 0" class="menu-label">Users</p>
           <ul class="menu-list">
-            <li v-for="user in users" :key="user.id">
-              <router-link v-bind:class="{ 'is-active': user.id == $route.params.user }" :to="{ name: 'BrowseProfile', params:{ user: user.id } }">
+            <li v-for="user in this.$store.state.followedUsers" :key="user.id">
+              <router-link v-bind:class="{ 'is-active': user.id == $route.params.userId }" :to="{ name: 'BrowseProfile', params:{ userId: user.id } }">
                 <i class="fa fa-user" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
                 {{ user.username }}
               </router-link>
@@ -47,14 +47,12 @@
         user: this.$store.state.User,
         searchText: '',
         channels: this.$store.state.channels,
-        users: [{
-          id: 13,
-          username: 'jpherkness'
-        }]
+        users: this.$store.state.followedUsers
       }
     },
     created () {
       this.loadChannels()
+      this.loadUsers()
     },
     methods: {
       loadChannels () {
@@ -62,6 +60,16 @@
           .then(response => {
             if (response.data.success) {
               this.$store.commit('setChannels', response.data.channels)
+            }
+          }, response => {
+            // Could not get any channels
+          })
+      },
+      loadUsers () {
+        this.$http.get(`/api/user/following/${this.user.Id}`)
+          .then(response => {
+            if (response.data.success) {
+              this.$store.commit('setFollowedUsers', response.data.following)
             }
           }, response => {
             // Could not get any channels

@@ -112,7 +112,7 @@ const router = new Router({
           component: Channel
         },
         {
-          path: '/user/:user',
+          path: '/user/:userId',
           name: 'BrowseProfile',
           props: true,
           component: Profile

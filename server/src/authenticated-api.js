@@ -40,10 +40,16 @@ router.post('/api/profile/:id', async (req, res) => {
  */
 router.get('/api/profile/:id', async (req, res) => {
   try {
-    res.send(JSON.stringify(await db.getProfileData(req.params.id)))
+    res.send({
+      success: true,
+      user: await db.getProfileData(req.params.id)
+    })
   } catch (e) {
     console.log(e)
-    res.send(JSON.stringify({res: 'error'}))
+    res.send({
+      success: false,
+      message: e
+    })
   }
 })
 
@@ -205,12 +211,15 @@ router.post('/api/product/dislike/:id', async (req, res) => {
 
 router.post('/api/user/follow/:id', async (req, res) => {
   try {
-    db.followUser(req.session.userId, req.params.id)
+    await db.followUser(req.session.userId, req.params.id)
     res.send({
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
@@ -221,7 +230,10 @@ router.post('/api/user/unfollow/:id', async (req, res) => {
       success: true
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
@@ -232,7 +244,10 @@ router.get('/api/user/following/:id', async (req, res) => {
       following: await db.getFollowing(req.params.id)
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 

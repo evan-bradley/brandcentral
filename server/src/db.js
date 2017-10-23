@@ -398,9 +398,7 @@ pool.followUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
     if (!follower || !followee) {
       reject(new Error('Missing a required field'))
-      return
     }
-
     try {
       await pool.query(FOLLOW_Q, [follower, followee])
       resolve()
@@ -414,9 +412,7 @@ pool.unfollowUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
     if (!follower || !followee) {
       reject(new Error('Missing a required field'))
-      return
     }
-
     try {
       await pool.query(UNFOLLOW_Q, [follower, followee])
       resolve()
@@ -431,23 +427,24 @@ pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
     if (!user) {
       reject(new Error('Missing user id'))
-      return
     }
 
     try {
       const results = await pool.query(FOLLOWING_Q, [user])
-      const following = new Array[results.length]()
+      const following = []
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
           const userObject = {
             username: results[i].USERNAME,
-            id: results[i].FOLLOWING.USER_FOLLOWED_ID
+            id: results[i].USER_FOLLOWED_ID
           }
-          following[i] = userObject
+          following.push(userObject)
         }
 
         resolve(following)
-      } else { resolve() }
+      } else { 
+        resolve([]) 
+      }
     } catch (e) {
       reject(e)
     }
