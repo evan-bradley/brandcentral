@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     loggedIn: false,
     User: new Classes.User(),
-    channels: []
+    channels: [],
+    followedUsers: []
   },
   mutations: {
     setUser (state, userObject) {
@@ -29,6 +30,18 @@ export default new Vuex.Store({
       state.channels = state.channels.filter(function (obj) {
         return obj.id !== channelId
       })
+    },
+    setFollowedUsers (state, users) {
+      state.followedUsers = users
+    },
+    removeFollowedUser (state, userId) {
+      // Requires a User object
+      state.followedUsers = state.followedUsers.filter(function (obj) {
+        return obj.id !== userId
+      })
+    },
+    addFollowedUser (state, user) {
+      state.followedUsers.push(user)
     }
   },
   getters: {

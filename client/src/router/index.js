@@ -44,8 +44,9 @@ const router = new Router({
       ]
     },
     {
-      path: '/profile',
+      path: '/profile/:userId',
       name: 'Profile',
+      props: true,
       component: Profile
     },
     {
@@ -112,7 +113,7 @@ const router = new Router({
           component: Channel
         },
         {
-          path: '/user/:user',
+          path: '/user/:userId',
           name: 'BrowseProfile',
           props: true,
           component: Profile
