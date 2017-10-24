@@ -41,10 +41,34 @@
         </ul>
       </div>
       <section class="section">
-        <div class="columns is-multiline">
-          <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="item in likedItems" :key="item.ProductName">
-            <VotingItem :item="item" />
+        <div v-if="likedItems.length > 0">
+          <div class="columns is-multiline">
+            <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="item in likedItems" :key="item.ProductName">
+              <VotingItem :item="item" />
+            </div>
           </div>
+          <nav class="pagination" v-show="totalProducts > numberPerPage" role="navigation" aria-label="pagination">
+            <a class="pagination-previous" @click="previousPage()" :disabled="currentPage == 1">Previous</a>
+            <a class="pagination-next" @click="nextPage()" :disabled="currentPage * numberPerPage >= totalProducts">Next page</a>
+            <!-- <ul class="pagination-list">
+              <li>
+                <a class="pagination-link is-current" aria-label="Page 1" aria-current="page">1</a>
+              </li>
+              <li>
+                <a class="pagination-link" aria-label="Goto page 2">2</a>
+              </li>
+              <li>
+                <a class="pagination-link" aria-label="Goto page 3">3</a>
+              </li>
+            </ul> -->
+          </nav>
+        </div>
+        <div v-else>
+          <article class="message">
+            <div class="message-body">
+              No results found.
+            </div>
+          </article>
         </div>
       </section>
     </div>
@@ -64,16 +88,11 @@
     props: ['userId'],
     data () {
       return {
-        user: undefined
-      }
-    },
-    computed: {
-      likedItems () {
-        return [
-          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61CwVYR-nYL._SX522_.jpg'),
-          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61bopQUes6L._UY679_.jpg'),
-          new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/71hS1%2BG7XRL._SY679_.jpg')
-        ]
+        user: undefined,
+        likedItems: [],
+        currentPage: 1,
+        numberPerPage: 12,
+        totalProducts: 0
       }
     },
     watch: {
@@ -87,6 +106,7 @@
     },
     created () {
       this.loadUserInformation()
+      this.loadLikedProducts(1)
     },
     methods: {
       hash (str) {
@@ -107,6 +127,31 @@
         }, response => {
           console.log('Failed to load channel information')
         })
+      },
+      loadLikedProducts (page) {
+        // if (page === this.currentPage) return
+        var userId = this.$route.params.userId
+        this.currentPage = page
+        var newLikedItems = []
+        this.$http.get(`/api/user/likedproducts/${userId}?productsPer=${this.numberPerPage}&page=${page}`)
+        .then(response => {
+          console.log(response)
+          if (response.data.success) {
+            response.body.likedproducts.forEach(function (el) {
+              newLikedItems.push(new Classes.Item(el.name, el.description, el.pictureUrl))
+            }, this)
+            this.likedItems = newLikedItems
+            this.totalProducts = response.body.totalProducts
+          }
+        }, response => {
+          console.log(`Failed to load products. userId=${userId}, page=${page}, numPerPage=${this.numPerPage}`)
+        })
+      },
+      previousPage () {
+        this.loadLikedProducts(this.currentPage - 1)
+      },
+      nextPage () {
+        this.loadLikedProducts(this.currentPage + 1)
       },
       following () {
         var userId = this.user.Id

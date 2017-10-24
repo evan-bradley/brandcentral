@@ -9,7 +9,7 @@
         <div class="media-content">
           <div :class="[this.displayMode ? 'subtitle is-5':'title is-4']">
             <p class="has-text-left is-pulled-left">
-              {{ itemName ? itemName : item.ProductName }}
+              {{ itemName ? itemName : item.ProductName.substr(0, 50) + '...' }}
             </p>
           </div>
         </div>
