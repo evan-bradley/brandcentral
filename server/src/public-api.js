@@ -60,7 +60,7 @@ router.post('/api/register', async (req, res) => {
       text: 'Hello, thanks for signing up. Please click this link to verify your account:\n' // plain text body
     }
 
-    registerEmail.text += `http://localhost:8080/verify?token=${results.token}`
+    registerEmail.text += `http://${process.env.URL}/verify?token=${results.token}`
     registerEmail.text += `\nYou can also enter the following code: ${results.code}`
 
     transporter.sendMail(registerEmail, (error, info) => {
@@ -95,7 +95,7 @@ router.post('/api/password/reset', async (req, res) => {
         text: 'Hello, to reset your password, please click the following link:\n' // plain text body
       }
 
-      resetEmail.text += `http://localhost:8080/reset?token=${token}`
+      resetEmail.text += `http://${process.env.URL}/reset?token=${token}`
 
       transporter.sendMail(resetEmail, (error, email) => {
         if (error) {
