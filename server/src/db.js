@@ -442,8 +442,8 @@ pool.getFollowing = user => {
         }
 
         resolve(following)
-      } else { 
-        resolve([]) 
+      } else {
+        resolve([])
       }
     } catch (e) {
       reject(e)
@@ -461,7 +461,7 @@ pool.getLikedProducts = (user, page, productsPer) => {
       const startproduct = ((page - 1) * productsPer)
       const endproduct = (page * productsPer)
       const results = await pool.query(LIKEDPRODUCTS_Q, [ user, startproduct, endproduct ])
-      const productsarray = new Array()
+      const productsarray = []
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
           const product = {
@@ -475,8 +475,8 @@ pool.getLikedProducts = (user, page, productsPer) => {
           productsarray[i] = product
         }
         resolve(productsarray)
-      } else { 
-        resolve([]) 
+      } else {
+        resolve([])
       }
     } catch (e) {
       console.log(e)
@@ -493,7 +493,7 @@ pool.getChannel = (channelId) => {
       if (results.length > 0) {
         const channel = {
           id: results[0].CHANNEL_ID,
-          name: results[0].CHANNEL_NAME,
+          name: results[0].CHANNEL_NAME
         }
 
         resolve(channel)
