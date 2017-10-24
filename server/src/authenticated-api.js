@@ -302,7 +302,7 @@ router.get('/api/channel/:id', async (req, res) => {
   }
 })
 
-router.get('/api/user/likedproducts', async (req, res) => {
+router.get('/api/user/likedproducts/:id', async (req, res) => {
   if (req.query.page === undefined) {
     req.query.page = 1
   }
@@ -314,11 +314,14 @@ router.get('/api/user/likedproducts', async (req, res) => {
       success: true,
       page: req.query.page,
       productsPer: req.query.productsPer,
-      totalProducts: await db.getNumLikedProducts(req.session.userId),
-      likedproducts: await db.getLikedProducts(req.session.userId, req.query.page, req.query.productsPer)
+      totalProducts: await db.getNumLikedProducts(req.params.id),
+      likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e
+    })
   }
 })
 

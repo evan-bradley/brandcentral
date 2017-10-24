@@ -455,18 +455,17 @@ pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
     if (!user || !page) {
       reject(new Error('Missing required field'))
-      return
     }
 
     try {
       const startproduct = ((page - 1) * productsPer)
-      const endproduct = (page * productsPer) - 1
+      const endproduct = (page * productsPer)
       const results = await pool.query(LIKEDPRODUCTS_Q, [ user, startproduct, endproduct ])
-      const productsarray = new Array[results.length]()
+      const productsarray = new Array()
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
           const product = {
-            id: results[i].PRODUCT.PRODUCT_ID,
+            id: results[i].PRODUCT_ID,
             name: results[i].PROD_NAME,
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
@@ -475,10 +474,12 @@ pool.getLikedProducts = (user, page, productsPer) => {
           }
           productsarray[i] = product
         }
-
         resolve(productsarray)
-      } else { resolve() }
+      } else { 
+        resolve([]) 
+      }
     } catch (e) {
+      console.log(e)
       reject(e)
     }
   })
