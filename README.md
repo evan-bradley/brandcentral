@@ -1,4 +1,4 @@
-# Brand Central Station
+![Brand Central Station](https://github.com/evan-bradley/brandcentralstation/blob/master/client/src/assets/brand_central_full.png)
 
 [Live Website](http://brandcentral.xyz/)
 
