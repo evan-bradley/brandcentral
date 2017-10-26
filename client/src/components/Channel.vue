@@ -21,13 +21,12 @@
 
 <script>
   import VotingItem from './VotingItem.vue'
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 
   export default {
     props: ['channelId'],
     data () {
       return {
-        currentItem: new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61rzIAnzTQL._UX522_.jpg'),
+        currentItem: undefined,
         channels: this.$store.state.channels,
         channel: {}
       }
