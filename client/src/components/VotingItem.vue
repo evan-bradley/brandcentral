@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="voting-item" v-bind:class="{ 'small': this.displayMode }">
     <div class="box">
       <figure class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
           <img :src="itemImageURL ? itemImageURL : item.ImmageURL" alt="Placeholder image">
