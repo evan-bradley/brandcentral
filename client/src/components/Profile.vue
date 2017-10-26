@@ -3,7 +3,7 @@
     <div v-if="user">
       <section class="section">
         <div class="is-centered">
-          <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(user.Email) + '?s=96&d=identicon'" class="profile-image" />
+          <img v-bind:src="'https://secure.gravatar.com/avatar/' + this.emailHash+ '?s=96&d=identicon'" class="profile-image" />
           <h1 class="title is-4">{{ user.FirstName }} {{ user.LastName }}</h1>
           <h1 class="subtitle">@{{ user.UserName }}</h1>
           <div v-if="user.Id != this.$store.state.User.Id">
@@ -99,7 +99,8 @@
         likedItems: [],
         currentPage: 1,
         numberPerPage: 12,
-        totalProducts: 0
+        totalProducts: 0,
+        emailHash: ''
       }
     },
     watch: {
@@ -127,10 +128,10 @@
           if (response.data.success) {
             this.user = new Classes.User()
             this.user.Id = Number(userId)
-            this.user.FirstName = response.body.user[0].USER_FNAME
-            this.user.LastName = response.body.user[0].USER_LNAME
-            this.user.UserName = response.body.user[0].USERNAME
-            this.user.Email = 'md5 hash from server goes here'
+            this.user.FirstName = response.body.user.firstName
+            this.user.LastName = response.body.user.lastName
+            this.user.UserName = response.body.user.username
+            this.emailHash = response.body.user.emailHash
           }
         }, response => {
           console.log('Failed to load channel information')
