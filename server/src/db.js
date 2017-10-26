@@ -206,9 +206,33 @@ pool.verifyUserToken = token => pool.query(VERIFY_TOKEN_Q, [ token ])
 const VERIFY_CODE_Q = 'UPDATE USER SET VERIFIED = \'1\' WHERE VER_CODE = ?'
 pool.verifyUserCode = code => pool.query(VERIFY_CODE_Q, [ code ])
 
-const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_PICT_URL
+const PROFILE_Q = `SELECT USER_FNAME, USER_LNAME, USERNAME, USER_EMAIL
 FROM USER WHERE USER_ID = ?`
-pool.getProfileData = id => pool.query(PROFILE_Q, [ id ])
+pool.getProfileData = id => {
+  return new Promise(async (resolve, reject) => {
+    if (!id) {
+      reject(new Error('Missing user ID'))
+      return
+    }
+
+    try {
+      const results = await pool.query(PROFILE_Q, [ id ])
+      if (results.length === 1) {
+        const profile = {
+          firstName: results[0].USER_FNAME,
+          lastName: results[0].USER_LNAME,
+          username: results[0].USERNAME,
+          emailHash: (await crypto.hash('md5')(results[0].USER_EMAIL)).toString('hex')
+        }
+        resolve(profile)
+      } else {
+        reject(new Error('No such user'))
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 
 // This function will query the database for the first 16 tags.
 const GET_ONBOARD_CHANNELS_Q = `SELECT * FROM CHANNEL LIMIT 16;`

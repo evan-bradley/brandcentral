@@ -34,6 +34,7 @@ const options = {
   contextName: 'eslint' // Defaults to `eslint`, but can be any string
 }
 
+const crypto = require('crypto-promise')
 const mysql = require('promise-mysql')
 process.env.DB_NAME = 'BRAND_CENTRAL_TESTING'
 const server = require('../src/server')
@@ -220,6 +221,34 @@ describe('Logging in', () => {
           cookie = sessionCookie
           // TODO: Check other values
 
+          resolve()
+        })
+    })
+  })
+})
+
+describe('Getting a user\'s profile', () => {
+  it('Should return a user\'s profile', () => {
+    return new Promise(async (resolve, reject) => {
+      let hash
+      try {
+        hash = (await crypto.hash('md5')(userData.email)).toString('hex')
+      } catch (e) {
+        reject(e)
+      }
+
+      chai.request(server)
+        .get(`/api/profile/${userId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          const user = res.body.user
+
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          user.firstName.should.equal(userData.firstName)
+          user.lastName.should.equal(userData.lastName)
+          user.username.should.equal(userData.username)
+          user.emailHash.should.equal(hash)
           resolve()
         })
     })
