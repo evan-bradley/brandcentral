@@ -6,7 +6,8 @@
           <img v-bind:src="'https://secure.gravatar.com/avatar/' + hash(user.Email) + '?s=96&d=identicon'" class="profile-image" />
           <h1 class="title is-4">{{ user.FirstName }} {{ user.LastName }}</h1>
           <h1 class="subtitle">@{{ user.UserName }}</h1>
-          <span v-if="following()">
+          <div v-if="user.Id != this.$store.state.User.Id">
+            <span v-if="following()">
               <a class="button is-primary"  @click="unfollow()">
                 Unfollow
               </a>
@@ -16,6 +17,12 @@
                 Follow
               </a>
             </span>
+          </div>
+          <div v-else>
+            <router-link :to="{ name: 'EditProfile' }" class="button">
+              Edit Profile
+            </router-link>
+          </div>
         </div>
       </section>
       <div class="tabs is-centered is-boxed">
