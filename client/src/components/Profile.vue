@@ -105,6 +105,7 @@
     watch: {
       userId: function (newVal, oldVal) {
         this.loadUserInformation()
+        this.loadLikedProducts(1)
       }
     },
     components: {
