@@ -325,20 +325,4 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   }
 })
 
-router.post('/api/verify/password', async (req, res) => {
-  try {
-    await db.verifyPassword(req.session.userId, req.body)
-    // console.log('Logged in', results.id, req.session.id)
-    res.send({
-      success: true
-    })
-  } catch (e) {
-    console.log(e)
-    res.send({
-      success: false,
-      message: e.message
-    })
-  }
-})
-
 module.exports = router

@@ -19,6 +19,31 @@ const pool = mysql.createPool({
   'multipleStatements': 'true'
 })
 
+const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
+const verifyPassword = (user, pass) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(GETPASSHASH_Q, [ user ])
+
+      if (results.length === 0) {
+        resolve(false)
+      }
+
+      const res = await bcrypt.compare(pass, results[0].USER_PASS_HASH)
+
+      if (res) {
+        // successful login
+        resolve(true)
+      } else {
+        // login failure
+        resolve(false)
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 /*
  * Put user details into database, checking for whether their GID is already
  * in the database.
@@ -138,33 +163,6 @@ pool.loginUser = info => {
       } else {
         // login failure
         reject(new Error('Username or password invalid'))
-      }
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
-pool.verifyPassword = (user, pass) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const results = await pool.query(GETPASSHASH_Q, [ user ])
-
-      if (results.length === 0) {
-        // login failure
-        reject(new Error('user id invalid'))
-        return
-      }
-
-      const res = await bcrypt.compare(pass.password, results[0].USER_PASS_HASH)
-
-      if (res) {
-        // successful login
-        resolve()
-      } else {
-        // login failure
-        reject(new Error('password invalid'))
       }
     } catch (e) {
       reject(e)

@@ -45,17 +45,12 @@
         if (this.errors.any()) {
           return
         }
-        const passwordVerificationBody = {
-          password: this.password
-        }
         const emailModificationBody = {
           id: this.user.Id,
           NewEmail: this.email,
           currentEmail: this.user.Email,
           password: this.password
         }
-        // TODO: We should combine these two requests into one.
-        this.$http.post('/api/verify/password', passwordVerificationBody)
           .then(response => {
             if (response.data.success) {
               this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, emailModificationBody)
