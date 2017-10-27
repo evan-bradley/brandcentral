@@ -55,6 +55,7 @@ const pool = mysql.createPool({
 const userData = {
   username: 'tester',
   email: 'test@null',
+  newEmail: 'testing@null',
   lastName: 'titor',
   firstName: 'john',
   password: 'password'
@@ -223,6 +224,41 @@ describe('Logging in', () => {
 
           resolve()
         })
+    })
+  })
+})
+
+describe('Changing a user\'s email', () => {
+  it('Should PUT /api/user/:id/email', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .put(`/api/user/${userId}/email`)
+        .set('cookie', cookie)
+        .send({
+          email: userData.newEmail,
+          password: userData.password
+        })
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  const USER_EMAIL_Q = 'select USER_EMAIL FROM USER WHERE USER_ID = ?'
+  it('Should set the new email', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const results = await pool.query(USER_EMAIL_Q, [ userId ])
+
+        results[0].USER_EMAIL.should.equal(userData.newEmail)
+        userData.oldEmail = userData.email
+        userData.email = userData.newEmail
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
     })
   })
 })
