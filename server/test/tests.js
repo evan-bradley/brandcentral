@@ -259,7 +259,7 @@ describe('Channel navigation', () => {
   it('Should GET /api/product', () => {
     return new Promise((resolve, reject) => {
       chai.request(server)
-        .get('/api/product?channelId=1')
+        .get('/api/product/random?channelId=1')
         .set('cookie', cookie)
         .end((err, res) => {
           should.not.exist(err)
