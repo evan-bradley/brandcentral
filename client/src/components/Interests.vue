@@ -72,10 +72,10 @@
         if (!this.canSubmitChannels()) return
 
         // Send the channels that the user selected to the server
-        var body = {
+        const body = {
           channels: this.selectedChannels
         }
-        this.$http.post(`/api/channels/${this.user.Id}`, body)
+        this.$http.post(`/api/user/${this.user.Id}/channels`, body)
           .then(response => {
             if (response.data.success) {
               this.$router.push({ name: 'Browse' })

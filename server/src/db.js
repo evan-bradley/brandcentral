@@ -19,6 +19,31 @@ const pool = mysql.createPool({
   'multipleStatements': 'true'
 })
 
+const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
+const verifyPassword = (user, pass) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(GETPASSHASH_Q, [ user ])
+
+      if (results.length === 0) {
+        resolve(false)
+      }
+
+      const res = await bcrypt.compare(pass, results[0].USER_PASS_HASH)
+
+      if (res) {
+        // successful login
+        resolve(true)
+      } else {
+        // login failure
+        resolve(false)
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 /*
  * Put user details into database, checking for whether their GID is already
  * in the database.
@@ -44,7 +69,6 @@ pool.registerUser = info => {
         } else if (info.email === results[0].USER_EMAIL) {
           reject(new Error('A user with that email is already registered.'))
         } else {
-          console.log(results[0])
           reject(new Error('Unknown SQL collision.'))
         }
       } else {
@@ -74,38 +98,40 @@ pool.registerUser = info => {
   })
 }
 
-const DUPCHECKEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_EMAIL = ?'
-const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VER_TOKEN = ? WHERE USER_EMAIL = ?;'
-pool.CheckNewEmail = info => {
+const DUPCHECKEMAIL_Q = 'SELECT USER_ID FROM USER WHERE USER_EMAIL = ?'
+const GETOLDEMAIL_Q = 'SELECT USER_EMAIL FROM USER WHERE USER_ID = ?'
+const CHANGEEMAIL_Q = 'UPDATE USER SET USER_EMAIL = ?, VERIFIED = \'0\', VER_TOKEN = ? WHERE USER_ID = ?;'
+pool.checkNewEmail = (id, info) => {
   return new Promise(async (resolve, reject) => {
-    if (!info.NewEmail) {
-      reject(new Error('Missing Email'))
+    if (!id || !info.email || !info.password) {
+      reject(new Error('Missing a required field'))
       return
     }
 
     try {
-      const results = await pool.query(DUPCHECKEMAIL_Q, [info.NewEmail])
-      if (results.length > 0) {
+      const existingEmails = await pool.query(DUPCHECKEMAIL_Q, [ info.email ])
+      const passwordCheck = await verifyPassword(id, info.password)
+      if (!passwordCheck) {
+        reject(new Error('Invalid password'))
+      } else if (existingEmails.length > 0) {
         reject(new Error('Email already used'))
       } else {
-        require('crypto').randomBytes(16, async (err, buffer) => {
-          if (err) {
-            reject(err)
-          }
+        const token = (await crypto.randomBytes(16)).toString('hex')
+        const email = await pool.query(GETOLDEMAIL_Q, [ id ])
 
-          const token = buffer.toString('hex')
-          const res = await pool.query(CHANGEEMAIL_Q, [info.NewEmail, token, info.currentEmail])
-          res.token = token
-          resolve(res)
+        await pool.query(CHANGEEMAIL_Q, [ info.email, token, id ])
+
+        resolve({
+          token,
+          email: email[0].USER_EMAIL
         })
-        // if (err.code === 'ER_DUP_ENTRY')
-        // err.message = 'A user with that ID is already registered'
       }
     } catch (e) {
       reject(e)
     }
   })
 }
+
 /*
  * Check user's password and return user info if it is valid
  */
@@ -138,33 +164,6 @@ pool.loginUser = info => {
       } else {
         // login failure
         reject(new Error('Username or password invalid'))
-      }
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-const GETPASSHASH_Q = 'SELECT USER_PASS_HASH FROM USER WHERE USER_ID = ?'
-pool.verifyPassword = (user, pass) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const results = await pool.query(GETPASSHASH_Q, [ user ])
-
-      if (results.length === 0) {
-        // login failure
-        reject(new Error('user id invalid'))
-        return
-      }
-
-      const res = await bcrypt.compare(pass.password, results[0].USER_PASS_HASH)
-
-      if (res) {
-        // successful login
-        resolve()
-      } else {
-        // login failure
-        reject(new Error('password invalid'))
       }
     } catch (e) {
       reject(e)
@@ -395,6 +394,7 @@ pool.likeProduct = (user, product) => {
     }
   })
 }
+
 const DISLIKE_Q = `INSERT INTO DISLIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
 pool.dislikeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
@@ -417,6 +417,7 @@ pool.unlikeProduct = (user, product) => {
 
   })
 }
+
 const FOLLOW_Q = `INSERT INTO FOLLOWING (FOLLOWER_ID, USER_FOLLOWED_ID) VALUES(?, ?)`
 pool.followUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
@@ -431,6 +432,7 @@ pool.followUser = (follower, followee) => {
     }
   })
 }
+
 const UNFOLLOW_Q = `DELETE FROM FOLLOWING WHERE FOLLOWER_ID = ? AND USER_FOLLOWED_ID = ?`
 pool.unfollowUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
@@ -474,6 +476,7 @@ pool.getFollowing = user => {
     }
   })
 }
+
 const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
 pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
