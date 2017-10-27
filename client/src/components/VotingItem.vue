@@ -88,7 +88,7 @@
           console.log('clicked previous')
         },
         next () {
-          this.$http.get(`/api/product?channelId=${this.channel}`)
+          this.$http.get(`/api/product/random?channelId=${this.channel}`)
             .then(response => { // Success
               if (response.data.success) {
                 this.itemName = response.data.product.name.substring(0, 30)

@@ -156,11 +156,11 @@ router.get('/api/user/:id/channels', async (req, res) => {
   }
 })
 
-router.get('/api/product', async (req, res) => {
+router.get('/api/product/random', async (req, res) => {
   try {
     res.send({
       success: true,
-      product: await db.getRandomProduct(req.query.channelId) // , req.query.count
+      product: await db.getRandomProduct(req.query.channelId)
     })
   } catch (e) {
     res.send({
