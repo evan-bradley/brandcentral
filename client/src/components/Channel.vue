@@ -45,7 +45,7 @@
     methods: {
       loadChannelInformation () {
         var channelId = this.$route.params.channelId
-        this.$http.get(`/api/channel/${channelId}`)
+        this.$http.get(`/api/channels/${channelId}`)
         .then(response => {
           if (response.data.success) {
             this.channel = response.body.channel

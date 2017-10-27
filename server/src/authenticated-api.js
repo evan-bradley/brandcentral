@@ -285,10 +285,8 @@ router.post('/api/channels/subscribe/:cid', async (req, res) => {
   }
 })
 
-/*
- * Retrieve user's channels.
  */
-router.get('/api/channel/:id', async (req, res) => {
+router.get('/api/channels/:id', async (req, res) => {
   try {
     res.send({
       success: true,
