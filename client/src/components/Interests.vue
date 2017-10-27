@@ -75,7 +75,7 @@
         var body = {
           channels: this.selectedChannels
         }
-        this.$http.post(`/api/channels/${this.user.Id}`, body)
+        this.$http.post(`/api/user/${this.user.Id}/channels`, body)
           .then(response => {
             if (response.data.success) {
               this.$router.push({ name: 'Browse' })

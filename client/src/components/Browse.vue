@@ -56,7 +56,7 @@
     },
     methods: {
       loadChannels () {
-        this.$http.get(`/api/channels/${this.user.Id}`)
+        this.$http.get(`/api/user/${this.user.Id}/channels`)
           .then(response => {
             if (response.data.success) {
               this.$store.commit('setChannels', response.data.channels)
