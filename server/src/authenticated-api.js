@@ -70,42 +70,45 @@ router.get('/api/logout', async (req, res) => {
   }
 })
 
-router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
+router.put('/api/user/:id/email', async (req, res) => {
+  if (parseInt(req.params.id, 10) !== parseInt(req.session.userId, 10)) {
+    res.send({
+      success: false,
+      message: 'Insufficient permissions'
+    })
+    return
+  }
+
   try {
-    const test = await db.CheckNewEmail(req.body)
+    const results = await db.checkNewEmail(req.session.userId, req.body)
     const OldEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-      to: req.body.currentEmail,
-      subject: 'Email Change ✔', // Subject line
+      to: results.email,
+      subject: 'Email Change Notification', // Subject line
       text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+    }
+
+    const NewVerifyEmail = {
+      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+      to: req.body.email,
+      subject: 'Email Verification', // Subject line
+      text: `Hello, please click this link to verify your new email: http://localhost:8080/verify?token=${results.token}\n` // plain text body
     }
 
     transporter.sendMail(OldEmail, (error, info) => {
       if (error) {
         return console.log(error)
       }
-    })
 
-    const NewVerifyEmail = {
-      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-      to: req.body.NewEmail,
-      subject: 'Hello ✔', // Subject line
-      text: 'Hello, please click this link to verify your new email:\n' // plain text body
-    }
-
-    NewVerifyEmail.text += `http://localhost:8080/verify?token=${test.token}`
-    console.log(NewVerifyEmail)
-
-    transporter.sendMail(NewVerifyEmail, (error, info) => {
-      if (error) {
-        return console.log(error)
-      }
-      console.log('Message sent: %s', info.messageId)
+      transporter.sendMail(NewVerifyEmail, (error, info) => {
+        if (error) {
+          return console.log(error)
+        }
+      })
     })
 
     res.send({
       success: true
-      // id: results.id
     })
   } catch (e) {
     console.log(e)

@@ -46,26 +46,15 @@
           return
         }
         const emailModificationBody = {
-          id: this.user.Id,
-          NewEmail: this.email,
-          currentEmail: this.user.Email,
+          email: this.email,
           password: this.password
         }
+
+        this.$http.put(`/api/user/${this.user.Id}/email`, emailModificationBody)
           .then(response => {
-            if (response.data.success) {
-              this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, emailModificationBody)
-                .then(response => {
-                  if (response.body.success) {
-                    this.user.Email = emailModificationBody.NewEmail
-                    this.$router.push({name: 'EditProfile'})
-                  } else {
-                    console.log(response)
-                    this.failureMessage = response.data.message
-                  }
-                }, response => {
-                  this.failureMessage = response.data.message
-                  console.log(response)
-                })
+            if (response.body.success) {
+              this.user.Email = emailModificationBody.NewEmail
+              this.$router.push({name: 'EditProfile'})
             } else {
               console.log(response)
               this.failureMessage = response.data.message
