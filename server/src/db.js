@@ -69,7 +69,6 @@ pool.registerUser = info => {
         } else if (info.email === results[0].USER_EMAIL) {
           reject(new Error('A user with that email is already registered.'))
         } else {
-          console.log(results[0])
           reject(new Error('Unknown SQL collision.'))
         }
       } else {

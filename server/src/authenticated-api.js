@@ -26,12 +26,20 @@ router.post('/api/profile/:id', async (req, res) => {
   if (parseInt(req.params.id, 10) === parseInt(req.session.userId, 10)) {
     try {
       await db.updateProfile(queryData)
-      res.send(JSON.stringify({res: 'success'}))
+      res.send({
+        success: true
+      })
     } catch (e) {
-      res.send(JSON.stringify({res: 'error'}))
+      res.send({
+        success: false,
+        message: e.message
+      })
     }
   } else {
-    res.send(JSON.stringify({res: 'error'}))
+    res.send({
+      success: false,
+      message: 'Insufficient permissions'
+    })
   }
 })
 
@@ -45,10 +53,9 @@ router.get('/api/profile/:id', async (req, res) => {
       user: await db.getProfileData(req.params.id)
     })
   } catch (e) {
-    console.log(e)
     res.send({
       success: false,
-      message: e
+      message: e.message
     })
   }
 })
@@ -62,10 +69,9 @@ router.get('/api/logout', async (req, res) => {
       message: 'Logged out'
     })
   } catch (e) {
-    console.log(e)
     res.send({
       success: false,
-      message: e
+      message: e.message
     })
   }
 })
