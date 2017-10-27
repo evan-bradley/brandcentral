@@ -393,6 +393,7 @@ pool.likeProduct = (user, product) => {
     }
   })
 }
+
 const DISLIKE_Q = `INSERT INTO DISLIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
 pool.dislikeProduct = (user, product) => {
   return new Promise(async (resolve, reject) => {
@@ -415,6 +416,7 @@ pool.unlikeProduct = (user, product) => {
 
   })
 }
+
 const FOLLOW_Q = `INSERT INTO FOLLOWING (FOLLOWER_ID, USER_FOLLOWED_ID) VALUES(?, ?)`
 pool.followUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
@@ -429,6 +431,7 @@ pool.followUser = (follower, followee) => {
     }
   })
 }
+
 const UNFOLLOW_Q = `DELETE FROM FOLLOWING WHERE FOLLOWER_ID = ? AND USER_FOLLOWED_ID = ?`
 pool.unfollowUser = (follower, followee) => {
   return new Promise(async (resolve, reject) => {
@@ -472,6 +475,7 @@ pool.getFollowing = user => {
     }
   })
 }
+
 const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
 pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
