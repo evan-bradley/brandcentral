@@ -129,9 +129,9 @@ router.put('/api/user/:id/email', async (req, res) => {
 /*
  * Store user's channels.
  */
-router.post('/api/channels/:user', async (req, res) => {
+router.post('/api/user/:id/channels', async (req, res) => {
   try {
-    await db.storeUserChannels(req.params.user, req.body.channels)
+    await db.storeUserChannels(req.params.id, req.body.channels)
     res.send({
       success: true
     })
