@@ -630,4 +630,52 @@ pool.getNumUsersSearch = searchFor => {
   })
 }
 
+const SEARCHCHANNELS_Q = 'SELECT CHANNEL_NAME, CHANNEL_ID FROM CHANNEL WHERE CHANNEL_NAME LIKE ? LIMIT ?'
+pool.getSearchForChannels = (searchFor, limit) => {
+  return new Promise(async (resolve, reject) => {
+    if (!searchFor || !limit) {
+    reject(new Error('Missing required field'))
+  }
+
+  try {
+    const wildcard = searchFor.concat('%')
+    const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
+    const channelArray = []
+    if (results.length > 0) {
+      for (let i = 0; i < results.length; i++) {
+        const Channel = {
+          id: results[i].CHANNEL_ID,
+          name: results[i].CHANNEL_NAME
+        }
+        channelArray[i] = Channel
+      }
+      resolve(channelArray)
+    } else {
+      resolve([])
+    }
+  } catch (e) {
+    console.log(e)
+    reject(e)
+  }
+})
+}
+
+const NUMCHANNELSSEARCH_Q = 'SELECT CAHNNEL_NAME, CHANNEL_ID FROM CAHNNEL WHERE CHANNEL_NAME LIKE ?'
+pool.getNumChannelsSearch = searchFor => {
+  return new Promise(async (resolve, reject) => {
+    if (!searchFor) {
+    reject(new Error('Missing required field'))
+    return
+  }
+
+  try {
+    const wildcard = searchFor.concat('%')
+    const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
+    resolve(results.length)
+  } catch (e) {
+    reject(e)
+  }
+})
+}
+
 module.exports = pool
