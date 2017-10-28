@@ -587,6 +587,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !limit) {
       reject(new Error('Missing required field'))
+      return
     }
 
     try {
@@ -635,6 +636,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !limit) {
     reject(new Error('Missing required field'))
+    return
   }
 
   try {
@@ -676,6 +678,59 @@ pool.getNumChannelsSearch = searchFor => {
     reject(e)
   }
 })
+}
+
+const SEACHUSERANDCHANNEL_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME, USER_ID, USERNAME FROM ((SELECT CHANNEL_ID, CHANNEL_NAME, \' \' AS USER_ID, \' \' AS USERNAME FROM CHANNEL) UNION (SELECT \' \' AS CHANNEL_ID, \' \' AS CHANNEL_NAME, USER_ID, USERNAME FROM USER)) AS USERCHANNEL WHERE CHANNEL_NAME LIKE ? OR USERNAME LIKE ? LIMIT ?'
+
+pool.getSearchForChannelsAndUsers = (searchFor, limit) => {
+  return new Promise(async (resolve, reject) => {
+    if (!searchFor || !limit) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const wildcard = searchFor.concat('%')
+      const results = await pool.query(SEACHUSERANDCHANNEL_Q, [wildcard, wildcard, limit])
+      const channelUserArray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const channelUser = {
+            cid: results[i].CHANNEL_ID,
+            cname: results[i].CHANNEL_NAME,
+            uid: results[i].USER_ID,
+            username: results[i].USERNAME
+          }
+          channelUserArray[i] = channelUser
+        }
+        resolve(channelUserArray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
+}
+
+const NUMCHANNELSANDUSERSEARCH_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME, USER_ID, USERNAME FROM ((SELECT CHANNEL_ID, CHANNEL_NAME, \' \' AS USER_ID, \' \' AS USERNAME FROM CHANNEL) UNION (SELECT \' \' AS CHANNEL_ID, \' \' AS CHANNEL_NAME, USER_ID, USERNAME FROM USER)) AS USERCHANNEL WHERE CHANNEL_NAME LIKE ? OR USERNAME LIKE ?'
+
+pool.getNumChannelsAndUsersSearch = searchFor => {
+    return new Promise(async (resolve, reject) => {
+      if (!searchFor) {
+        reject(new Error('Missing required field'))
+        return
+      }
+
+    try {
+      const wildcard = searchFor.concat('%')
+      const results = await pool.query(NUMCHANNELSANDUSERSEARCH_Q, [wildcard, wildcard])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 
 module.exports = pool
