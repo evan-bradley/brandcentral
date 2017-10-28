@@ -535,4 +535,134 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} /api/users/search/:searchFor Search for users
+ * @apiName SearchForUsers
+ * @apiGroup
+ *
+ * @apiParam {String} searchFor entered search word
+ * @apiParam {Number} searchlimit limit for return (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Number}  limit the number limit of the search
+ * @apiSuccess {Number}  totalUsers the total number of results it would return if not limited
+ * @apiSuccess {Array}  searchForUsers array of 'User' objects with the username and user_id
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/users/search/:searchFor', async (req, res) => {
+  if (req.query.searchLimit === undefined) {
+    req.query.searchLimit = 10
+  }
+  try {
+    res.send({
+        success: true,
+        searchLimit: req.query.searchLimit,
+        totalUsers: await db.getNumUsersSearch(req.params.searchFor),
+        searchForUsers: await db.getSearchForUsers(req.params.searchFor, req.query.searchLimit)
+  })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/channel/search/:searchFor Search for users
+ * @apiName SearchForChannels
+ * @apiGroup
+ *
+ * @apiParam {String} searchFor entered search word
+ * @apiParam {Number} searchlimit limit for return (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Number}  limit the number limit of the search
+ * @apiSuccess {Number}  totalChannels the total number of results it would return if not limited
+ * @apiSuccess {Array}  searchForChannels array of 'Channel' objects with the
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/channel/search/:searchFor', async (req, res) => {
+    if (req.query.searchLimit === undefined) {
+    req.query.searchLimit = 10
+  }
+  try {
+    res.send({
+        success: true,
+        searchLimit: req.query.searchLimit,
+        totalChannels: await db.getNumChannelsSearch(req.params.searchFor),
+        searchForChannels: await db.getSearchForChannels(req.params.searchFor, req.query.searchLimit)
+  })
+  } catch (e) {
+      res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/users/channel/search/:searchFor Search for users and channels
+ * @apiName SearchForChannelsAndUsers
+ * @apiGroup
+ *
+ * @apiParam {String} searchFor entered search word
+ * @apiParam {Number} searchlimit limit for return (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Number}  limit the number limit of the search
+ * @apiSuccess {Number}  totalChannelsAndUsers the total number of results it would return if not limited
+ * @apiSuccess {Array}  searchForChannels array of 'ChannelUser' objects with the
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/users/channel/search/:searchFor', async (req, res) => {
+    if (req.query.searchLimit === undefined) {
+      req.query.searchLimit = 10
+  }
+  try {
+    res.send({
+        success: true,
+        searchLimit: req.query.searchLimit,
+        totalChannelsAndUsers: await db.getNumChannelsAndUsersSearch(req.params.searchFor),
+        searchResults: await db.getSearchForChannelsAndUsers(req.params.searchFor, req.query.searchLimit)
+  })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/users/channel/search/:searchFor Search for users and channels
+ * @apiName SearchForChannelsAndUsers
+ * @apiGroup
+ *
+ * @apiParam {String} uid user id that you want to look for
+ * @apiParam {Number} pid product id to check (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will return like/dislike/none
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/product/userpreference/:uid', async (req, res) => {
+
+  try {
+    res.send({
+        success: true,
+        preference: await db.getUserPreference(req.params.uid, req.query.pid)
+  })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
 module.exports = router
