@@ -582,4 +582,52 @@ pool.subscribeChannel = (user, channel) => {
   })
 }
 
+const SEARCHUSERS_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ? LIMIT ?'
+pool.getSearchForUsers = (searchFor, limit) => {
+  return new Promise(async (resolve, reject) => {
+    if (!searchFor || !limit) {
+      reject(new Error('Missing required field'))
+    }
+
+    try {
+      const wildcard = searchFor.concat('%')
+      const results = await pool.query(SEARCHUSERS_Q, [wildcard, limit])
+      const userArray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const USER = {
+            id: results[i].USER_ID,
+            name: results[i].USERNAME
+          }
+          userArray[i] = USER
+        }
+        resolve(userArray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
+}
+
+const NUMUSERSSEARCH_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ?'
+pool.getNumUsersSearch = searchFor => {
+  return new Promise(async (resolve, reject) => {
+      if (!searchFor) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const wildcard = searchFor.concat('%')
+      const results = await pool.query(NUMUSERSSEARCH_Q, [wildcard])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool

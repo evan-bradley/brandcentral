@@ -535,4 +535,37 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} api/channel/:id Get a channel
+ * @apiName GetChannel
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} id Channel to retrieve
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Object}  channel Channel information object
+ * @apiSuccess {Number}  id      Channel ID
+ * @apiSuccess {String}  name    Channel name
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/users/search/:searchFor', async (req, res) => {
+  if (req.query.searchLimit === undefined) {
+    req.query.searchLimit = 10
+  }
+  try {
+    res.send({
+        success: true,
+        searchLimit: req.query.searchLimit,
+        totalUsers: await db.getNumUsersSearch(req.params.searchFor),
+        searchForUsers: await db.getSearchForUsers(req.params.searchFor, req.query.searchLimit)
+  })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
 module.exports = router
