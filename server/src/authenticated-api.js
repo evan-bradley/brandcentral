@@ -602,20 +602,20 @@ router.get('/api/channel/search/:searchFor', async (req, res) => {
 })
 
 /**
- * @api {get} /api/users/channel/:searchFor Search for users
- * @apiName SearchForChannels
+ * @api {get} /api/users/channel/search/:searchFor Search for users and channels
+ * @apiName SearchForChannelsAndUsers
  * @apiGroup
  *
  * @apiParam {String} searchFor entered search word
  *
  * @apiSuccess {Boolean} success true
  * @apiSuccess {Number}  limit the number limit of the search
- * @apiSuccess {Number}  totalChannels the total number of results it would return if not limited
- * @apiSuccess {Array}  searchForChannels array of 'Channel' objects with the
+ * @apiSuccess {Number}  totalChannelsAndUsers the total number of results it would return if not limited
+ * @apiSuccess {Array}  searchForChannels array of 'ChannelUser' objects with the
  * @apiError   {Boolean} success false
  * @apiError   {String}  message Error message
  */
-router.get('/api/users/channel/:searchFor', async (req, res) => {
+router.get('/api/users/channel/search/:searchFor', async (req, res) => {
   if (req.query.searchLimit === undefined) {
   req.query.searchLimit = 10
 }
