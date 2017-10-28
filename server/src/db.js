@@ -733,4 +733,29 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
   })
 }
 
+const CHECKLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const CHECKDISLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM DISLIKE WHERE USER_ID = ? AND PRODUCT_ID = ?'
+pool.getUserPreference = (userID, productID) => {
+  return new Promise(async (resolve, reject) => {
+      if (!userID || !productID) {
+        reject(new Error('Missing required field'))
+        return
+    }
+
+    try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [userID, productID])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [userID, productID])
+      if (likeresults.length > 0) {
+        resolve('like')
+      } else if (dislikeresults.length > 0) {
+        resolve('dislike')
+      } else {
+        resolve('none')
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
