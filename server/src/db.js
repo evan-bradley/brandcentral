@@ -378,16 +378,16 @@ pool.getRandomProduct = channel => {
   })
 }
 
-const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
-pool.likeProduct = (user, product) => {
+const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)`
+pool.likeProduct = (user, product, cid) => {
   return new Promise(async (resolve, reject) => {
-    if (!user || !product) {
+    if (!user || !product || !cid) {
       reject(new Error('Missing a required field'))
       return
     }
 
     try {
-      await pool.query(LIKE_Q, [user, product])
+      await pool.query(LIKE_Q, [user, product, cid, moment().format('YYYY-MM-DD HH:mm:ss')])
       resolve()
     } catch (e) {
       reject(e)
@@ -497,7 +497,9 @@ pool.getLikedProducts = (user, page, productsPer) => {
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
             productUrl: results[i].PROD_URL,
-            model: results[i].PROD_MODEL
+            model: results[i].PROD_MODEL.
+            channelid: results[i].CHANNEL_ID,
+            time: results[i].TIME_LIKED
           }
           productsarray[i] = product
         }
@@ -591,7 +593,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEARCHUSERS_Q, [wildcard, limit])
       const userArray = []
       if (results.length > 0) {
@@ -622,7 +624,7 @@ pool.getNumUsersSearch = searchFor => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMUSERSSEARCH_Q, [wildcard])
       resolve(results.length)
     } catch (e) {
@@ -640,7 +642,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
     const channelArray = []
     if (results.length > 0) {
@@ -671,7 +673,7 @@ pool.getNumChannelsSearch = searchFor => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
     resolve(results.length)
   } catch (e) {
@@ -690,7 +692,7 @@ pool.getSearchForChannelsAndUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEACHUSERANDCHANNEL_Q, [wildcard, wildcard, limit])
       const channelUserArray = []
       if (results.length > 0) {
@@ -724,7 +726,7 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
       }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMCHANNELSANDUSERSEARCH_Q, [wildcard, wildcard])
       resolve(results.length)
     } catch (e) {
