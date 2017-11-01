@@ -591,7 +591,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEARCHUSERS_Q, [wildcard, limit])
       const userArray = []
       if (results.length > 0) {
@@ -622,7 +622,7 @@ pool.getNumUsersSearch = searchFor => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMUSERSSEARCH_Q, [wildcard])
       resolve(results.length)
     } catch (e) {
@@ -640,7 +640,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
     const channelArray = []
     if (results.length > 0) {
@@ -671,7 +671,7 @@ pool.getNumChannelsSearch = searchFor => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
     resolve(results.length)
   } catch (e) {
@@ -690,7 +690,7 @@ pool.getSearchForChannelsAndUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEACHUSERANDCHANNEL_Q, [wildcard, wildcard, limit])
       const channelUserArray = []
       if (results.length > 0) {
@@ -724,7 +724,7 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
       }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMCHANNELSANDUSERSEARCH_Q, [wildcard, wildcard])
       resolve(results.length)
     } catch (e) {
