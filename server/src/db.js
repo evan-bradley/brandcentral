@@ -497,7 +497,7 @@ pool.getLikedProducts = (user, page, productsPer) => {
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
             productUrl: results[i].PROD_URL,
-            model: results[i].PROD_MODEL.
+            model: results[i].PROD_MODEL,
             channelid: results[i].CHANNEL_ID,
             time: results[i].TIME_LIKED
           }
