@@ -448,7 +448,7 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
-const FOLLOWING_Q = 'SELECT USERNAME, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
+const FOLLOWING_Q = 'SELECT USERNAME, USER.USER_FNAME, USER.USER_LNAME, USER.USER_EMAIL, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
     if (!user) {
@@ -462,7 +462,10 @@ pool.getFollowing = user => {
         for (let i = 0; i < results.length; i++) {
           const userObject = {
             username: results[i].USERNAME,
-            id: results[i].USER_FOLLOWED_ID
+            id: results[i].USER_FOLLOWED_ID,
+            firstName: results[i].USER_FNAME,
+            lastName: results[i].USER_LNAME,
+            emailHash: (await crypto.hash('md5')(results[i].USER_EMAIL)).toString('hex')
           }
           following.push(userObject)
         }
