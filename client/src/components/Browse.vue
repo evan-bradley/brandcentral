@@ -2,7 +2,7 @@
   <section class="section">
     <div class="columns">
       <div class="column is-narrow">
-        <aside class="menu box" style="width: 250px;">
+        <aside class="menu box" style="min-width: 250px;">
           <div class="field">
             <div class="control">
               <input class="input" type="text" placeholder="Search" v-model="searchText">
