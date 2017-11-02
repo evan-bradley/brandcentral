@@ -112,7 +112,9 @@ li
         .box
             height: 100%
 
-.side-bar
+.side-menu
+    overflow: hidden
+    min-width: 250px
     padding: 0px
     hr
         margin: 0px
@@ -125,7 +127,10 @@ li
         text-transform: uppercase
         font-weight: normal
     .search-input-container
-        padding: 12px
+        padding: 4px
+        .input
+            border: none
+            box-shadow: none
     .search-results-container
         .search-results-message
             padding: 6px 12px
@@ -137,7 +142,12 @@ li
     padding: 6px 12px
     .username
         color: #4a4a4a
+    .profile-image
+        width: 28px
+        height: 28px
     &:hover
+        background-color: #F5F5F5
+    &.is-active
         background-color: #F5F5F5
 
 .channel-item
@@ -146,11 +156,13 @@ li
         color: #4a4a4a
     .tag
         border-radius: 100px
-        width: 32px
-        height: 32px
+        width: 28px
+        height: 28px
         background-color: $primary
         color: white
         font-size: 1.0rem
         margin-right: 10px
     &:hover
+        background-color: #F5F5F5
+    &.is-active
         background-color: #F5F5F5
