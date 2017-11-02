@@ -111,3 +111,58 @@ li
         height: 100%
         .box
             height: 100%
+
+.side-menu
+    overflow: hidden
+    min-width: 250px
+    padding: 0px
+    hr
+        margin: 0px
+    .label
+        margin-left: 12px
+        margin-top: 10px
+        color: #7a7a7a
+        font-size: 0.75em
+        letter-spacing: 0.1em
+        text-transform: uppercase
+        font-weight: normal
+    .search-input-container
+        padding: 4px
+        .input
+            border: none
+            box-shadow: none
+    .search-results-container
+        .search-results-message
+            padding: 6px 12px
+.item-link
+    display: flex
+    align-items: center
+
+.user-item
+    padding: 6px 12px
+    .username
+        color: #4a4a4a
+    .profile-image
+        width: 28px
+        height: 28px
+    &:hover
+        background-color: #F5F5F5
+    &.is-active
+        background-color: #F5F5F5
+
+.channel-item
+    padding: 6px 12px
+    .channel-name
+        color: #4a4a4a
+    .tag
+        border-radius: 100px
+        width: 28px
+        height: 28px
+        background-color: $primary
+        color: white
+        font-size: 1.0rem
+        margin-right: 10px
+    &:hover
+        background-color: #F5F5F5
+    &.is-active
+        background-color: #F5F5F5

@@ -448,7 +448,7 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
-const FOLLOWING_Q = 'SELECT USERNAME, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
+const FOLLOWING_Q = 'SELECT USERNAME, USER.USER_FNAME, USER.USER_LNAME, USER.USER_EMAIL, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
     if (!user) {
@@ -462,7 +462,10 @@ pool.getFollowing = user => {
         for (let i = 0; i < results.length; i++) {
           const userObject = {
             username: results[i].USERNAME,
-            id: results[i].USER_FOLLOWED_ID
+            id: results[i].USER_FOLLOWED_ID,
+            firstName: results[i].USER_FNAME,
+            lastName: results[i].USER_LNAME,
+            emailHash: (await crypto.hash('md5')(results[i].USER_EMAIL)).toString('hex')
           }
           following.push(userObject)
         }
@@ -584,7 +587,7 @@ pool.subscribeChannel = (user, channel) => {
   })
 }
 
-const SEARCHUSERS_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ? LIMIT ?'
+const SEARCHUSERS_Q = 'SELECT USER_ID, USERNAME, USER_FNAME, USER_LNAME, USER_EMAIL FROM USER WHERE CONCAT(USERNAME, USER_FNAME, USER_LNAME) LIKE ? LIMIT ?'
 pool.getSearchForUsers = (searchFor, limit) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !limit) {
@@ -600,7 +603,10 @@ pool.getSearchForUsers = (searchFor, limit) => {
         for (let i = 0; i < results.length; i++) {
           const USER = {
             id: results[i].USER_ID,
-            name: results[i].USERNAME
+            username: results[i].USERNAME,
+            firstName: results[i].USER_FNAME,
+            lastName: results[i].USER_LNAME,
+            emailHash: (await crypto.hash('md5')(results[i].USER_EMAIL)).toString('hex')
           }
           userArray[i] = USER
         }
@@ -615,7 +621,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
   })
 }
 
-const NUMUSERSSEARCH_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ?'
+const NUMUSERSSEARCH_Q = 'SELECT USER_ID, USERNAME, USER_FNAME, USER_LNAME FROM USER WHERE CONCAT(USERNAME, USER_FNAME, USER_LNAME) LIKE ?'
 pool.getNumUsersSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
       if (!searchFor) {
@@ -664,7 +670,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
 })
 }
 
-const NUMCHANNELSSEARCH_Q = 'SELECT CAHNNEL_NAME, CHANNEL_ID FROM CAHNNEL WHERE CHANNEL_NAME LIKE ?'
+const NUMCHANNELSSEARCH_Q = 'SELECT CHANNEL_NAME, CHANNEL_ID FROM CHANNEL WHERE CHANNEL_NAME LIKE ?'
 pool.getNumChannelsSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor) {
