@@ -766,4 +766,31 @@ pool.getUserPreference = (userID, productID) => {
   })
 }
 
+const REMOVELIKE_Q = 'DELETE FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const REMOVEDISLIKE_Q = 'DELETE FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+pool.changePreference = (userID, productID) => {
+  return new Promise(async (resolve, reject) => {
+      if (!userID || !productID) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [userID, productID])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [userID, productID])
+      if (likeresults.length > 0) {
+        await pool.query(REMOVELIKE_Q, [userID, productID])
+        resolve('removelike')
+      } else if (dislikeresults.length > 0) {
+        await pool.query(REMOVEDISLIKE_Q, [userID, productID])
+        resolve('removedislike')
+      } else {
+        resolve('none')
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
