@@ -644,12 +644,12 @@ router.get('/api/search', async (req, res) => {
 })
 
 /**
- * @api {get} /api/users/channel/search/:searchFor Search for users and channels
- * @apiName SearchForChannelsAndUsers
+ * @api {get} /api/product/userpreference/:uid returns what input a user has given for a product
+ * @apiName userpreference
  * @apiGroup
  *
- * @apiParam {String} uid user id that you want to look for
- * @apiParam {Number} pid product id to check (query)
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
  *
  * @apiSuccess {Boolean} success true
  * @apiSuccess {String}  preference will return like/dislike/none
@@ -665,6 +665,33 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
   })
   } catch (e) {
     res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/product/changepreference/:uid removes the already entered preference of a product
+ * @apiName changepreference
+ * @apiGroup
+ *
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will return like/dislike/none
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/product/changepreference/:uid', async (req, res) => {
+  try {
+    res.send({
+    success: true,
+    change: await db.changePreference(req.params.uid, req.query.pid)
+  })
+  } catch (e) {
+      res.send({
       success: false,
       message: e
     })
