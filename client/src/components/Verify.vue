@@ -72,9 +72,9 @@
                 .then(response => {
                   if (response.body.success) {
                     if (response.body.channels.length === 0) {
-                      this.$router.push({ name: 'Interests' })
+                      this.$router.push({ name: 'interests' })
                     } else {
-                      this.$router.push({ name: 'Browse' })
+                      this.$router.push({ name: 'home' })
                     }
                   } else {
                     this.failureMessage = response.body.message

@@ -14,7 +14,7 @@
           </span>
         </div>
         <div class="column is-5">
-           <voting-item :item ="this.currentItem" :channel="this.channel.id" />
+           <voting-item :item ="this.currentItem" :channel="this.channel.id" :displayMode="false"/>
         </div>
     </div>
 </template>

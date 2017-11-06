@@ -379,15 +379,15 @@ pool.getRandomProduct = channel => {
 }
 
 const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)`
-pool.likeProduct = (user, product, cid) => {
+pool.likeProduct = (user, product, channelId) => {
   return new Promise(async (resolve, reject) => {
-    if (!user || !product || !cid) {
+    if (!user || !product || !channelId) {
       reject(new Error('Missing a required field'))
       return
     }
 
     try {
-      await pool.query(LIKE_Q, [user, product, cid, moment().format('YYYY-MM-DD HH:mm:ss')])
+      await pool.query(LIKE_Q, [user, product, channelId, moment().format('YYYY-MM-DD HH:mm:ss')])
       resolve()
     } catch (e) {
       reject(e)

@@ -30,7 +30,7 @@
           <p class="help is-danger" v-show="errors.has('confirm password')">{{ errors.first('confirm password') }}</p>
         </div>
         <button class="button is-primary" @click="changePassword">Change Password</button>
-        <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
+        <router-link class="button is-pulled-right" :to="{ name: 'editProfile' }">Cancel</router-link>
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
 
 <script>
   import EditProfile from './EditProfile'
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 
   export default {
     name: 'ChangePassword',

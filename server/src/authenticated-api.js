@@ -291,6 +291,7 @@ router.get('/api/product/:id', async (req, res) => {
  * @apiGroup Product
  *
  * @apiParam {Number} id Product ID
+ * @apiParam {Number} channelId Id of the channel where the product was liked
  *
  * @apiSuccess {Boolean} success true
  * @apiError   {Boolean} success false
@@ -298,7 +299,7 @@ router.get('/api/product/:id', async (req, res) => {
  */
 router.post('/api/product/like/:id', async (req, res) => {
   try {
-    await db.likeProduct(req.session.userId, req.params.id, req.query.cid)
+    await db.likeProduct(req.session.userId, req.params.id, req.body.channelId)
     res.send({
       success: true
     })
