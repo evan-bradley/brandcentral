@@ -209,15 +209,11 @@ router.post('/api/user/:id/channels', async (req, res) => {
  */
 router.get('/api/user/:id/channels', async (req, res) => {
   try {
-    if (parseInt(req.params.id, 10) === parseInt(req.session.userId, 10)) {
-      const channels = await db.retrieveUserChannels(req.params.id)
+    const channels = await db.retrieveUserChannels(req.params.id)
       res.send({
-        success: true,
-        channels
-      })
-    } else {
-      throw new Error('Unauthorized')
-    }
+      success: true,
+      channels
+    })
   } catch (e) {
     res.send({
       success: false,
