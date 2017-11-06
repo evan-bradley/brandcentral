@@ -24,7 +24,7 @@
           <p class="help is-danger" v-show="errors.has('username')">{{ errors.first('username') }}</p>
         </div>
         <button class="button is-primary" @click="Update">Update profile</button>
-        <router-link class="button is-pulled-right" :to="{ name: 'Profile' }">Cancel</router-link>
+        <router-link class="button is-pulled-right" :to="{ name: 'profile', params:{ userId: this.user.Id }}">Cancel</router-link>
       </div>
     </div>
   </div>

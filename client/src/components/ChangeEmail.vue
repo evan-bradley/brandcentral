@@ -22,7 +22,7 @@
           </div>
         </div>
         <button class="button is-primary" @click="changeEmail">Change email address</button>
-        <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
+        <router-link class="button is-pulled-right" :to="{ name: 'editProfile' }">Cancel</router-link>
       </div>
     </div>
   </div>
@@ -54,7 +54,7 @@
           .then(response => {
             if (response.body.success) {
               this.user.Email = emailModificationBody.NewEmail
-              this.$router.push({name: 'EditProfile'})
+              this.$router.push({name: 'editProfile'})
             } else {
               console.log(response)
               this.failureMessage = response.data.message

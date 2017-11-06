@@ -1,10 +1,10 @@
 <template>
   <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
+      <router-link class="navbar-item" :to="{ name: 'home' }">
         <img src="../assets/brand_central_icon.png">
       </router-link>
-      <router-link class="navbar-item" :to="{ name: 'WelcomeScreen' }">
+      <router-link class="navbar-item" :to="{ name: 'home' }">
         Browse
       </router-link>
     </div>
@@ -20,8 +20,8 @@
             <br> @{{ this.$store.state.User.UserName }}
           </div>
           <hr class="navbar-divider">
-          <router-link :to="{ name: 'Profile', params:{ userId: this.$store.state.User.Id } }" class="navbar-item">Profile</router-link>
-          <router-link :to="{ name: 'EditProfile' }" class="navbar-item">Settings</router-link>
+          <router-link :to="{ name: 'profile', params:{ userId: this.$store.state.User.Id } }" class="navbar-item">Profile</router-link>
+          <router-link :to="{ name: 'editProfile' }" class="navbar-item">Settings</router-link>
           <!--<a class="navbar-item">About</a>  
           about is empty right now. we can add it back when we get something to put here--> 
           <hr class="navbar-divider">
@@ -47,7 +47,7 @@
         this.$http.get('/api/logout')
           .then(response => {
             this.$store.commit('LogOut')
-            this.$router.push({ name: 'Login' })
+            this.$router.push({ name: 'login' })
           }, response => {
             console.log(response)
           })
