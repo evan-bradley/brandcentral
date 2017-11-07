@@ -1,6 +1,11 @@
 <template>
   <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
+      <div class="navbar-burger left toggle-button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
       <router-link class="navbar-item" :to="{ name: 'home' }">
         <img src="../assets/brand_central_icon.png">
       </router-link>

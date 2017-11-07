@@ -1,8 +1,8 @@
 <template>
   <section class="section">
     <div class="columns">
-      <div class="column is-narrow">
-        <SideMenu class="aside is-hidden-mobile"></SideMenu>
+      <div class="column is-narrow is-hidden-touch">
+        <SideMenu class="aside"></SideMenu>
       </div>
       <div class="column">
         <router-view></router-view>
