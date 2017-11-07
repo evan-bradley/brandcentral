@@ -1,5 +1,5 @@
 <template>
-  <div class="side-menu box">
+  <div class="side-menu">
     <div class="search-input-container">
       <input class="input" type="text" placeholder="Search" v-model="searchText" @input="refreshSearchResults()">
     </div>

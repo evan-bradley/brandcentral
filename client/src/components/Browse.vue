@@ -2,7 +2,9 @@
   <section class="section">
     <div class="columns">
       <div class="column is-narrow is-hidden-touch">
-        <SideMenu class="aside"></SideMenu>
+        <div class="box" style="padding: 0px;">
+          <SideMenu class="aside"></SideMenu>
+        </div>
       </div>
       <div class="column">
         <router-view></router-view>
