@@ -1,21 +1,21 @@
 <template>
-  <div v-if="mutableProduct" class="voting-item" v-bind:class="{ 'small': this.displayMode }">
+  <div v-if="displayProduct" class="voting-item" v-bind:class="{ 'small': this.displayMode }">
     <div class="box">
       <figure class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-        <img :src="mutableProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+        <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
       </figure>
       <hr style="margin: 20px -20px">
       <div class="media">
         <div class="media-content">
           <div :class="[this.displayMode ? 'subtitle is-5':'title is-4']">
             <p class="has-text-left is-pulled-left">
-              {{ mutableProduct.name.substr(0, 50) + '...' }}
+              {{ displayProduct.name.substr(0, 50) + '...' }}
             </p>
           </div>
         </div>
       </div>
       <div class="content has-text-left" v-show="!this.displayMode">
-        {{ mutableProduct.description.substring(0, 80) + '...'  }}
+        {{ displayProduct.description.substring(0, 80) + '...'  }}
       </div>
     </div>
     <div v-show="!this.displayMode">
@@ -61,72 +61,82 @@
 
 
 <script>
-  var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
-  export default {
-    props: ['product', 'channel', 'displayMode'],
-    data () {
-      return {
-        mutableProduct: this.product
-      }
-    },
-    watch: {
-      channel () {
-        this.next()
-      }
-    },
-    methods: {
-      previous () {
-        console.log('clicked previous')
-      },
-      next () {
-        this.$http.get(`/api/product/random?channelId=${this.channel}`)
-          .then(response => { // Success
-            if (response.data.success) {
-              var id = response.data.product.id
-              var name = response.data.product.name
-              var description = response.data.product.description
-              var pictureUrl = response.data.product.pictureUrl
-              this.mutableProduct = new Classes.Product(id, name, description, pictureUrl)
-            } else {
-              this.failureMessage = response.data.message
-            }
-          }, response => { // Error
-            console.log(response)
-            this.failureMessage = response.data.message
-          })
-      },
-      like () {
-        var body = {
-          channelId: this.channel
-        }
-        this.$http.post(`/api/product/like/${this.mutableProduct.id}`, body)
-          .then(response => { // Success
-            if (response.data.success) {
-              this.failureMessage = response.data.message
-              console.log('liked ' + this.mutableProduct.name)
-              this.next()
-            }
-          }, response => { // Error
-            console.log(response)
-            this.failureMessage = response.data.message
-          })
-      },
-      dislike () {
-        this.$http.post(`/api/product/dislike/${this.mutableProduct.id}`)
-          .then(response => { // Success
-            if (response.data.success) {
-              this.failureMessage = response.data.message
-              console.log('disliked ' + this.mutableProduct.name)
-              this.next()
-            }
-          }, response => { // Error
-            console.log(response)
-            this.failureMessage = response.data.message
-          })
-      }
-    },
-    mounted () {
+var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
+export default {
+  props: ['product', 'channel', 'displayMode'],
+  data () {
+    return {
+      displayProduct: this.product,
+      previousProducts: [],
+      maxPrevious: 5
+    }
+  },
+  watch: {
+    channel () {
       this.next()
     }
+  },
+  methods: {
+    previous () {
+      if (this.previousProducts.length > 0) {
+        this.displayProduct = this.previousProducts.pop()
+      }
+    },
+    next () {
+      if (typeof this.displayProduct !== 'undefined') {
+        this.previousProducts.push(this.displayProduct)
+        if (this.previousProducts.length > this.maxPrevious) {
+          this.previousProducts.shift()
+        }
+      }
+      this.$http.get(`/api/product/random?channelId=${this.channel}`)
+        .then(response => { // Success
+          if (response.data.success) {
+            var id = response.data.product.id
+            var name = response.data.product.name
+            var description = response.data.product.description
+            var pictureUrl = response.data.product.pictureUrl
+            this.displayProduct = new Classes.Product(id, name, description, pictureUrl)
+          } else {
+            this.failureMessage = response.data.message
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    },
+    like () {
+      var body = {
+        channelId: this.channel
+      }
+      this.$http.post(`/api/product/like/${this.displayProduct.id}`, body)
+        .then(response => { // Success
+          if (response.data.success) {
+            this.failureMessage = response.data.message
+            console.log('liked ' + this.displayProduct.name)
+            this.next()
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    },
+    dislike () {
+      this.$http.post(`/api/product/dislike/${this.displayProduct.id}`)
+        .then(response => { // Success
+          if (response.data.success) {
+            this.failureMessage = response.data.message
+            console.log('disliked ' + this.displayProduct.name)
+            this.next()
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    }
+  },
+  mounted () {
+    this.next()
   }
+}
 </script>
