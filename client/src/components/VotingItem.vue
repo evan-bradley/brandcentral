@@ -2,7 +2,7 @@
   <div v-if="mutableProduct" class="voting-item" v-bind:class="{ 'small': this.displayMode }">
     <div class="box">
       <figure class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-        <img :src="mutableProduct.pictureUrl" alt="Placeholder image">
+        <img :src="mutableProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
       </figure>
       <hr style="margin: 20px -20px">
       <div class="media">
