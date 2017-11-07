@@ -12,6 +12,8 @@
               Subscribe
             </a>
           </span>
+          <br>
+          <hr>
         </div>
         <div class="column is-5">
            <voting-item :item ="this.currentItem" :channel="this.channel.id" :displayMode="false"/>
