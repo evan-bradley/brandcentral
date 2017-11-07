@@ -39,7 +39,7 @@
             <!--<a class="navbar-item">About</a>
             about is empty right now. we can add it back when we get something to put here-->
             <hr class="navbar-divider">
-            <a class="navbar-item" @click="signOut">Sign out</a>
+            <a class="dropdown-item" @click="signOut">Sign out</a>
           </div>
         </div>
       </div>
