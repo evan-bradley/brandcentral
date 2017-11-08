@@ -5,7 +5,7 @@
         <div class="columns is-vcentered">
           <div class="column is-4 is-offset-4">
             <h4 class="title has-text-centered is-4">
-              <!-- <img src="../../web/assets/brand_central_icon.png" style="max-width: 20%"> -->
+              <!-- <img src="../Assets/brand_central_icon.png" style="max-width: 20%"> -->
             </h4>
             <div class="box">
               <h4 class="title has-text-centered is-4">Register Account</h4>
@@ -62,7 +62,7 @@
             </div>
             <p class="has-text-centered">
                 Already have an account?
-                <a v-on:click="navigate(3)"><u>Login</u></a> 
+                <a v-on:click="navigate(1)"><u>Login</u></a> 
             </p>
           </div>
         </div>

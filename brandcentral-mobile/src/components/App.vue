@@ -14,7 +14,8 @@ import RecoverPassword from './RecoverPassword.vue'
   export default {
     data(){
       return {
-        'display': 1
+        'display': 1,
+        'LoggedIn': false
       }
     },
     components: {
@@ -24,7 +25,11 @@ import RecoverPassword from './RecoverPassword.vue'
     },
     methods: {
       changeDisplay(number) {
-        this.display = number
+        if(this.LoggedIn) {
+          this.display = 1
+        } else {
+          this.display = number
+        }
       }
     }  
   }
