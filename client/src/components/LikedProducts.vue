@@ -1,5 +1,5 @@
 <template>
-  <section class="section">
+  <div class="liked-products-container">
     <div v-if="likedProducts.length > 0">
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.name">
@@ -18,7 +18,7 @@
         </div>
       </article>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>

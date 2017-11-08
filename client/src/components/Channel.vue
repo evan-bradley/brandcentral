@@ -15,7 +15,7 @@
           <br>
           <hr>
         </div>
-        <div class="column is-11">
+        <div class="column is-9">
            <ProductItem v-if="this.displayProduct" :item ="this.displayProduct" :channel="this.channel.id" :product="this.displayProduct" :displayMode="'medium'"/>
         </div>
     </div>

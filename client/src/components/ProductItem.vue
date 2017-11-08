@@ -2,6 +2,16 @@
   <div class="voting-item" v-if="displayProduct">
     <!-- Large Display Mode (Component) -->
     <div v-if="displayMode === 'large'" class="large">
+      <div class="field has-addons">
+        <p class="control">
+          <a class="button" v-on:click="back" style="border-radius: 100px;">
+            <span class="icon">
+              <i class="fa fa-angle-left"></i>
+            </span>
+            <span>Back</span>
+          </a>
+        </p>
+      </div>
       <div class="columns" style="padding:10px">
         <div class="column is-4">
           <div class="image is-square" style="border: 1px solid #dedede;margin: -10px; overflow: hidden; border-radius: 5px;">
@@ -47,32 +57,7 @@
 
     <!-- Medium Display Mode (Channel) -->
     <div v-if="displayMode === 'medium'" class="medium">
-      <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
-        <div class="columns box">
-          <div class="column is-4">
-            <div class="image-container image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-              <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
-            </div>
-          </div>
-          <br>
-          <div class="column is-8">
-            <div class="media">
-              <div class="media-content">
-                <div class="title is-4">
-                  <p class="has-text-left is-pulled-left">
-                    {{ displayProduct.name}}
-                  </p>
-                </div>
-                <p class="has-text-left is-pulled-left">
-                  {{ displayProduct.description.substring(0, 200) + '...'}}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </router-link>
-      <br>
-      <div class="voting-button-container" style="margin-top: 20px">
+      <div class="voting-button-container" style="margin-bottom: 20px">
         <div class="has-text-centered">
           <div class="field has-addons is-grouped is-grouped-centered">
             <p class="control">
@@ -106,6 +91,31 @@
           </div>
         </div>
       </div>
+      <br>
+      <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
+        <div class="columns box" style="margin: 0px;">
+          <div class="column is-4">
+            <div class="image-container image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
+              <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+            </div>
+          </div>
+          <br>
+          <div class="column is-8">
+            <div class="media">
+              <div class="media-content">
+                <div class="title is-4">
+                  <p class="has-text-left is-pulled-left">
+                    {{ displayProduct.name}}
+                  </p>
+                </div>
+                <p class="has-text-left is-pulled-left">
+                  {{ displayProduct.description.substring(0, 200) + '...'}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </router-link>
     </div>
     <!-- Small Display Mode (Like Page)-->
     <div v-if="displayMode === 'small'" class="small">
@@ -231,6 +241,9 @@ export default {
           console.log(response)
           this.failureMessage = response.data.message
         })
+    },
+    back () {
+      this.$router.go(-1)
     }
   }
 }
