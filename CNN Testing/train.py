@@ -1,3 +1,5 @@
+# Based off tutorial found at
+
 import dataset
 import tensorflow as tf
 import time
@@ -16,7 +18,7 @@ set_random_seed(2)
 batch_size = 32
 
 #Prepare input data
-classes = ['dogs','cats']
+classes = ['Like','Dislike']
 num_classes = len(classes)
 
 # 20% of the data will automatically be used for validation
@@ -203,9 +205,9 @@ def train(num_iteration):
             
             show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
             saver.save(session,
-                       'C:/Users/bjack/Downloads/CNN Testing/dogs-cats-model')
+                       'C:/Users/bjack/Documents/CNN Testing/like-dislike-model')
 
 
     total_iterations += num_iteration
 
-train(num_iteration=3000)
+train(num_iteration=200)
