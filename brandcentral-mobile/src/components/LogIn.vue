@@ -48,6 +48,7 @@
 
 <script>
   var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var axios = require('axios')
 
   export default {
     name: 'LogIn',
@@ -65,7 +66,7 @@
             password: this.user.Password
           }
 
-          this.$http.post('/api/login', loginInfo)
+          axios.post('/api/login', loginInfo)
             .then(response => { // Success
               if (response.data.success) {
                 this.user.Id = response.data.id

@@ -75,6 +75,8 @@
 </template>
 
 <script>
+  var axios = require('axios')
+
   export default {
     props: {
       token: {
@@ -92,7 +94,7 @@
     methods: {
       sendEmail () {
         // Quit if any inputs are invalid
-        this.$http.post('/api/password/reset', {
+        axios.post('/api/password/reset', {
           email: this.Email
         })
           .then(response => { // Success
@@ -110,7 +112,7 @@
           newPassword: this.NewPassword
         }
 
-        this.$http.post(`/api/password/reset`, body)
+        axios.post(`/api/password/reset`, body)
           .then(response => { // Success
             if (response.body.success) {
               this.$router.push({ name: 'Login' })

@@ -73,6 +73,7 @@
 
 <script>
   var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var axios = require('axios')
 
   export default {
     name: 'Register',
@@ -108,7 +109,7 @@
           password: this.user.Password,
           email: this.user.Email
         }
-        this.$http.post('/api/register', registration)
+        axios.post('/api/register', registration)
           .then(response => { // Success
             if (response.data.success) {
               this.$router.push({ name: 'Verify' })
