@@ -26,7 +26,7 @@
               <hr>
               <div class="control">
                 <button class="button is-primary" @click="sendEmail">Send Email</button>
-                <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
+                <router-link class="button is-pulled-right" :to="{ name: 'login' }">Cancel</router-link>
               </div>
             </div>
           </div>
@@ -66,7 +66,7 @@
               <hr>
               <div class="control">
                 <button class="button is-primary" @click="reset">Reset Password</button>
-                <router-link class="button is-pulled-right" :to="{ name: 'Login' }">Cancel</router-link>
+                <router-link class="button is-pulled-right" :to="{ name: 'login' }">Cancel</router-link>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@
         })
           .then(response => { // Success
             if (response.data.success) {
-              this.$router.push({ name: 'Login' })
+              this.$router.push({ name: 'login' })
             } else {
               this.failureMessage = response.data.message
             }
@@ -129,7 +129,7 @@
         this.$http.post(`/api/password/reset`, body)
           .then(response => { // Success
             if (response.body.success) {
-              this.$router.push({ name: 'Login' })
+              this.$router.push({ name: 'login' })
             } else {
               this.failureMessage = response.data.message
             }

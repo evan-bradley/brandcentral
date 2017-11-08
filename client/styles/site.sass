@@ -1,11 +1,7 @@
 
 $primary: #EF233C
-$secondary: #E74C3C
-$alterntive: #ECF0F1
-$alterntive2: #3498DB
-$alterntive3: #2980B9
-$danger: $secondary
-$link-hover: $secondary
+$secondary: #323237
+$danger: $primary
 $section-padding: 20px
 
 @import '../node_modules/bulma/bulma'
@@ -105,3 +101,130 @@ li
     background-color: $info
     color:  $white
     padding: 10px
+
+.voting-item
+    height: 100%
+    .small
+        height: 100%
+        .box
+            height: 100%
+    .hover-content
+        align-items: center
+        display: flex
+        justify-content: center
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        padding: 20px
+        background: rgba(white, 0.8)
+        color: black
+        opacity: 0
+        transition: transform 0.1s, opacity 0.1s
+        &:hover
+            opacity: 1
+
+
+.side-menu
+    overflow: hidden
+    min-width: 250px
+    padding: 0px
+    hr
+        margin: 0px
+    .label
+        margin-left: 12px
+        margin-top: 10px
+        color: #7a7a7a
+        font-size: 0.75em
+        letter-spacing: 0.1em
+        text-transform: uppercase
+        font-weight: normal
+    .search-input-container
+        padding: 4px
+        .input
+            border: none
+            box-shadow: none
+    .search-results-container
+        .search-results-message
+            padding: 6px 12px
+.item-link
+    display: flex
+    align-items: center
+
+.user-item
+    padding: 8px 14px
+    .information-container
+        display: grid
+    .name
+        font-weight: 500
+        color: black
+    .username
+        color: #4a4a4a
+    .profile-image
+        width: 28px
+        height: 28px
+    &:hover
+        background-color: #F5F5F5
+    &.is-active
+        background-color: #F5F5F5
+
+.channel-item
+    padding: 8px 14px
+    .channel-name
+        color: #4a4a4a
+    .tag
+        border-radius: 100px
+        width: 28px
+        height: 28px
+        background-color: $primary
+        color: white
+        font-size: 1.0rem
+        margin-right: 10px
+    &:hover
+        background-color: #F5F5F5
+    &.is-active
+        background-color: #F5F5F5
+// Slideout
+body
+    width: 100%
+    height: 100%
+
+.slideout-menu
+    position: fixed
+    top: 0
+    bottom: 0
+    width: 256px
+    min-height: 100vh
+    overflow-y: scroll
+    -webkit-overflow-scrolling: touch
+    z-index: 0
+    display: none
+
+.slideout-menu-left
+    left: 0
+
+.slideout-menu-right
+    right: 0
+
+.slideout-panel
+    position: relative
+    z-index: 1
+    will-change: transform
+    background-color: #FFF /* A background-color is required */
+    min-height: 100vh
+
+.slideout-open,
+.slideout-open body,
+.slideout-open .slideout-panel
+    overflow: hidden
+
+.slideout-open .slideout-menu
+    display: block
+
+.navbar-burger
+    &.left
+        margin-left: 0px
+
+#side
+    border-right: 1px solid #DBDBDB

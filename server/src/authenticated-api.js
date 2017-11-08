@@ -16,8 +16,16 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-/*
- * Update a user profile.
+/**
+ * @api {post} api/profile/:id Update user information
+ * @apiName UpdateProfile
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User's unique ID
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
 router.post('/api/profile/:id', async (req, res) => {
   const queryData = req.body
@@ -26,17 +34,38 @@ router.post('/api/profile/:id', async (req, res) => {
   if (parseInt(req.params.id, 10) === parseInt(req.session.userId, 10)) {
     try {
       await db.updateProfile(queryData)
-      res.send(JSON.stringify({res: 'success'}))
+      res.send({
+        success: true
+      })
     } catch (e) {
-      res.send(JSON.stringify({res: 'error'}))
+      res.send({
+        success: false,
+        message: e.message
+      })
     }
   } else {
-    res.send(JSON.stringify({res: 'error'}))
+    res.send({
+      success: false,
+      message: 'Insufficient permissions'
+    })
   }
 })
 
-/*
- * Get information for a user's profile.
+/**
+ * @api {get} api/profile/:id Get user information
+ * @apiName GetProfile
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User's unique ID
+ *
+ * @apiSuccess {Boolean} success   true
+ * @apiSuccess {Object}  user      Profile data
+ * @apiSuccess {String}  firstName User's first name
+ * @apiSuccess {String}  lastName  User's last name
+ * @apiSuccess {String}  username  User's username
+ * @apiSuccess {String}  emailHash An MD5 hash of the user's email
+ * @apiError   {Boolean} success   false
+ * @apiError   {String}  message   Error message
  */
 router.get('/api/profile/:id', async (req, res) => {
   try {
@@ -45,14 +74,22 @@ router.get('/api/profile/:id', async (req, res) => {
       user: await db.getProfileData(req.params.id)
     })
   } catch (e) {
-    console.log(e)
     res.send({
       success: false,
-      message: e
+      message: e.message
     })
   }
 })
 
+/**
+ * @api {get} api/logout Log out of account
+ * @apiName Logout
+ * @apiGroup Login/Logout
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
 router.get('/api/logout', async (req, res) => {
   try {
     await db.updateLastSeen(req.session.id)
@@ -62,50 +99,66 @@ router.get('/api/logout', async (req, res) => {
       message: 'Logged out'
     })
   } catch (e) {
-    console.log(e)
     res.send({
       success: false,
-      message: e
+      message: e.message
     })
   }
 })
 
-router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
+/**
+ * @api {put} api/user/:id/email Change email
+ * @apiName ChangeEmail
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User's ID
+ * @apiParam {Object} body Email change information
+ * @apiParam {String} email New email address
+ * @apiParam {String} password User's password
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.put('/api/user/:id/email', async (req, res) => {
+  if (parseInt(req.params.id, 10) !== parseInt(req.session.userId, 10)) {
+    res.send({
+      success: false,
+      message: 'Insufficient permissions'
+    })
+    return
+  }
+
   try {
-    const test = await db.CheckNewEmail(req.body)
+    const results = await db.checkNewEmail(req.session.userId, req.body)
     const OldEmail = {
       from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-      to: req.body.currentEmail,
-      subject: 'Email Change ✔', // Subject line
+      to: results.email,
+      subject: 'Email Change Notification', // Subject line
       text: 'Hello, we noticed that your email has been changed on your account. Please contact us if this was not you.' // plain text body
+    }
+
+    const NewVerifyEmail = {
+      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
+      to: req.body.email,
+      subject: 'Email Verification', // Subject line
+      text: `Hello, please click this link to verify your new email: http://localhost:8080/verify?token=${results.token}\n` // plain text body
     }
 
     transporter.sendMail(OldEmail, (error, info) => {
       if (error) {
         return console.log(error)
       }
-    })
 
-    const NewVerifyEmail = {
-      from: '"Brand Central Station" <BrandCentralStation@firemail.cc>', // sender address
-      to: req.body.NewEmail,
-      subject: 'Hello ✔', // Subject line
-      text: 'Hello, please click this link to verify your new email:\n' // plain text body
-    }
-
-    NewVerifyEmail.text += `http://localhost:8080/verify?token=${test.token}`
-    console.log(NewVerifyEmail)
-
-    transporter.sendMail(NewVerifyEmail, (error, info) => {
-      if (error) {
-        return console.log(error)
-      }
-      console.log('Message sent: %s', info.messageId)
+      transporter.sendMail(NewVerifyEmail, (error, info) => {
+        if (error) {
+          return console.log(error)
+        }
+      })
     })
 
     res.send({
       success: true
-      // id: results.id
     })
   } catch (e) {
     console.log(e)
@@ -117,12 +170,21 @@ router.post('/api/profile/ChangeEmail/:token', async (req, res) => {
   }
 })
 
-/*
- * Store user's channels.
+/**
+ * @api {post} api/user/:id/channels Set a user's channels
+ * @apiName SetChannels
+ * @apiGroup User
+ *
+ * @apiParam {Number}   id User's ID
+ * @apiParam {Number[]} channels List of channels to set
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
-router.post('/api/channels/:user', async (req, res) => {
+router.post('/api/user/:id/channels', async (req, res) => {
   try {
-    await db.storeUserChannels(req.params.user, req.body.channels)
+    await db.storeUserChannels(req.params.id, req.body.channels)
     res.send({
       success: true
     })
@@ -134,20 +196,24 @@ router.post('/api/channels/:user', async (req, res) => {
   }
 })
 
-/*
- * Retrieve user's channels.
+/**
+ * @api {get} api/user/:id/channels Get a user's channels
+ * @apiName GetChannels
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User's ID
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
-router.get('/api/channels/:user', async (req, res) => {
+router.get('/api/user/:id/channels', async (req, res) => {
   try {
-    if (parseInt(req.params.user, 10) === parseInt(req.session.userId, 10)) {
-      const channels = await db.retrieveUserChannels(req.params.user)
+    const channels = await db.retrieveUserChannels(req.params.id)
       res.send({
-        success: true,
-        channels
-      })
-    } else {
-      throw new Error('Unauthorized')
-    }
+      success: true,
+      channels
+    })
   } catch (e) {
     res.send({
       success: false,
@@ -156,11 +222,29 @@ router.get('/api/channels/:user', async (req, res) => {
   }
 })
 
-router.get('/api/product', async (req, res) => {
+/**
+ * @api {get} api/product/random Get a random product
+ * @apiName GetRandomProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} channelId ID of a channel (query)
+ *
+ * @apiSuccess {Boolean} success     true
+ * @apiSuccess {Object}  product     Product object
+ * @apiSuccess {Number}  id          Product ID
+ * @apiSuccess {String}  name        Name of the product
+ * @apiSuccess {String}  description Description of the product
+ * @apiSuccess {String}  pictureUrl  URL pointing at the product picture
+ * @apiSuccess {String}  productUrl  URL pointing at a webpage for the product
+ * @apiSuccess {String}  model       Model number of the product
+ * @apiError   {Boolean} success     false
+ * @apiError   {String}  message     Error message
+ */
+router.get('/api/product/random', async (req, res) => {
   try {
     res.send({
       success: true,
-      product: await db.getRandomProduct(req.query.channelId) // , req.query.count
+      product: await db.getRandomProduct(req.query.channelId)
     })
   } catch (e) {
     res.send({
@@ -170,6 +254,22 @@ router.get('/api/product', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} api/product/:id Get a product by its ID
+ * @apiName GetProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product ID
+ *
+ * @apiSuccess {Boolean} success     true
+ * @apiSuccess {String}  name        Name of the product
+ * @apiSuccess {String}  description Description of the product
+ * @apiSuccess {String}  pictureUrl  URL pointing at the product picture
+ * @apiSuccess {String}  productUrl  URL pointing at a webpage for the product
+ * @apiSuccess {String}  model       Model number of the product
+ * @apiError   {Boolean} success     false
+ * @apiError   {String}  message     Error message
+ */
 router.get('/api/product/:id', async (req, res) => {
   try {
     res.send({
@@ -177,13 +277,28 @@ router.get('/api/product/:id', async (req, res) => {
       product: await db.getProduct(req.params.id)
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 
+/**
+ * @api {post} api/product/like/:id Like a product
+ * @apiName LikeProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product ID
+ * @apiParam {Number} channelId Id of the channel where the product was liked
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
 router.post('/api/product/like/:id', async (req, res) => {
   try {
-    await db.likeProduct(req.session.userId, req.params.id)
+    await db.likeProduct(req.session.userId, req.params.id, req.body.channelId)
     res.send({
       success: true
     })
@@ -195,6 +310,17 @@ router.post('/api/product/like/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} api/product/dislike/:id Dislike a product
+ * @apiName DislikeProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product ID
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
 router.post('/api/product/dislike/:id', async (req, res) => {
   try {
     await db.dislikeProduct(req.session.userId, req.params.id)
@@ -209,6 +335,18 @@ router.post('/api/product/dislike/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} api/user/follow/:id Follow a user
+ * @apiName FollowUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User to follow
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ * TODO: Rename to POST /api/user/:followee/followers/:follower
+ */
 router.post('/api/user/follow/:id', async (req, res) => {
   try {
     await db.followUser(req.session.userId, req.params.id)
@@ -223,6 +361,18 @@ router.post('/api/user/follow/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} api/user/unfollow/:id Unfollow a user
+ * @apiName UnfollowUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User to unfollow
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ * TODO: Rename to DELETE /api/user/:followee/followers/:follower
+ */
 router.post('/api/user/unfollow/:id', async (req, res) => {
   try {
     await db.unfollowUser(req.session.userId, req.params.id)
@@ -237,6 +387,17 @@ router.post('/api/user/unfollow/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} api/user/unfollow/:id Unfollow a user
+ * @apiName UnfollowUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id User to unfollow
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
 router.get('/api/user/following/:id', async (req, res) => {
   try {
     res.send({
@@ -251,8 +412,16 @@ router.get('/api/user/following/:id', async (req, res) => {
   }
 })
 
-/*
- * unsubscribe to a user's channel.
+/**
+ * @api {post} api/channels/unsubscribe/:cid Unsubscribe from a channel
+ * @apiName Unsubscribe
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} cid Channel to unsubscribe from
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
 router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
   try {
@@ -268,8 +437,16 @@ router.post('/api/channels/unsubscribe/:cid', async (req, res) => {
   }
 })
 
-/*
- * subscribe to a channel.
+/**
+ * @api {post} api/channels/subscribe/:cid Subscribe to a channel
+ * @apiName Subscribe
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} cid Channel to subscribe to
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
 router.post('/api/channels/subscribe/:cid', async (req, res) => {
   try {
@@ -285,10 +462,21 @@ router.post('/api/channels/subscribe/:cid', async (req, res) => {
   }
 })
 
-/*
- * Retrieve user's channels.
+/**
+ * @api {get} api/channel/:id Get a channel
+ * @apiName GetChannel
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} id Channel to retrieve
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Object}  channel Channel information object
+ * @apiSuccess {Number}  id      Channel ID
+ * @apiSuccess {String}  name    Channel name
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
-router.get('/api/channel/:id', async (req, res) => {
+router.get('/api/channels/:id', async (req, res) => {
   try {
     res.send({
       success: true,
@@ -302,6 +490,28 @@ router.get('/api/channel/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} api/user/likedproducts/:id Get a user's liked products
+ * @apiName GetChannel
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} id          User's ID
+ * @apiParam {Number} page        Page number (query)
+ * @apiParam {Number} productsPer Products per page (query)
+ *
+ * @apiSuccess {Boolean}  success     true
+ * @apiSuccess {Number}   page        Page indicated in query
+ * @apiSuccess {Number}   productsPer Products per page indicated in query
+ * @apiSuccess {Object[]} channel     Channel information object
+ * @apiSuccess {Number}   id          Product ID
+ * @apiSuccess {String}   name        Name of the product
+ * @apiSuccess {String}   description Description of the product
+ * @apiSuccess {String}   pictureUrl  URL pointing at the product picture
+ * @apiSuccess {String}   productUrl  URL pointing at a webpage for the product
+ * @apiSuccess {String}   model       Model number of the product
+ * @apiError   {Boolean}  success     false
+ * @apiError   {String}   message     Error message
+ */
 router.get('/api/user/likedproducts/:id', async (req, res) => {
   if (req.query.page === undefined) {
     req.query.page = 1
@@ -325,18 +535,165 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   }
 })
 
-router.post('/api/verify/password', async (req, res) => {
+/**
+ * @api {get} /api/users/search Search for users
+ * @apiName SearchForUsers
+ * @apiGroup
+ *
+ * @apiParam {String} query entered search word
+ * @apiParam {Number} limit limit for return (query)
+ *
+ * @apiSuccess {Boolean} success    true
+ * @apiSuccess {Number}  limit      the number limit of the search
+ * @apiSuccess {Array}   users      array of 'User' objects with the username and user_id
+ * @apiError   {Boolean} success    false
+ * @apiError   {String}  message    Error message
+ */
+router.get('/api/users/search', async (req, res) => {
+  if (req.query.query === undefined) {
+    req.query.query = ""
+  }
+  if (req.query.limit === undefined) {
+    req.query.limit = 10
+  }
   try {
-    await db.verifyPassword(req.session.userId, req.body)
-    // console.log('Logged in', results.id, req.session.id)
     res.send({
-      success: true
+      success: true,
+      limit: parseInt(req.query.limit),
+      users: await db.getSearchForUsers(req.query.query, parseInt(req.query.limit))
     })
   } catch (e) {
-    console.log(e)
     res.send({
       success: false,
-      message: e.message
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/channel/search/:searchFor Search for users
+ * @apiName SearchForChannels
+ * @apiGroup
+ *
+ * @apiParam {String} query entered search word
+ * @apiParam {Number} limit limit for return (query)
+ *
+ * @apiSuccess {Boolean} success       true
+ * @apiSuccess {Number}  limit         the number limit of the search
+ * @apiSuccess {Array}   channels      array of 'Channel' objects with the
+ * @apiError   {Boolean} success       false
+ * @apiError   {String}  message       Error message
+ */
+router.get('/api/channel/search', async (req, res) => {
+  if (req.query.query === undefined) {
+    req.query.query = ""
+  }
+  if (req.query.limit === undefined) {
+    req.query.limit = 10
+  }
+  try {
+    res.send({
+      success: true,
+      limit: parseInt(req.query.limit),
+      channels: await db.getSearchForChannels(req.query.query, parseInt(req.query.limit))
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/search Search for users and channels
+ * @apiName SearchForChannelsAndUsers
+ * @apiGroup
+ *
+ * @apiParam {String} query      entered search word
+ * @apiParam {Number} limit      limit for return (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Number}  limit   the number limit of the search
+ * @apiSuccess {Object}  results object containing the results for user and channel
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/search', async (req, res) => {
+  if (req.query.query === undefined) {
+    req.query.query = ""
+  }  
+  if (req.query.limit === undefined) {
+    req.query.limit = 10
+  }
+  try {
+    res.send({
+      success: true,
+      limit: req.query.limit,
+      results: {
+        channels: await db.getSearchForChannels(req.query.query, parseInt(req.query.limit)),
+        users: await db.getSearchForUsers(req.query.query, parseInt(req.query.limit))
+      }
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/product/userpreference/:uid returns what input a user has given for a product
+ * @apiName userpreference
+ * @apiGroup
+ *
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will return like/dislike/none
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/product/userpreference/:uid', async (req, res) => {
+
+  try {
+    res.send({
+        success: true,
+        preference: await db.getUserPreference(req.params.uid, req.query.pid)
+  })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
+/**
+ * @api {get} /api/product/changepreference/:uid removes the already entered preference of a product
+ * @apiName changepreference
+ * @apiGroup
+ *
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will return like/dislike/none
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/product/changepreference/:uid', async (req, res) => {
+  try {
+    res.send({
+    success: true,
+    change: await db.changePreference(req.params.uid, req.query.pid)
+  })
+  } catch (e) {
+      res.send({
+      success: false,
+      message: e
     })
   }
 })

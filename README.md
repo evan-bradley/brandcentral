@@ -1,4 +1,4 @@
-# Brand Central Station
+![Brand Central Station](https://github.com/evan-bradley/brandcentralstation/blob/master/client/src/assets/brand_central_full.png)
 
 [Live Website](http://brandcentral.xyz/)
 
@@ -42,6 +42,13 @@ In 'server':
 ```
 npm test
 ```
+
+### Generate and View API Documentation
+In 'server':
+```
+npm run doc 
+```
+Then navigate to 'localhost:8080' in your web browser.
 
 ### Serve with hot reload at localhost:8080
 From 'server' directory (for API):

@@ -34,6 +34,7 @@ const options = {
   contextName: 'eslint' // Defaults to `eslint`, but can be any string
 }
 
+const crypto = require('crypto-promise')
 const mysql = require('promise-mysql')
 process.env.DB_NAME = 'BRAND_CENTRAL_TESTING'
 const server = require('../src/server')
@@ -54,6 +55,7 @@ const pool = mysql.createPool({
 const userData = {
   username: 'tester',
   email: 'test@null',
+  newEmail: 'testing@null',
   lastName: 'titor',
   firstName: 'john',
   password: 'password'
@@ -226,11 +228,74 @@ describe('Logging in', () => {
   })
 })
 
+describe('Changing a user\'s email', () => {
+  it('Should PUT /api/user/:id/email', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .put(`/api/user/${userId}/email`)
+        .set('cookie', cookie)
+        .send({
+          email: userData.newEmail,
+          password: userData.password
+        })
+        .end((err, res) => {
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          resolve()
+        })
+    })
+  })
+
+  const USER_EMAIL_Q = 'select USER_EMAIL FROM USER WHERE USER_ID = ?'
+  it('Should set the new email', () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const results = await pool.query(USER_EMAIL_Q, [ userId ])
+
+        results[0].USER_EMAIL.should.equal(userData.newEmail)
+        userData.oldEmail = userData.email
+        userData.email = userData.newEmail
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
+  })
+})
+
+describe('Getting a user\'s profile', () => {
+  it('Should return a user\'s profile', () => {
+    return new Promise(async (resolve, reject) => {
+      let hash
+      try {
+        hash = (await crypto.hash('md5')(userData.email)).toString('hex')
+      } catch (e) {
+        reject(e)
+      }
+
+      chai.request(server)
+        .get(`/api/profile/${userId}`)
+        .set('cookie', cookie)
+        .end((err, res) => {
+          const user = res.body.user
+
+          should.not.exist(err)
+          res.body.success.should.equal(true)
+          user.firstName.should.equal(userData.firstName)
+          user.lastName.should.equal(userData.lastName)
+          user.username.should.equal(userData.username)
+          user.emailHash.should.equal(hash)
+          resolve()
+        })
+    })
+  })
+})
+
 describe('Channel navigation', () => {
   it('Should GET /api/product', () => {
     return new Promise((resolve, reject) => {
       chai.request(server)
-        .get('/api/product?channelId=1')
+        .get('/api/product/random?channelId=1')
         .set('cookie', cookie)
         .end((err, res) => {
           should.not.exist(err)

@@ -12,24 +12,27 @@
               Subscribe
             </a>
           </span>
+          <br>
+          <hr>
         </div>
-        <div class="column is-5">
-           <voting-item :item ="this.currentItem" :channel="this.channel.id" />
+        <div class="column is-9">
+           <ProductItem v-if="this.displayProduct" :item ="this.displayProduct" :channel="this.channel.id" :product="this.displayProduct" :displayMode="'medium'"/>
         </div>
     </div>
 </template>
 
 <script>
-  import VotingItem from './VotingItem.vue'
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
-
+  import ProductItem from './ProductItem.vue'
+  var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
   export default {
     props: ['channelId'],
     data () {
       return {
-        currentItem: new Classes.Item('productName', 'itemDescription', 'https://images-na.ssl-images-amazon.com/images/I/61rzIAnzTQL._UX522_.jpg'),
         channels: this.$store.state.channels,
-        channel: {}
+        channel: {},
+        displayProduct: undefined,
+        previousProducts: [],
+        maxPrevious: 5
       }
     },
     watch: {
@@ -38,15 +41,39 @@
       }
     },
     components: {
-      'voting-item': VotingItem
+      'ProductItem': ProductItem
     },
     created () {
       this.loadChannelInformation()
+
+      // Register event handlers
+      this.$on('likedProduct', event => {
+        console.log('LIKED')
+        this.next()
+      })
+
+      this.$on('dislikedProduct', event => {
+        console.log('DISLIKED')
+        this.next()
+      })
+
+      this.$on('nextProduct', event => {
+        console.log('NEXT')
+        this.next()
+      })
+
+      this.$on('previousProduct', event => {
+        console.log('PREVIOUS')
+        this.previous()
+      })
+    },
+    mounted () {
+      this.next()
     },
     methods: {
       loadChannelInformation () {
         var channelId = this.$route.params.channelId
-        this.$http.get(`/api/channel/${channelId}`)
+        this.$http.get(`/api/channels/${channelId}`)
         .then(response => {
           if (response.data.success) {
             this.channel = response.body.channel
@@ -56,7 +83,7 @@
         })
       },
       subscribed () {
-        // Returns a boolean indicating if the user is ubscribed to the current channel
+        // Returns a boolean indicating if the user is subscribed to the current channel
         var channelId = this.channel.id
         var channels = this.$store.state.channels
         var subbed = channels.some(function (element) {
@@ -83,6 +110,34 @@
         }, response => {
           console.log('Failed to unsubscribe')
         })
+      },
+      previous () {
+        if (this.previousProducts.length > 0) {
+          this.displayProduct = this.previousProducts.pop()
+        }
+      },
+      next () {
+        if (typeof this.displayProduct !== 'undefined') {
+          this.previousProducts.push(this.displayProduct)
+          if (this.previousProducts.length > this.maxPrevious) {
+            this.previousProducts.shift()
+          }
+        }
+        this.$http.get(`/api/product/random?channelId=${this.channelId}`)
+          .then(response => { // Success
+            if (response.data.success) {
+              var id = response.data.product.id
+              var name = response.data.product.name
+              var description = response.data.product.description
+              var pictureUrl = response.data.product.pictureUrl
+              this.displayProduct = new Classes.Product(id, name, description, pictureUrl)
+            } else {
+              this.failureMessage = response.data.message
+            }
+          }, response => { // Error
+            console.log(response)
+            this.failureMessage = response.data.message
+          })
       }
     }
   }

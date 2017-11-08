@@ -68,7 +68,20 @@
         this.$http.post(`/api/verify`, body)
           .then(response => {
             if (response.body.success) {
-              this.$router.push({ name: 'Interests' })
+              this.$http.get(`/api/user/${this.$store.state.User.Id}/channels`)
+                .then(response => {
+                  if (response.body.success) {
+                    if (response.body.channels.length === 0) {
+                      this.$router.push({ name: 'interests' })
+                    } else {
+                      this.$router.push({ name: 'home' })
+                    }
+                  } else {
+                    this.failureMessage = response.body.message
+                  }
+                }, response => {
+                  console.log(response)
+                })
             } else {
               this.failureMessage = response.body.message
             }

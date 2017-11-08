@@ -11,11 +11,15 @@ import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
 import Interests from '@/components/Interests'
-import WelcomePage from '@/components/WelcomePage'
+import Welcome from '@/components/Welcome'
 import Channel from '@/components/Channel'
+import LikedProducts from '@/components/LikedProducts'
+import SubscribedChannels from '@/components/SubscribedChannels'
+import FollowingUsers from '@/components/FollowingUsers'
+import ProductItem from '@/components/ProductItem'
 
 // var store = require('../Vuex/states')
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 Vue.use(Router)
 
 const router = new Router({
@@ -23,35 +27,29 @@ const router = new Router({
   routes: [
     {
       path: '/settings',
-      name: 'Settings',
+      name: 'settings',
       component: ProfileHome,
       children: [
         {
           path: 'profile',
-          name: 'EditProfile',
+          name: 'editProfile',
           component: EditProfile
         },
         {
           path: 'password',
-          name: 'ChangePassword',
+          name: 'changePassword',
           component: ChangePassword
         },
         {
           path: 'email',
-          name: 'ChangeEmail',
+          name: 'changeEmail',
           component: ChangeEmail
         }
       ]
     },
     {
-      path: '/profile/:userId',
-      name: 'Profile',
-      props: true,
-      component: Profile
-    },
-    {
       path: '/login',
-      name: 'Login',
+      name: 'login',
       component: LogIn,
       meta: {
         hideNav: true,
@@ -60,7 +58,7 @@ const router = new Router({
     },
     {
       path: '/register',
-      name: 'Register',
+      name: 'register',
       component: Register,
       meta: {
         hideNav: true,
@@ -69,7 +67,7 @@ const router = new Router({
     },
     {
       path: '/reset/:token?',
-      name: 'ResetPassword',
+      name: 'resetPassword',
       component: ResetPassword,
       props: true,
       meta: {
@@ -79,7 +77,7 @@ const router = new Router({
     },
     {
       path: '/verify/:token?',
-      name: 'Verify',
+      name: 'verify',
       component: Verify,
       props: true,
       meta: {
@@ -89,7 +87,7 @@ const router = new Router({
     },
     {
       path: '/interests',
-      name: 'Interests',
+      name: 'interests',
       component: Interests,
       meta: {
         hideNav: true,
@@ -98,29 +96,54 @@ const router = new Router({
     },
     {
       path: '/',
-      name: 'Browse',
+      name: '',
       component: Browse,
       children: [
         {
           path: '/',
-          name: 'WelcomeScreen',
-          component: WelcomePage
+          name: 'home',
+          component: Welcome
         },
         {
-          path: '/channel/:channelId',
-          name: 'Channel',
+          path: 'channel/:channelId',
+          name: 'channel',
           props: true,
           component: Channel
         },
         {
-          path: '/user/:userId',
-          name: 'BrowseProfile',
+          path: 'product/:productId/:channel',
+          name: 'product',
           props: true,
-          component: Profile
+          component: ProductItem
+        },
+        {
+          path: 'profile/:userId',
+          name: '',
+          props: true,
+          component: Profile,
+          children: [
+            {
+              path: '/',
+              name: 'profile',
+              props: true,
+              component: LikedProducts
+            },
+            {
+              path: 'channels',
+              name: 'channels',
+              props: true,
+              component: SubscribedChannels
+            },
+            {
+              path: 'following',
+              name: 'following',
+              props: true,
+              component: FollowingUsers
+            }
+          ]
         }
       ]
     }
-
   ],
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }

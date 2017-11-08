@@ -17,8 +17,22 @@ const transporter = nodemailer.createTransport({
   }
 })
 
-/*
- * Login user.
+/**
+ * @api {post} /api/login Login to an account
+ * @apiName Login
+ * @apiGroup Login/Logout
+ *
+ * @apiParam {String} username User's username
+ * @apiParam {String} password User's password
+ *
+ * @apiSuccess {Boolean} success   true
+ * @apiSuccess {Number}  id        User's ID
+ * @apiSuccess {String}  lastName  User's last name
+ * @apiSuccess {String}  firstName User's first name
+ * @apiSuccess {String}  email     User's email
+ * @apiSuccess {String}  lastSeen  When the user was last seen (currently unused)
+ * @apiError   {Boolean} success   false
+ * @apiError   {String}  message   Error message
  */
 router.post('/api/login', async (req, res) => {
   try {
@@ -44,8 +58,21 @@ router.post('/api/login', async (req, res) => {
   }
 })
 
-/*
- * Register user.
+/**
+ * @api {post} /api/register Register a new account
+ * @apiName Register
+ * @apiGroup Registration
+ *
+ * @apiParam {String} username  User's username
+ * @apiParam {String} firstName User's first name
+ * @apiParam {String} lastName  User's last name
+ * @apiParam {String} password  User's password
+ * @apiParam {String} email     User's email address
+ *
+ * @apiSuccess {Boolean} success   true
+ * @apiSuccess {Number}  id        User's ID
+ * @apiError   {Boolean} success   false
+ * @apiError   {String}  message   Error message
  */
 router.post('/api/register', async (req, res) => {
   try {
@@ -81,6 +108,22 @@ router.post('/api/register', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} /api/password/reset Reset a user's password
+ * @apiName ResetPassword
+ * @apiGroup User
+ * @apiDescription This will send a reset token/link to the user's email if no
+ * token is provided, otherwise it will accept a token and reset the user's
+ * password to the specified new password.
+ *
+ * @apiParam {String} email       User's email
+ * @apiParam {String} token       The verification token the user was given
+ * @apiParam {String} newPassword The desired new password
+ *
+ * @apiSuccess {Boolean} success   true
+ * @apiError   {Boolean} success   false
+ * @apiError   {String}  message   Error message
+ */
 router.post('/api/password/reset', async (req, res) => {
   try {
     if (req.body.token) {
@@ -115,6 +158,22 @@ router.post('/api/password/reset', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} /api/verify Verify a user's email
+ * @apiName Verify
+ * @apiGroup Registration
+ * @apiDescription This takes either a token or a code, both of which were sent
+ * to the user in an email, and marks the user as having a verified email
+ * address.
+ *
+ * @apiParam {String} email       User's email
+ * @apiParam {String} token       The verification token the user was given
+ * @apiParam {String} newPassword The desired new password
+ *
+ * @apiSuccess {Boolean} success   true
+ * @apiError   {Boolean} success   false
+ * @apiError   {String}  message   Error message
+ */
 router.post('/api/verify', async (req, res) => {
   try {
     if (req.body.token) {
@@ -137,10 +196,24 @@ router.post('/api/verify', async (req, res) => {
 })
 
 /**
- * Returns a message indicating whether or not the session is authenticated. If
- * the session is authenticated, the response also contains information for the
- * user who is authenticated. This should always return a successful response,
- * and contain a attribute called authenticated, which is a boolean.
+ * @api {get} /api/authenticated Check if a client is authenticated
+ * @apiName Authenticated
+ * @apiGroup Util
+ * @apiDescription Returns a message indicating whether or not the session is
+ * authenticated. If the session is authenticated, the response also contains
+ * information for the user who is authenticated. This should always return a
+ * successful response, and contain a attribute called authenticated, which is
+ * a boolean.
+ *
+ * @apiSuccess {Boolean} success       true
+ * @apiSuccess {Boolean} authenticated Whether the user is authenticated
+ * @apiSuccess {Object}  user          User object returned if the user is authenticated
+ * @apiSuccess {Number}  id            User's ID
+ * @apiSuccess {String}  lastName      User's last name
+ * @apiSuccess {String}  firstName     User's first name
+ * @apiSuccess {String}  username      User's username
+ * @apiSuccess {String}  email         User's email
+ * @apiError   {String}  message       Error message
  */
 router.get('/api/authenticated', async (req, res) => {
   // Check to see if the session has a user
@@ -173,10 +246,18 @@ router.get('/api/authenticated', async (req, res) => {
   }
 })
 
-// Returns a collection of tags to present to the user during the onboarding
-// process. The response will contain an attribute called success, which
-// indicates the success of the request. The response will also contain an
-// array of tags.
+/**
+ * @api {get} /api/channels/onboard Get onboarding channels
+ * @apiName Authenticated
+ * @apiGroup Util
+ * @apiDescription Returns a collection of tags to present to the user during
+ * the onboarding process.
+ *
+ * @apiSuccess {Boolean}  success  true
+ * @apiSuccess {Number[]} channels Array of sixteen tags
+ * @apiSuccess {Boolean}  success  false
+ * @apiError   {String}   message  Error message
+ */
 router.get('/api/channels/onboard', async (req, res) => {
   try {
     res.send({
