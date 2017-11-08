@@ -16,6 +16,7 @@ import Channel from '@/components/Channel'
 import LikedProducts from '@/components/LikedProducts'
 import SubscribedChannels from '@/components/SubscribedChannels'
 import FollowingUsers from '@/components/FollowingUsers'
+import ProductItem from '@/components/ProductItem'
 
 // var store = require('../Vuex/states')
 var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
@@ -108,6 +109,12 @@ const router = new Router({
           name: 'channel',
           props: true,
           component: Channel
+        },
+        {
+          path: 'product/:productId/:channel',
+          name: 'product',
+          props: true,
+          component: ProductItem
         },
         {
           path: 'profile/:userId',

@@ -1,0 +1,237 @@
+<template>
+  <div class="voting-item" v-if="displayProduct">
+    <!-- Large Display Mode (Component) -->
+    <div v-if="displayMode === 'large'" class="large">
+      <div class="columns" style="padding:10px">
+        <div class="column is-4">
+          <div class="image is-square" style="border: 1px solid #dedede;margin: -10px; overflow: hidden; border-radius: 5px;">
+            <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+            <div class="hover-content">
+            <div class="voting-button-container">
+              <div class="has-text-centered">
+                <div class="field has-addons is-grouped is-grouped-centered">
+                  <p class="control">
+                    <a class="button is-primary is-large" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
+                        <i class="fa fa-thumbs-o-down"></i>
+                      </span>
+                    </a>
+                  </p>
+                  <p class="control">
+                    <a class="button is-primary is-large" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
+                        <i class="fa fa-thumbs-o-up"></i>
+                      </span>
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="column is-8" style="padding-top: 0px">
+          <div class="media">
+            <div class="media-content">
+              <div class="title is-4">
+                <p class="has-text-left is-pulled-left">
+                  {{ displayProduct.name}}
+                </p>
+              </div>
+              <p class="has-text-left is-pulled-left">
+                {{ displayProduct.description}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medium Display Mode (Channel) -->
+    <div v-if="displayMode === 'medium'" class="medium">
+      <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
+        <div class="columns box">
+          <div class="column is-4">
+            <div class="image-container image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
+              <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+            </div>
+          </div>
+          <br>
+          <div class="column is-8">
+            <div class="media">
+              <div class="media-content">
+                <div class="title is-4">
+                  <p class="has-text-left is-pulled-left">
+                    {{ displayProduct.name}}
+                  </p>
+                </div>
+                <p class="has-text-left is-pulled-left">
+                  {{ displayProduct.description.substring(0, 200) + '...'}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </router-link>
+      <br>
+      <div class="voting-button-container" style="margin-top: 20px">
+        <div class="has-text-centered">
+          <div class="field has-addons is-grouped is-grouped-centered">
+            <p class="control">
+              <a class="button is-medium" v-on:click="previous" style="border-radius: 100px;">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-left"></i>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-primary is-medium" v-on:click="dislike" style="border-radius: 100px;">
+                <span class="icon is-small">
+                  <i class="fa fa-thumbs-o-down"></i>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-primary is-medium" v-on:click="like" style="border-radius: 100px;">
+                <span class="icon is-small">
+                  <i class="fa fa-thumbs-o-up"></i>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-medium" v-on:click="next" style="border-radius: 100px;">
+                <span class="icon is-small">
+                  <i class="fa fa-angle-right"></i>
+                </span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Small Display Mode (Like Page)-->
+    <div v-if="displayMode === 'small'" class="small">
+      <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
+        <div class="box">
+          <div class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
+            <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+            <div class="hover-content">
+              <div class="voting-button-container">
+                <div class="has-text-centered">
+                  <div class="field has-addons is-grouped is-grouped-centered">
+                    <p class="control">
+                      <a class="button is-primary is-medium" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
+                          <i class="fa fa-thumbs-o-down"></i>
+                        </span>
+                      </a>
+                    </p>
+                    <p class="control">
+                      <a class="button is-primary is-medium" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
+                          <i class="fa fa-thumbs-o-up"></i>
+                        </span>
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr style="margin: 20px -20px">
+          <p>{{ displayProduct.name.substr(0, 32) + '...' }}</p>
+        </div>
+      </router-link>
+    </div>
+  </div>
+</template>
+
+
+
+<script>
+var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
+export default {
+  props: {
+    productId: {
+      required: false
+    },
+    product: {
+      required: false
+    },
+    channel: {
+      required: false,
+      default: 0
+    },
+    displayMode: {
+      required: false,
+      default: 'large'
+    }
+  },
+  data () {
+    return {
+      displayProduct: this.product
+    }
+  },
+  watch: {
+    product (product) {
+      this.displayProduct = product
+    },
+    productId (productId) {
+      this.loadProductFromId(productId)
+    }
+  },
+  created () {
+    if (this.productId) this.loadProductFromId(this.productId)
+  },
+  methods: {
+    previous () {
+      this.$parent.$emit('previousProduct')
+    },
+    next () {
+      this.$parent.$emit('nextProduct')
+    },
+    like () {
+      var body = {
+        channelId: this.channel
+      }
+      console.log(body)
+      this.$http.post(`/api/product/like/${this.displayProduct.id}`, body)
+        .then(response => { // Success
+          console.log(response)
+          if (response.data.success) {
+            this.failureMessage = response.data.message
+            console.log('liked ' + this.displayProduct.name)
+            this.$parent.$emit('likedProduct', this.displayProduct)
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    },
+    dislike () {
+      this.$http.post(`/api/product/dislike/${this.displayProduct.id}`)
+        .then(response => { // Success
+          if (response.data.success) {
+            this.failureMessage = response.data.message
+            console.log('disliked ' + this.displayProduct.name)
+            this.$parent.$emit('dislikedProduct', this.displayProduct)
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    },
+    loadProductFromId (productId) {
+      this.$http.get(`/api/product/${productId}`)
+        .then(response => { // Success
+          if (response.data.success) {
+            this.displayProduct = new Classes.Product(
+              response.data.product.id,
+              response.data.product.name,
+              response.data.product.description,
+              response.data.product.pictureUrl)
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    }
+  }
+}
+</script>

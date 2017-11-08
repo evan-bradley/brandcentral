@@ -3,7 +3,7 @@
     <div v-if="likedProducts.length > 0">
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.name">
-          <VotingItem :product="product" :displayMode="true"/>
+          <ProductItem :product="product" :displayMode="'small'"/>
         </div>
       </div>
       <nav class="pagination" v-show="totalProducts > numberPerPage" role="navigation" aria-label="pagination">
@@ -23,7 +23,7 @@
 
 <script>
   import EditProfile from './EditProfile'
-  import VotingItem from './VotingItem.vue'
+  import ProductItem from './ProductItem.vue'
   var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
   var md5 = require('md5')
 
@@ -49,7 +49,7 @@
     },
     components: {
       'EditProfile': EditProfile,
-      'VotingItem': VotingItem
+      'ProductItem': ProductItem
     },
     created () {
       this.loadLikedProducts(1)

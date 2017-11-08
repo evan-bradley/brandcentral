@@ -21,7 +21,7 @@
 
 <script>
   import EditProfile from './EditProfile'
-  import VotingItem from './VotingItem.vue'
+  import ProductItem from './ProductItem.vue'
   import ChannelItem from './ChannelItem.vue'
   export default {
     name: 'SubscribedChannels',
@@ -42,7 +42,7 @@
     },
     components: {
       'EditProfile': EditProfile,
-      'VotingItem': VotingItem,
+      'ProductItem': ProductItem,
       'ChannelItem': ChannelItem
     },
     created () {
