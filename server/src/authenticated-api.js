@@ -277,7 +277,10 @@ router.get('/api/product/:id', async (req, res) => {
       product: await db.getProduct(req.params.id)
     })
   } catch (e) {
-    res.send()
+    res.send({
+      success: false,
+      message: e.message
+    })
   }
 })
 

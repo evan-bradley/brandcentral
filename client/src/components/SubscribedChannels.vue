@@ -1,5 +1,5 @@
 <template>
-  <section class="section">
+  <div class="subscribed-channels-container">
     <div v-if="channels.length > 0">
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="channel in channels" :key="channel.id">
@@ -16,12 +16,12 @@
         </div>
       </article>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
   import EditProfile from './EditProfile'
-  import VotingItem from './VotingItem.vue'
+  import ProductItem from './ProductItem.vue'
   import ChannelItem from './ChannelItem.vue'
   export default {
     name: 'SubscribedChannels',
@@ -42,7 +42,7 @@
     },
     components: {
       'EditProfile': EditProfile,
-      'VotingItem': VotingItem,
+      'ProductItem': ProductItem,
       'ChannelItem': ChannelItem
     },
     created () {

@@ -1,11 +1,7 @@
 
 $primary: #EF233C
-$secondary: #E74C3C
-$alterntive: #ECF0F1
-$alterntive2: #3498DB
-$alterntive3: #2980B9
-$danger: $secondary
-$link-hover: $secondary
+$secondary: #323237
+$danger: $primary
 $section-padding: 20px
 
 @import '../node_modules/bulma/bulma'
@@ -107,10 +103,28 @@ li
     padding: 10px
 
 .voting-item
-    &.small
+    height: 100%
+    .small
         height: 100%
         .box
             height: 100%
+    .hover-content
+        align-items: center
+        display: flex
+        justify-content: center
+        position: absolute
+        width: 100%
+        height: 100%
+        top: 0
+        left: 0
+        padding: 20px
+        background: rgba(white, 0.8)
+        color: black
+        opacity: 0
+        transition: transform 0.1s, opacity 0.1s
+        &:hover
+            opacity: 1
+
 
 .side-menu
     overflow: hidden

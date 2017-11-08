@@ -36,7 +36,7 @@
   import UserItem from './UserItem.vue'
   import ChannelItem from './ChannelItem.vue'
   export default {
-    name: 'SizeMenu',
+    name: 'SideMenu',
     components: {
       'UserItem': UserItem,
       'ChannelItem': ChannelItem

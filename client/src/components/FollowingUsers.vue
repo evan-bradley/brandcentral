@@ -1,5 +1,5 @@
 <template>
-  <section class="section">
+  <div class="followed-users-container">
     <div v-if="users.length > 0">
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="user in users" :key="user.id">
@@ -16,7 +16,7 @@
         </div>
       </article>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
