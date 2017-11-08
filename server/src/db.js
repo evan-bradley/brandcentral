@@ -378,10 +378,36 @@ pool.getRandomProduct = channel => {
   })
 }
 
+const GET_PRODUCT_Q = `SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?`
+pool.getProduct = (productId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const results = await pool.query(GET_PRODUCT_Q, [productId])
+      if(results.length == 0) {
+        reject(new Error(`No such product exists with id: ${productId}`))
+        return
+      }
+      const product = {
+        id: results[0].PRODUCT_ID,
+        name: results[0].PROD_NAME,
+        description: results[0].PROD_DESC,
+        pictureUrl: results[0].PROD_PICT_URL,
+        productUrl: results[0].PROD_URL,
+        model: results[0].PROD_MODEL
+      }
+      resolve(product)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)`
 pool.likeProduct = (user, product, channelId) => {
   return new Promise(async (resolve, reject) => {
-    if (!user || !product || !channelId) {
+    if (user === null || product === null  || channelId === null ) {
+      console.log(user)
+      console.log(product)
+      console.log(channelId)
       reject(new Error('Missing a required field'))
       return
     }
