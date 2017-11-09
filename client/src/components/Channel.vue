@@ -38,6 +38,8 @@
     watch: {
       channelId: function (newVal, oldVal) {
         this.loadChannelInformation()
+        this.next()
+        this.previousProducts = []
       }
     },
     components: {
