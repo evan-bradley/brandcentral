@@ -6,6 +6,7 @@ import time
 from datetime import timedelta
 import math
 import random
+import os
 import numpy as np
 
 #Adding Seed so that random initialization is consistent
@@ -14,6 +15,7 @@ seed(1)
 from tensorflow import set_random_seed
 set_random_seed(2)
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 batch_size = 32
 
@@ -205,9 +207,9 @@ def train(num_iteration):
             
             show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
             saver.save(session,
-                       'C:/Users/bjack/Documents/CNN Testing/like-dislike-model')
+                       dir_path+'/like-dislike-model')
 
 
     total_iterations += num_iteration
 
-train(num_iteration=200)
+train(num_iteration=120)

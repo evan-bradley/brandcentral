@@ -22,7 +22,7 @@
           </div>
         </div>
         <button class="button is-primary" @click="changeEmail">Change email address</button>
-        <router-link class="button is-pulled-right" :to="{ name: 'EditProfile' }">Cancel</router-link>
+        <router-link class="button is-pulled-right" :to="{ name: 'editProfile' }">Cancel</router-link>
       </div>
     </div>
   </div>
@@ -45,32 +45,16 @@
         if (this.errors.any()) {
           return
         }
-        const passwordVerificationBody = {
-          password: this.password
-        }
         const emailModificationBody = {
-          id: this.user.Id,
-          NewEmail: this.email,
-          currentEmail: this.user.Email,
+          email: this.email,
           password: this.password
         }
-        // TODO: We should combine these two requests into one.
-        this.$http.post('/api/verify/password', passwordVerificationBody)
+
+        this.$http.put(`/api/user/${this.user.Id}/email`, emailModificationBody)
           .then(response => {
-            if (response.data.success) {
-              this.$http.post(`/api/profile/ChangeEmail/${this.user.Id}`, emailModificationBody)
-                .then(response => {
-                  if (response.body.success) {
-                    this.user.Email = emailModificationBody.NewEmail
-                    this.$router.push({name: 'EditProfile'})
-                  } else {
-                    console.log(response)
-                    this.failureMessage = response.data.message
-                  }
-                }, response => {
-                  this.failureMessage = response.data.message
-                  console.log(response)
-                })
+            if (response.body.success) {
+              this.user.Email = emailModificationBody.NewEmail
+              this.$router.push({name: 'editProfile'})
             } else {
               console.log(response)
               this.failureMessage = response.data.message

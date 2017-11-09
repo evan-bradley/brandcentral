@@ -2,7 +2,7 @@ import urllib.request
 import os
 import MySQLdb
 
-modelSaveLocation = 'C:/Users/bjack/Downloads/CNN Testing/like-dislike-model'
+modelSaveLocation = 'C:/Users/bjack/Documents/brandcentralstation/CNN Testing/like-dislike-model'
 # pictureSaveRoot = 'C:/Users/bjack/Downloads/CNN Testing/training_data/'
 
 

@@ -62,7 +62,7 @@
             </div>
             <p class="has-text-centered">
                 Already have an account?
-                <router-link :to="{ name: 'Login' }"><u>Login</u></router-link>
+                <router-link :to="{ name: 'login' }"><u>Login</u></router-link>
             </p>
           </div>
         </div>
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 
   export default {
     name: 'Register',
@@ -111,7 +111,7 @@
         this.$http.post('/api/register', registration)
           .then(response => { // Success
             if (response.data.success) {
-              this.$router.push({ name: 'Verify' })
+              this.$router.push({ name: 'verify' })
             } else {
               console.log(response)
               this.failureMessage = response.data.message

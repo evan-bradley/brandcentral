@@ -43,6 +43,13 @@ In 'server':
 npm test
 ```
 
+### Generate and View API Documentation
+In 'server':
+```
+npm run doc 
+```
+Then navigate to 'localhost:8080' in your web browser.
+
 ### Serve with hot reload at localhost:8080
 From 'server' directory (for API):
 ```
