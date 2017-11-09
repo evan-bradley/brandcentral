@@ -1,0 +1,20 @@
+[Unit]
+Description=Brand Central Website
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /var/www/brandcentralstation/server/src/server.js
+Restart=always
+User=brandcentralstation
+Group=brandcentralstation
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=DB_USER=root
+Environment=DB_PASS=somethingeasy
+Environment=DB_NAME=BRAND_CENTRAL
+Environment=TEST_DB_NAME=BRAND_CENTRAL_TESTING
+Environment=SESSION_DB=SESSION_STORE
+Environment=URL=brandcentral.xyz
+WorkingDirectory=/var/www/brandcentralstation/server/src/
+
+[Install]
+WantedBy=multi-user.target
