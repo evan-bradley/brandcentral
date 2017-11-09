@@ -77,6 +77,11 @@
 
   export default {
     name: 'Register',
+    props: {      
+      baseURL: {
+        default: 'https://brandcentral.xyz/'
+      }
+    },
     data () {
       return {
         user: new Classes.User(),
@@ -109,7 +114,7 @@
           password: this.user.Password,
           email: this.user.Email
         }
-        axios.post('/api/register', registration)
+        axios.post(this.baseURL + '/api/register', registration)
           .then(response => { // Success
             if (response.data.success) {
               this.$router.push({ name: 'Verify' })

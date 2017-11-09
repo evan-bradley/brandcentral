@@ -52,6 +52,11 @@
 
   export default {
     name: 'LogIn',
+    props: {      
+      baseURL: {
+        default: 'https://brandcentral.xyz/'
+      }
+    },
     data () {
       return {
         user: new Classes.User(),

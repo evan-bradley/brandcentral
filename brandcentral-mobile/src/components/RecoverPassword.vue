@@ -78,7 +78,10 @@
   var axios = require('axios')
 
   export default {
-    props: {
+    props: {      
+      baseURL: {
+        default: 'https://brandcentral.xyz/'
+      },
       token: {
         default: ''
       }

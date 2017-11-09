@@ -1,8 +1,8 @@
 <template>
   <div>
-    <LogIn v-show="display === 1" v-on:navigate="changeDisplay" />
-    <Register v-show="display === 2" v-on:navigate="changeDisplay"/>
-    <RecoverPassword v-show="display === 3" v-on:navigate="changeDisplay"/>
+    <LogIn v-show="display === 1" :baseURL="baseURL" v-on:navigate="changeDisplay" />
+    <Register v-show="display === 2" :baseURL="baseURL" v-on:navigate="changeDisplay"/>
+    <RecoverPassword v-show="display === 3" :baseURL="baseURL" v-on:navigate="changeDisplay"/>
   </div>
 </template>
 
@@ -15,7 +15,8 @@ import RecoverPassword from './RecoverPassword.vue'
     data(){
       return {
         'display': 1,
-        'LoggedIn': false
+        'loggedIn': false,
+        'baseURL': 'https://brandcentral.xyz/'
       }
     },
     components: {
@@ -25,7 +26,7 @@ import RecoverPassword from './RecoverPassword.vue'
     },
     methods: {
       changeDisplay(number) {
-        if(this.LoggedIn) {
+        if(this.loggedIn) {
           this.display = 1
         } else {
           this.display = number
