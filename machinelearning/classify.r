@@ -1,6 +1,6 @@
 # Loads necessary packages into the system.
 load_packages <- function() {
-    needed <- c("DBI", "RMySQL", "e1071", "rpart")
+    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet")
     lapply(needed, require, character.only = TRUE)
 }
 load_packages()
@@ -89,17 +89,45 @@ classify_naive_bayes <- function(id) {
     train <- tag_matrix[train_ind, ]
     test <- tag_matrix[-train_ind, ]
 
-    x <- train[,-ncol(train)]
-    y <- train[,ncol(train)]
+    # x <- train[,-ncol(train)]
+    # y <- train[,ncol(train)]
+    # test <- test[,-ncol(test)]
 
-    m <- naiveBayes(train[,-ncol(train)], as.factor(train[,ncol(train)]))
-    p <- predict(m, test[,-ncol(test)])
+    # nb <- naiveBayes(train, as.factor(labels))
+    # p <- predict(nb, as.factor(test))
 
     # Previously X2380
-    m <- naiveBayes(X975 ~ ., data.frame(train))
+    m <- naiveBayes(as.factor(X975) ~ ., train)
     p <- predict(m, data.frame(test[,-ncol(test)]))
 
-    table(p, as.factor(test[,ncol(test)]))
+    grid.table(table(p, test[,ncol(test)]))
+    plot(sort(colSums(tag_matrix)), type="l")
+    print(sort(colSums(tag_matrix)))
+}
+
+classify_neural_network <- function() {
+    tag_matrix <- get_training_data(id)
+    
+    ## 75% of the sample size
+    smp_size <- floor(0.75 * nrow(tag_matrix))
+    
+    ## set the seed to make your partition reproductible
+    set.seed(123)
+    train_ind <- sample(seq_len(nrow(tag_matrix)), size = smp_size)
+    
+    train <- tag_matrix[train_ind, ]
+    test <- tag_matrix[-train_ind, ]
+    
+    train <- cbind(train[, 1:975], class.ind(as.factor(train$X975)))
+    names(train) <- c(names(train)[1:975],"l1","l2")
+    n <- names(train)
+    f <- as.formula(paste("l1 + l2 + ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
+    nn <- neuralnet(f, data = train, hidden = c(500), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
+    pr.nn <- compute(nn, test_data)
+    pr.nn_ <- pr.nn$net.result
+    pr.nn_2 <- max.col(pr.nn_)
+    mean(pr.nn_2 == test_labels)
+    print(confusionMatrix(unlist(pr.nn_2), unlist(test_labels)))
 }
 
 classify_decision_tree <- function(id) {
