@@ -3,12 +3,14 @@ load_packages <- function() {
     needed <- c("DBI", "RMySQL", "e1071", "rpart")
     lapply(needed, require, character.only = TRUE)
 }
+load_packages()
 
 # Connects to the MySQL database.
 connect_to_db <- function() {
     lapply(dbListConnections(dbDriver( drv = "MySQL")), dbDisconnect)
     dbConnect(MySQL(), user='root', password='somethingeasy', dbname='BRAND_CENTRAL', host='138.197.85.34')
 }
+mysqldb <- connect_to_db()
 
 # Returns a matrix of tags.
 get_tags <- function(db) {
@@ -25,11 +27,7 @@ get_product_tags <- function(db) {
     return(prod_tags)
 }
 
-get_likes_matrix <- function(db, id, tags, prod_tags) {
-    likes_query <- dbSendQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
-    likes <- fetch(likes_query, n=-1)
-    # write.csv(likes, file = "likes.csv")
-
+make_tag_matrix <- function(likes, tags, prod_tags) {
     for(product in likes$PRODUCT_ID) {
         product_id <- product
         prod_tag_list <- as.matrix((tags$TAG_ID %in% prod_tags[prod_tags$product_id == product_id,]$tag_id)*1)
@@ -40,36 +38,34 @@ get_likes_matrix <- function(db, id, tags, prod_tags) {
         }
     }
 
-    # write.csv(like_tag_matrix, file = "like_tag_matrix.csv")
     return(like_tag_matrix)
 }
 
-get_dislikes_matrix <- function(db, id, tags, prod_tags) {
+get_likes <- function(db, id) {
+    likes_query <- dbSendQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
+    likes <- fetch(likes_query, n=-1)
+    # write.csv(likes, file = "likes.csv")
+
+    return(likes)
+}
+
+get_dislikes <- function(db, id) {
     dislikes_query <- dbSendQuery(db, paste("select * from DISLIKES WHERE USER_ID =", id, sep = " "))
     dislikes <- fetch(dislikes_query, n=-1)
     # write.csv(dislikes, file = "dislikes.csv")
 
-    for(product in dislikes$PRODUCT_ID) {
-        product_id <- product
-        prod_tag_list <- as.matrix((tags$TAG_ID %in% prod_tags[prod_tags$product_id == product_id,]$tag_id)*1)
-        if(!exists("dislike_tag_matrix")) {
-            dislike_tag_matrix <- t(prod_tag_list)
-        } else {
-            dislike_tag_matrix <- rbind(dislike_tag_matrix, t(prod_tag_list))
-        }
-    }
-
-    # write.csv(dislike_tag_matrix, file = "dislike_tag_matrix.csv")
-    return(dislike_tag_matrix)
+    return(dislikes)
 }
 
-get_training_data <- function() {
-    mydb <- connect_to_db()
+get_training_data <- function(id) {
+    mydb = mysqldb
     tags <- get_tags(mydb)
     prod_tags <- get_product_tags(mydb)
+    likes <- get_likes(mydb, id)
+    dislikes <- get_dislikes(mydb, id)
 
-    like_tag_matrix <- get_likes_matrix(mydb, 2, tags, prod_tags)
-    dislike_tag_matrix <- get_dislikes_matrix(mydb, 2, tags, prod_tags)
+    like_tag_matrix <- make_tag_matrix(likes, tags, prod_tags)
+    dislike_tag_matrix <- make_tag_matrix(dislikes, tags, prod_tags)
 
     class_1 <- cbind(like_tag_matrix, 1)
     class_2 <- cbind(dislike_tag_matrix, 2)
@@ -80,8 +76,8 @@ get_training_data <- function() {
     return(tag_matrix)
 }
 
-classify_naive_bayes <- function() {
-    tag_matrix <- get_training_data()
+classify_naive_bayes <- function(id) {
+    tag_matrix <- get_training_data(id)
 
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
@@ -103,11 +99,11 @@ classify_naive_bayes <- function() {
     m <- naiveBayes(X975 ~ ., data.frame(train))
     p <- predict(m, data.frame(test[,-ncol(test)]))
 
-    table(p, test[,ncol(test)])
+    table(p, as.factor(test[,ncol(test)]))
 }
 
-classify_decision_tree <- function() {
-    tag_matrix <- get_training_data()
+classify_decision_tree <- function(id) {
+    tag_matrix <- get_training_data(id)
 
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
@@ -123,4 +119,5 @@ classify_decision_tree <- function() {
     p <- predict(fit, data.frame(test[,-ncol(test)]), type = "class")
 
     table(p, test[,ncol(test)])
+    return(fit)
 }
