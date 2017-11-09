@@ -97,7 +97,7 @@
     methods: {
       sendEmail () {
         // Quit if any inputs are invalid
-        axios.post('/api/password/reset', {
+        axios.post(baseURL + '/api/password/reset', {
           email: this.Email
         })
           .then(response => { // Success
@@ -115,7 +115,7 @@
           newPassword: this.NewPassword
         }
 
-        axios.post(`/api/password/reset`, body)
+        axios.post(baseURL + '/api/password/reset', body)
           .then(response => { // Success
             if (response.body.success) {
               this.$router.push({ name: 'Login' })

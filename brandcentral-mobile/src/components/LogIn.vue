@@ -71,7 +71,7 @@
             password: this.user.Password
           }
 
-          axios.post('/api/login', loginInfo)
+          axios.post(baseURL + '/api/login', loginInfo)
             .then(response => { // Success
               if (response.data.success) {
                 this.user.Id = response.data.id
