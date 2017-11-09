@@ -80,7 +80,7 @@
   export default {
     props: {      
       baseURL: {
-        default: 'https://brandcentral.xyz/'
+        default: 'https://brandcentral.xyz'
       },
       token: {
         default: ''

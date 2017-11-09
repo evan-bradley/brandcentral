@@ -16,7 +16,7 @@ import RecoverPassword from './RecoverPassword.vue'
       return {
         'display': 1,
         'loggedIn': false,
-        'baseURL': 'https://brandcentral.xyz/'
+        'baseURL': 'https://brandcentral.xyz'
       }
     },
     components: {

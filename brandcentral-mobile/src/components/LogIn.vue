@@ -54,7 +54,7 @@
     name: 'LogIn',
     props: {      
       baseURL: {
-        default: 'https://brandcentral.xyz/'
+        default: 'https://brandcentral.xyz'
       }
     },
     data () {
