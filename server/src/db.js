@@ -401,7 +401,9 @@ pool.getProduct = (productId) => {
     }
   })
 }
-const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)`
+const LIKE_Q = 'INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)'
+const REMOVELIKE_Q = 'DELETE FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const REMOVEDISLIKE_Q = 'DELETE FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
 pool.likeProduct = (user, product, channelId) => {
   return new Promise(async (resolve, reject) => {
     if (user === null || product === null  || channelId === null ) {
@@ -413,6 +415,13 @@ pool.likeProduct = (user, product, channelId) => {
     }
 
     try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [user, product])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [user, product])
+      if (likeresults.length > 0) {
+        await pool.query(REMOVELIKE_Q, [user, product])
+      } else if (dislikeresults.length > 0) {
+        await pool.query(REMOVEDISLIKE_Q, [user, product])
+      }
       await pool.query(LIKE_Q, [user, product, channelId, moment().format('YYYY-MM-DD HH:mm:ss')])
       resolve()
     } catch (e) {
@@ -430,6 +439,13 @@ pool.dislikeProduct = (user, product) => {
     }
 
     try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [user, product])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [user, product])
+      if (likeresults.length > 0) {
+        await pool.query(REMOVELIKE_Q, [user, product])
+      } else if (dislikeresults.length > 0) {
+        await pool.query(REMOVEDISLIKE_Q, [user, product])
+      }
       await pool.query(DISLIKE_Q, [user, product])
       resolve()
     } catch (e) {
@@ -506,7 +522,7 @@ pool.getFollowing = user => {
   })
 }
 
-const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? LIMIT ?,?'
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? ORDER BY LIKES.TIME_LIKED LIMIT ?,?'
 pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
     if (!user || !page) {
@@ -783,33 +799,6 @@ pool.getUserPreference = (userID, productID) => {
         resolve('like')
       } else if (dislikeresults.length > 0) {
         resolve('dislike')
-      } else {
-        resolve('none')
-      }
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-const REMOVELIKE_Q = 'DELETE FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
-const REMOVEDISLIKE_Q = 'DELETE FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
-pool.changePreference = (userID, productID) => {
-  return new Promise(async (resolve, reject) => {
-      if (!userID || !productID) {
-      reject(new Error('Missing required field'))
-      return
-    }
-
-    try {
-      const likeresults = await pool.query(CHECKLIKES_Q, [userID, productID])
-      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [userID, productID])
-      if (likeresults.length > 0) {
-        await pool.query(REMOVELIKE_Q, [userID, productID])
-        resolve('removelike')
-      } else if (dislikeresults.length > 0) {
-        await pool.query(REMOVEDISLIKE_Q, [userID, productID])
-        resolve('removedislike')
       } else {
         resolve('none')
       }
