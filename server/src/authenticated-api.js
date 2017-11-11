@@ -671,34 +671,6 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
   }
 })
 
-<<<<<<< HEAD
-/**
- * @api {get} /api/product/changepreference/:uid removes the already entered preference of a product
- * @apiName changepreference
- * @apiGroup
- *
- * @apiParam {Number} uid user id that you to check their preference for
- * @apiQuery {Number} pid product id to check (query)
- *
- * @apiSuccess {Boolean} success true
- * @apiSuccess {String}  preference will return like/dislike/none
- * @apiError   {Boolean} success false
- * @apiError   {String}  message Error message
- */
-router.get('/api/product/changepreference/:uid', async (req, res) => {
-  try {
-    res.send({
-    success: true,
-    change: await db.changePreference(req.params.uid, req.query.pid)
-  })
-  } catch (e) {
-      res.send({
-      success: false,
-      message: e
-    })
-  }
-})
-
 /**
  * @api {get} /api/likes/search/:searchFor Search for products
  * @apiName SearchForLikes
@@ -734,6 +706,4 @@ router.get('/api/likes/search/:uid', async (req, res) => {
   }
 })
 
-=======
->>>>>>> master
 module.exports = router
