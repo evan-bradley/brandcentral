@@ -10,13 +10,17 @@
 import LogIn from './LogIn.vue'
 import Register from './Register.vue'
 import RecoverPassword from './RecoverPassword.vue'
+var axios = require('axios')
+var instance = axios.create({
+  baseURL: 'https://cors-anywhere.herokuapp.com/https://brandcentral.xyz',
+  timeout: 1000,
+})
 
   export default {
     data(){
       return {
         'display': 1,
-        'loggedIn': false,
-        'baseURL': 'https://brandcentral.xyz'
+        'loggedIn': false
       }
     },
     components: {

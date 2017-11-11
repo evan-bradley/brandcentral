@@ -74,14 +74,13 @@
 <script>
   var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
   var axios = require('axios')
+  var instance = axios.create({
+    baseURL: 'https://cors-anywhere.herokuapp.com/https://brandcentral.xyz',
+    timeout: 1000,
+  })
 
   export default {
     name: 'Register',
-    props: {      
-      baseURL: {
-        default: 'https://brandcentral.xyz'
-      }
-    },
     data () {
       return {
         user: new Classes.User(),
@@ -114,7 +113,7 @@
           password: this.user.Password,
           email: this.user.Email
         }
-        axios.post(this.baseURL + '/api/register', registration)
+        instance.post(this.baseURL + '/api/register', registration)
           .then(response => { // Success
             if (response.data.success) {
               this.$router.push({ name: 'Verify' })

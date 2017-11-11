@@ -76,12 +76,13 @@
 
 <script>
   var axios = require('axios')
-
+  var instance = axios.create({
+    baseURL: 'https://cors-anywhere.herokuapp.com/https://brandcentral.xyz',
+    timeout: 1000,
+  })
+  
   export default {
     props: {      
-      baseURL: {
-        default: 'https://brandcentral.xyz'
-      },
       token: {
         default: ''
       }
@@ -97,10 +98,9 @@
     methods: {
       sendEmail () {
         // Quit if any inputs are invalid
-        axios.post(baseURL + '/api/password/reset', {
+        instance.post(this.baseURL + '/api/password/reset', {
           email: this.Email
-        })
-          .then(response => { // Success
+        }).then(response => { // Success
             if (response.data.success) {
               this.$router.push({ name: 'Login' })
             } else {
@@ -115,7 +115,7 @@
           newPassword: this.NewPassword
         }
 
-        axios.post(baseURL + '/api/password/reset', body)
+        instance.post(this.baseURL + '/api/password/reset', body)
           .then(response => { // Success
             if (response.body.success) {
               this.$router.push({ name: 'Login' })
