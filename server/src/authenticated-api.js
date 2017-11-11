@@ -671,6 +671,7 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
   }
 })
 
+<<<<<<< HEAD
 /**
  * @api {get} /api/product/changepreference/:uid removes the already entered preference of a product
  * @apiName changepreference
@@ -733,4 +734,6 @@ router.get('/api/likes/search/:uid', async (req, res) => {
   }
 })
 
+=======
+>>>>>>> master
 module.exports = router
