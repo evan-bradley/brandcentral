@@ -404,6 +404,8 @@ pool.getProduct = (productId) => {
 const LIKE_Q = 'INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)'
 const REMOVELIKE_Q = 'DELETE FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
 const REMOVEDISLIKE_Q = 'DELETE FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const CHECKLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const CHECKDISLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
 pool.likeProduct = (user, product, channelId) => {
   return new Promise(async (resolve, reject) => {
     if (user === null || product === null  || channelId === null ) {
@@ -425,6 +427,7 @@ pool.likeProduct = (user, product, channelId) => {
       await pool.query(LIKE_Q, [user, product, channelId, moment().format('YYYY-MM-DD HH:mm:ss')])
       resolve()
     } catch (e) {
+      console.log(e)
       reject(e)
     }
   })
@@ -449,6 +452,7 @@ pool.dislikeProduct = (user, product) => {
       await pool.query(DISLIKE_Q, [user, product])
       resolve()
     } catch (e) {
+      console.log(e)
       reject(e)
     }
   })
@@ -522,7 +526,7 @@ pool.getFollowing = user => {
   })
 }
 
-const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? ORDER BY LIKES.TIME_LIKED LIMIT ?,?'
+const LIKEDPRODUCTS_Q = 'SELECT * FROM (LIKES INNER JOIN PRODUCT ON LIKES.PRODUCT_ID = PRODUCT.PRODUCT_ID) WHERE LIKES.USER_ID = ? ORDER BY LIKES.TIME_LIKED DESC LIMIT ?,?'
 pool.getLikedProducts = (user, page, productsPer) => {
   return new Promise(async (resolve, reject) => {
     if (!user || !page) {
@@ -783,8 +787,6 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
   })
 }
 
-const CHECKLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
-const CHECKDISLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM DISLIKE WHERE USER_ID = ? AND PRODUCT_ID = ?'
 pool.getUserPreference = (userID, productID) => {
   return new Promise(async (resolve, reject) => {
       if (!userID || !productID) {
