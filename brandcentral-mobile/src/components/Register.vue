@@ -29,14 +29,14 @@
               <div class="field">
                 <label class="label">Username</label>
                 <div class="control">
-                  <input class="input" type="text" placeholder="Username" name="username" v-model="user.UserName" v-validate="{ required: true }"/>
+                  <input class="input" type="text" placeholder="Username" name="username" v-model="user.UserName" />
                 </div>
                 <p class="help is-danger"></p>
               </div>
               <div class="field">
                 <label class="label">Email</label>
                 <div class="control">
-                  <input class="input" type="text" placeholder="Email" name="email" v-model="user.Email" v-validate="{ required: true, email: true}"/>
+                  <input class="input" type="text" placeholder="Email" name="email" v-model="user.Email" />
                 </div>
                 <p class="help is-danger"></p>
               </div>
@@ -44,14 +44,14 @@
               <div class="field">
                 <label class="label">Password</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="Password" name="password" v-model="user.Password" v-validate="{ required: true, min: 8}"/>
+                  <input class="input" type="password" placeholder="Password" name="password" v-model="user.Password" />
                 </div>
                 <p class="help is-danger" ></p>
               </div>
               <div class="field">
                 <label class="label">Confirm Password</label>
                 <div class="control">
-                  <input class="input" type="password" placeholder="Confirm Password" name="confirm password"v-model="confirmPassword" @keydown.enter="login" v-validate="{required: true, confirmed: 'password'}"/>
+                  <input class="input" type="password" placeholder="Confirm Password" name="confirm password"v-model="confirmPassword" @keydown.enter="login" />
                 </div>
                 <p class="help is-danger" ></p>
               </div>
@@ -90,12 +90,6 @@
     },
     methods: {
       register () {
-        // Quit if any inputs are invalid
-        this.$validator.validateAll()
-        if (this.errors.any()) {
-          return
-        }
-
         // Basic validation
         if (this.user.UserName === '') {
           this.failureMessage = 'Username cannot be blank'

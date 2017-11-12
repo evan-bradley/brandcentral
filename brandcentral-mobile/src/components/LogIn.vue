@@ -5,7 +5,7 @@
         <div class="columns is-vcentered">
           <div class="column is-4 is-offset-4">
             <h4 class="title has-text-centered is-4">
-              <imag src="../Assets/brand_central_icon.png" style="max-width: 20%" alt="BrandCentral" />
+              <!-- <imag src="../Assets/brand_central_icon.png" style="max-width: 20%" alt="BrandCentral" /> -->
             </h4>
             <div class="box">
               <h4 class="title has-text-centered is-4">Login</h4>
@@ -78,6 +78,7 @@
                 this.user.FirstName = response.data.firstName
                 this.user.LastName = response.data.lastName
                 this.user.Email = response.data.email
+                this.$emit('LogIn')
               } else {
                 this.failureMessage = response.data.message
               }
