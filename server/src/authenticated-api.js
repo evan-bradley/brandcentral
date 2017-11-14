@@ -690,4 +690,31 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} /api/product/deletepreference/:uid deletes any input a user has entered on a product
+ * @apiName deletepreference
+ * @apiGroup
+ *
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will be deleted
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/product/deletepreference/:uid', async (req, res) => {
+    try {
+      await db.deleteUserPreference(req.params.uid, req.query.pid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
 module.exports = router
