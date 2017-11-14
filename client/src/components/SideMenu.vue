@@ -10,22 +10,22 @@
       </div>
       <p v-show="searchedChannels.length > 0" class="label">Channels</p>
       <ul class="search-results-channels">
-        <ChannelItem v-for="channel in searchedChannels" :key="channel.id" :channel="channel"></ChannelItem>
+        <ChannelRow v-for="channel in searchedChannels" :key="channel.id" :channel="channel"></ChannelRow>
       </ul>
       <p v-show="searchedUsers.length > 0" class="label">Users</p>
       <ul class="search-results-users">
-        <UserItem v-for="user in searchedUsers" :key="user.id" :user="user"></UserItem>
+        <UserRow v-for="user in searchedUsers" :key="user.id" :user="user"></UserRow>
       </ul>
       <hr>
     </div>
     <div class="information-container">
       <ul v-show="this.$store.state.channels.length > 0" class="subscribed-channels">
         <p class="label">Subscribed</p>
-        <ChannelItem v-for="channel in this.$store.state.channels" :key="channel.id" :channel="channel"></ChannelItem>
+        <ChannelRow v-for="channel in this.$store.state.channels" :key="channel.id" :channel="channel"></ChannelRow>
       </ul>
       <ul v-show="this.$store.state.followedUsers.length > 0" class="followed-users">
         <p class="label">Following</p>
-        <UserItem v-for="user in this.$store.state.followedUsers" :key="user.id" :user="user"></UserItem>
+        <UserRow v-for="user in this.$store.state.followedUsers" :key="user.id" :user="user"></UserRow>
       </ul>
     </div>
   </div>
@@ -33,13 +33,13 @@
 
 
 <script>
-  import UserItem from './UserItem.vue'
-  import ChannelItem from './ChannelItem.vue'
+  import UserRow from './UserRow.vue'
+  import ChannelRow from './ChannelRow.vue'
   export default {
     name: 'SideMenu',
     components: {
-      'UserItem': UserItem,
-      'ChannelItem': ChannelItem
+      'UserRow': UserRow,
+      'ChannelRow': ChannelRow
     },
     data () {
       return {

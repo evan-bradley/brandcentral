@@ -4,7 +4,7 @@
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="channel in channels" :key="channel.id">
           <div class='box' style='padding:0px;overflow:hidden;'>
-            <ChannelItem :channel="channel" />
+            <ChannelRow :channel="channel" />
           </div>
         </div>
       </div>
@@ -22,7 +22,7 @@
 <script>
   import EditProfile from './EditProfile'
   import ProductItem from './ProductItem.vue'
-  import ChannelItem from './ChannelItem.vue'
+  import ChannelRow from './ChannelRow.vue'
   export default {
     name: 'SubscribedChannels',
     props: {
@@ -43,7 +43,7 @@
     components: {
       'EditProfile': EditProfile,
       'ProductItem': ProductItem,
-      'ChannelItem': ChannelItem
+      'ChannelRow': ChannelRow
     },
     created () {
       this.loadChannels()

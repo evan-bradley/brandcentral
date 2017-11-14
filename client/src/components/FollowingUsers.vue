@@ -4,7 +4,7 @@
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="user in users" :key="user.id">
           <div class='box' style='padding:0px;overflow:hidden;'>
-            <UserItem :user="user" :shouldDisplayName="true"/>
+            <UserRow :user="user" :shouldDisplayName="true"/>
           </div>
         </div>
       </div>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import UserItem from './UserItem'
+  import UserRow from './UserRow'
 
   export default {
     name: 'FollowingUsers',
@@ -40,7 +40,7 @@
       }
     },
     components: {
-      'UserItem': UserItem
+      'UserRow': UserRow
     },
     created () {
       this.loadUsers()

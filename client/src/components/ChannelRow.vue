@@ -1,6 +1,6 @@
 <template>
-  <li class="channel-item" v-bind:class="{ 'is-active': channel.id == $route.params.channelId }">
-    <router-link v-on:click.native="select()" class="item-link channel-item-link" :to="{ name: 'channel', params:{ channelId: channel.id } }">
+  <li class="channel-row" v-bind:class="{ 'is-active': channel.id == $route.params.channelId }">
+    <router-link v-on:click.native="select()" class="item-link channel-row-link" :to="{ name: 'channel', params:{ channelId: channel.id } }">
       <span class="tag">
         <i class="fa fa-tag" aria-hidden="true"></i>
       </span>
@@ -11,7 +11,7 @@
 
 <script>
   export default {
-    name: 'ChannelItem',
+    name: 'ChannelRow',
     props: {
       channel: {
         type: Object,
