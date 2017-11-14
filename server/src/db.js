@@ -845,4 +845,26 @@ pool.getSearchLikedProducts = (searchFor, limit, user) => {
 })
 }
 
+pool.deleteUserPreference = (userID, productID) => {
+  return new Promise(async (resolve, reject) => {
+      if (!userID || !productID) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [userID, productID])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [userID, productID])
+      if (likeresults.length > 0) {
+        await pool.query(REMOVELIKE_Q, [user, product])
+      } else if (dislikeresults.length > 0) {
+        await pool.query(REMOVEDISLIKE_Q, [user, product])
+      }
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
