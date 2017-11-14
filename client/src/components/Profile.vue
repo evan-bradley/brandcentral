@@ -29,19 +29,19 @@
         <ul>
           <li v-bind:class="{ 'is-active': $route.name == 'profile' }">
             <router-link :to="{ name: 'profile' }">
-              <i class="fa fa-heart" style="margin-right: 5px;" aria-hidden="true"></i>
+              <i class="material-icons md-16" style="margin-right: 5px;" aria-hidden="true">favorite</i>
               <span>Likes</span>
             </router-link>
           </li>
           <li v-bind:class="{ 'is-active': $route.name == 'channels' }">
             <router-link :to="{ name: 'channels' }">
-              <i class="fa fa-tag" style="margin-right: 5px;" aria-hidden="true"></i>
+              <i class="material-icons md-16" style="margin-right: 5px;" aria-hidden="true">local_offer</i>
               <span>Channels</span>
             </router-link>
           </li>
           <li v-bind:class="{ 'is-active': $route.name == 'following' }">
             <router-link :to="{ name: 'following' }">
-              <i class="fa fa-user" style="margin-right: 5px;" aria-hidden="true"></i>
+              <i class="material-icons md-16" style="margin-right: 5px;" aria-hidden="true">account_circle</i>
               <span>Following</span>
             </router-link>
           </li>

@@ -130,13 +130,13 @@
                   <div class="field has-addons is-grouped is-grouped-centered">
                     <p class="control">
                       <a class="button is-primary is-medium" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
-                          <i class="fa fa-thumbs-o-down"></i>
+                          <i class="material-icons md-24">thumb_down</i>
                         </span>
                       </a>
                     </p>
                     <p class="control">
                       <a class="button is-primary is-medium" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
-                          <i class="fa fa-thumbs-o-up"></i>
+                          <i class="material-icons md-24">thumb_up</i>
                         </span>
                       </a>
                     </p>

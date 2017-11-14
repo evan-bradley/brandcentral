@@ -22,7 +22,7 @@
         <div v-for="channel in channels" v-bind:key="channel.id" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
           <a class="box" v-on:click="toggleChannelSelection(channel)" v-bind:class="{ 'selected-tag': selectedChannels.includes(channel.CHANNEL_ID) }">
             <h3 class="title is-6">
-              <i class="fa fa-tag" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true"></i>
+              <i class="material-icons md-16" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true">local_offer</i>
               <span>{{ channel.CHANNEL_NAME | capitalize}}</span>
             </h3>
           </a>
