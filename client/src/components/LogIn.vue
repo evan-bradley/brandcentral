@@ -27,17 +27,24 @@
                 </div>
               </div>
               <hr>
-              <div class="control">
-                <button class="button is-primary" @click="login">Login</button>
+              <div class="columns is-vcentered">
+                <p class="column is-6">
+                  <button class="button is-primary" @click="login">
+                    Login
+                  </button>
+                </p>
+                <p class="column is-6">
+                  <router-link class="is-pulled-right" :to="{name: 'resetPassword', params:{token: '/'}}">
+                    Forgot password?
+                  </router-link>
+                </p>
               </div>
             </div>
             <p class="has-text-centered">
               Don't have an account?
-              <router-link :to="{ name: 'register' }"><u>Register</u></router-link>
-            </p>
-            <p class="has-text-centered">
-              Forgot your password?
-              <router-link :to="{name: 'resetPassword', params:{token: '/'}}"><u>Reset Password</u></router-link>
+              <router-link class="is-primary" :to="{ name: 'register' }">
+                Sign Up
+              </router-link>
             </p>
           </div>
         </div>

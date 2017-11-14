@@ -146,7 +146,7 @@
             </div>
           </div>
           <hr style="margin: 20px -20px">
-          <p>{{ displayProduct.name.substr(0, 32) + '...' }}</p>
+          <b><p style="font-size: 1em;line-height: 1em;height: 2em;overflow: hidden;">{{ displayProduct.name }}</p></b>
         </div>
       </router-link>
     </div>

@@ -61,8 +61,10 @@
               </div>
             </div>
             <p class="has-text-centered">
-                Already have an account?
-                <router-link :to="{ name: 'login' }"><u>Login</u></router-link>
+              Already have an account?
+              <router-link class="is-primary" :to="{ name: 'login' }">
+                Login
+              </router-link>
             </p>
           </div>
         </div>
