@@ -1,7 +1,14 @@
 <template>
   <div class="side-menu">
     <div class="search-input-container">
-      <input class="input" type="text" placeholder="Search" v-model="searchText" @input="refreshSearchResults()">
+      <div class="field">
+        <p class="control has-icons-left">
+          <input class="input has-icon-left" type="text" placeholder="Search" v-model="searchText" @input="refreshSearchResults()">
+          <span class="icon is-small is-left">
+            <i class="material-icons">search</i>
+          </span>
+        </p>
+      </div>
     </div>
     <hr>
     <div class="search-results-container" v-if="searchText.length > 0">

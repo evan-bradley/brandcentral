@@ -213,6 +213,8 @@ body
     will-change: transform
     background-color: #FFF /* A background-color is required */
     min-height: 100vh
+    +desktop
+        transform: none !important
 
 .slideout-open,
 .slideout-open body,
@@ -228,3 +230,18 @@ body
 
 #side
     border-right: 1px solid #DBDBDB
+
+// Navigation Bar
+.navbar-burger
+    +desktop
+        display: none
+    +touch
+        display: flex
+        align-items: center
+        justify-content: center
+
+// Material Icons
+.material-icons.md-16
+    font-size: 16px
+.material-icons.md-24
+    font-size: 24px

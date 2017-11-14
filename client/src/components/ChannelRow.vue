@@ -2,7 +2,8 @@
   <li class="channel-row" v-bind:class="{ 'is-active': channel.id == $route.params.channelId }">
     <router-link v-on:click.native="select()" class="item-link channel-row-link" :to="{ name: 'channel', params:{ channelId: channel.id } }">
       <span class="tag">
-        <i class="fa fa-tag" aria-hidden="true"></i>
+        <!-- <i class="fa fa-tag" aria-hidden="true"></i> -->
+        <i class="material-icons md-16">local_offer</i>
       </span>
       <span class="channel-name">{{ channel.name }}</span>
     </router-link>

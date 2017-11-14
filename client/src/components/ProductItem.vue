@@ -63,28 +63,28 @@
             <p class="control">
               <a class="button is-medium" v-on:click="previous" style="border-radius: 100px;">
                 <span class="icon is-small">
-                  <i class="fa fa-angle-left"></i>
+                  <i class="material-icons md-24">chevron_left</i>
                 </span>
               </a>
             </p>
             <p class="control">
               <a class="button is-primary is-medium" v-on:click="dislike" style="border-radius: 100px;">
                 <span class="icon is-small">
-                  <i class="fa fa-thumbs-o-down"></i>
+                  <i class="material-icons md-24">thumb_down</i>
                 </span>
               </a>
             </p>
             <p class="control">
               <a class="button is-primary is-medium" v-on:click="like" style="border-radius: 100px;">
                 <span class="icon is-small">
-                  <i class="fa fa-thumbs-o-up"></i>
+                  <i class="material-icons md-24">thumb_up</i>
                 </span>
               </a>
             </p>
             <p class="control">
               <a class="button is-medium" v-on:click="next" style="border-radius: 100px;">
                 <span class="icon is-small">
-                  <i class="fa fa-angle-right"></i>
+                  <i class="material-icons md-24">chevron_right</i>
                 </span>
               </a>
             </p>

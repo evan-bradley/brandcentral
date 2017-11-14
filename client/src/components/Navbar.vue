@@ -2,9 +2,7 @@
   <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <div class="navbar-burger left toggle-button">
-        <span></span>
-        <span></span>
-        <span></span>
+        <i class="material-icons">menu</i>
       </div>
       <router-link class="navbar-item" :to="{ name: 'home' }">
         <img src="../assets/brand_central_icon.png">
@@ -14,11 +12,9 @@
       </router-link>
       <div class="navbar-burger burger" @click="toggleBurger"
            :class="{ 'is-active': burgerActive }">
-        <!-- Note: these spans generate the burger lines -->
-        <span></span>
-        <span></span>
-        <span></span>
+        <i class="material-icons">more_vert</i>
       </div>
+      
     </div>
     <div class="navbar-menu" :class="{ 'is-active': burgerActive }">
       <div class="navbar-end">
