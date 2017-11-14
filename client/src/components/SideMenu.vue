@@ -54,6 +54,10 @@
     created () {
       this.loadChannels()
       this.loadUsers()
+
+      this.$on(['selectedUser', 'selectedChannel'], event => {
+        this.$parent.slideout.toggle()
+      })
     },
     methods: {
       loadChannels () {
