@@ -57,41 +57,6 @@
 
     <!-- Medium Display Mode (Channel) -->
     <div v-if="displayMode === 'medium'" class="medium">
-      <div class="voting-button-container" style="margin-bottom: 20px">
-        <div class="has-text-centered">
-          <div class="field has-addons is-grouped is-grouped-centered">
-            <p class="control">
-              <a class="button is-medium" v-on:click="previous" style="border-radius: 100px;">
-                <span class="icon is-small">
-                  <i class="material-icons md-24">chevron_left</i>
-                </span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button is-primary is-medium" v-on:click="dislike" style="border-radius: 100px;">
-                <span class="icon is-small">
-                  <i class="material-icons md-24">thumb_down</i>
-                </span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button is-primary is-medium" v-on:click="like" style="border-radius: 100px;">
-                <span class="icon is-small">
-                  <i class="material-icons md-24">thumb_up</i>
-                </span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button is-medium" v-on:click="next" style="border-radius: 100px;">
-                <span class="icon is-small">
-                  <i class="material-icons md-24">chevron_right</i>
-                </span>
-              </a>
-            </p>
-          </div>
-        </div>
-      </div>
-      <br>
       <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
         <div class="columns box" style="margin: 0px;">
           <div class="column is-4">
@@ -104,19 +69,55 @@
             <div class="media">
               <div class="media-content">
                 <div class="title is-4">
-                  <p class="has-text-left is-pulled-left">
-                    {{ displayProduct.name}}
+                  <p class="title has-text-left is-pulled-left">
+                    {{ displayProduct.name.substring(0, 80) + '...' }}
                   </p>
                 </div>
-                <p class="has-text-left is-pulled-left">
+                <p class="description has-text-left is-pulled-left">
                   {{ displayProduct.description.substring(0, 200) + '...'}}
                 </p>
               </div>
             </div>
           </div>
         </div>
+        <br>
+        <div class="voting-button-container" style="margin-top: 20px">
+          <div class="has-text-centered">
+            <div class="field has-addons is-grouped is-grouped-centered">
+              <p class="control">
+                <a class="button is-medium" v-on:click.stop.prevent="previous" style="border-radius: 100px;">
+                  <span class="icon is-small">
+                    <i class="material-icons md-24">chevron_left</i>
+                  </span>
+                </a>
+              </p>
+              <p class="control">
+                <a class="button is-primary is-medium" v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
+                  <span class="icon is-small">
+                    <i class="material-icons md-24">thumb_down</i>
+                  </span>
+                </a>
+              </p>
+              <p class="control">
+                <a class="button is-primary is-medium" v-on:click.stop.prevent="like" style="border-radius: 100px;">
+                  <span class="icon is-small">
+                    <i class="material-icons md-24">thumb_up</i>
+                  </span>
+                </a>
+              </p>
+              <p class="control">
+                <a class="button is-medium" v-on:click.stop.prevent="next" style="border-radius: 100px;">
+                  <span class="icon is-small">
+                    <i class="material-icons md-24">chevron_right</i>
+                  </span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </router-link>
     </div>
+
     <!-- Small Display Mode (Like Page)-->
     <div v-if="displayMode === 'small'" class="small">
       <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">

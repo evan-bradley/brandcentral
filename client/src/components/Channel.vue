@@ -1,5 +1,5 @@
 <template>
-    <div class="columns is-multiline is-centered">
+    <div class="channel-container columns is-multiline is-centered">
         <div class="column is-12">
           <span class="is-pulled-left" style="font-size: 1.4rem; color: black;">{{ this.channel.name }}</span>
           <span v-if="subscribed()" class="is-pulled-right">
@@ -13,9 +13,9 @@
             </a>
           </span>
           <br>
-          <hr>
+          <hr class="divider">
         </div>
-        <div class="column is-9">
+        <div class="product-container column is-9">
            <ProductItem v-if="this.displayProduct" :item ="this.displayProduct" :channel="this.channel.id" :product="this.displayProduct" :displayMode="'medium'"/>
         </div>
     </div>

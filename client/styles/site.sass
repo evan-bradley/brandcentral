@@ -102,12 +102,28 @@ li
     color:  $white
     padding: 10px
 
+.channel-container
+    +touch
+        .divider
+            display: none !important
+    .product-container
+        color: black
+
 .voting-item
     height: 100%
     .small
         height: 100%
         .box
             height: 100%
+    .medium
+        .title
+            font-size: 1.4rem
+        +touch
+            .description
+                display: none
+                background: red !important
+            .title
+                font-size: 1.1rem
     .hover-content
         align-items: center
         display: flex
