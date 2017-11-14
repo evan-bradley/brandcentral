@@ -1,6 +1,6 @@
 # Loads necessary packages into the system.
 load_packages <- function() {
-    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet")
+    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet", "nnet", "caret")
     lapply(needed, require, character.only = TRUE)
 }
 load_packages()
@@ -105,7 +105,7 @@ classify_naive_bayes <- function(id) {
     print(sort(colSums(tag_matrix)))
 }
 
-classify_neural_network <- function() {
+classify_neural_network <- function(id) {
     tag_matrix <- get_training_data(id)
     
     ## 75% of the sample size
@@ -118,16 +118,16 @@ classify_neural_network <- function() {
     train <- tag_matrix[train_ind, ]
     test <- tag_matrix[-train_ind, ]
     
-    train <- cbind(train[, 1:975], class.ind(as.factor(train$X975)))
-    names(train) <- c(names(train)[1:975],"l1","l2")
+    train <- cbind(train[, 1:974], class.ind(as.factor(train$X975)))
+    names(train) <- c(names(train)[1:974],"l1","l2")
     n <- names(train)
-    f <- as.formula(paste("l1 + l2 + ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
-    nn <- neuralnet(f, data = train, hidden = c(500), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
-    pr.nn <- compute(nn, test_data)
+    f <- as.formula(paste("l1 + l2 ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
+    nn <- neuralnet(f, data = train, hidden = c(50, 50, 50, 50, 50, 50, 50), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
+    pr.nn <- compute(nn, test[,1:974])
     pr.nn_ <- pr.nn$net.result
     pr.nn_2 <- max.col(pr.nn_)
-    mean(pr.nn_2 == test_labels)
-    print(confusionMatrix(unlist(pr.nn_2), unlist(test_labels)))
+    mean(pr.nn_2 == test[,975])
+    print(confusionMatrix(unlist(pr.nn_2), unlist(test[,975])))
 }
 
 classify_decision_tree <- function(id) {
