@@ -810,17 +810,19 @@ pool.getUserPreference = (userID, productID) => {
   })
 }
 
-const SEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND PRODUCT.PROD_NAME LIKE ? OR TAG.TAG_DESC LIKE ? LIMIT ?'
-pool.getSearchLikedProducts = (searchFor, limit, user) => {
+const SEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND PRODUCT.PROD_NAME LIKE ? OR TAG.TAG_DESC LIKE ? LIMIT ?,?'
+pool.getSearchLikedProducts = (searchFor, page, productsPer, user) => {
   return new Promise(async (resolve, reject) => {
-    if (!searchFor || !limit || !user) {
+    if (!searchFor || !page || !user) {
     reject(new Error('Missing required field'))
     return
   }
 
   try {
+    const startproduct = ((page - 1) * productsPer)
+    const endproduct = (page * productsPer)
     const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard, limit])
+    const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard, startproduct, endproduct])
     const productArray = []
     if (results.length > 0) {
       for (let i = 0; i < results.length; i++) {
@@ -840,6 +842,23 @@ pool.getSearchLikedProducts = (searchFor, limit, user) => {
     }
   } catch (e) {
     console.log(e)
+    reject(e)
+  }
+})
+}
+const NUMSEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND PRODUCT.PROD_NAME LIKE ? OR TAG.TAG_DESC LIKE ?'
+pool.getNumSearchLikedProducts = (searchFor, user) => {
+  return new Promise(async (resolve, reject) => {
+    if (!user || !searchFor) {
+    reject(new Error('Missing required field'))
+    return
+  }
+
+  try {
+    const wildcard = '%' + searchFor + '%'
+    const results = await pool.query(NUMSEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard])
+    resolve(results.length)
+  } catch (e) {
     reject(e)
   }
 })

@@ -519,20 +519,39 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   if (req.query.productsPer === undefined) {
     req.query.productsPer = 10
   }
-  try {
-    res.send({
-      success: true,
-      page: req.query.page,
-      productsPer: req.query.productsPer,
-      totalProducts: await db.getNumLikedProducts(req.params.id),
-      likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
+  if (req.query.query === undefined) {
+    req.query.query = ""
+    try {
+      res.send({
+          success: true,
+          page: req.query.page,
+          productsPer: req.query.productsPer,
+          totalProducts: await db.getNumLikedProducts(req.params.id),
+          likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
     })
-  } catch (e) {
-    res.send({
-      success: false,
-      message: e
+    } catch (e) {
+      res.send({
+        success: false,
+        message: e
+      })
+    }
+  } else {
+    try {
+      res.send({
+        success: true,
+          page: req.query.page,
+          productsPer: req.query.productsPer,
+          totalProducts: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
+          likedproducts: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.uid)
     })
+    } catch (e) {
+      res.send({
+        success: false,
+        message: e
+      })
+    }
   }
+
 })
 
 /**
@@ -662,41 +681,6 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
     res.send({
         success: true,
         preference: await db.getUserPreference(req.params.uid, req.query.pid)
-  })
-  } catch (e) {
-    res.send({
-      success: false,
-      message: e
-    })
-  }
-})
-
-/**
- * @api {get} /api/likes/search/:searchFor Search for products
- * @apiName SearchForLikes
- * @apiGroup
- *
- * @apiParam {String} query entered search word
- * @apiParam {Number} limit limit for return (query)
- *
- * @apiSuccess {Boolean} success       true
- * @apiSuccess {Number}  limit         the number limit of the search
- * @apiSuccess {Array}   channels      array of 'Channel' objects with the
- * @apiError   {Boolean} success       false
- * @apiError   {String}  message       Error message
- */
-router.get('/api/likes/search/:uid', async (req, res) => {
-    if (req.query.query === undefined) {
-    req.query.query = ""
-  }
-  if (req.query.limit === undefined) {
-    req.query.limit = 10
-  }
-  try {
-    res.send({
-      success: true,
-      limit: parseInt(req.query.limit),
-      channels: await db.getSearchLikedProducts(req.query.query, parseInt(req.query.limit), req.params.uid)
   })
   } catch (e) {
     res.send({
