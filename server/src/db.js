@@ -810,7 +810,7 @@ pool.getUserPreference = (userID, productID) => {
   })
 }
 
-const SEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND PRODUCT.PROD_NAME LIKE ? OR TAG.TAG_DESC LIKE ? LIMIT ?,?'
+const SEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND CONCAT(PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, TAG.TAG_DESC) LIKE ? LIMIT ?,?'
 pool.getSearchLikedProducts = (searchFor, page, productsPer, user) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !page || !user) {
@@ -822,7 +822,7 @@ pool.getSearchLikedProducts = (searchFor, page, productsPer, user) => {
     const startproduct = ((page - 1) * productsPer)
     const endproduct = (page * productsPer)
     const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard, startproduct, endproduct])
+    const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, startproduct, endproduct])
     const productArray = []
     if (results.length > 0) {
       for (let i = 0; i < results.length; i++) {
