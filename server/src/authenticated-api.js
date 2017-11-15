@@ -667,13 +667,13 @@ router.get('/api/search', async (req, res) => {
  * @apiError   {Boolean} success false
  * @apiError   {String}  message Error message
  */
-router.get('/api/product/userpreference/:uid', async (req, res) => {
+router.get('/api/product/:pid/preference/:uid', async (req, res) => {
 
   try {
     res.send({
-        success: true,
-        preference: await db.getUserPreference(req.params.uid, req.query.pid)
-  })
+      success: true,
+      preference: await db.getUserPreference(req.params.uid, req.params.pid)
+    })
   } catch (e) {
     res.send({
       success: false,

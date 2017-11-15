@@ -21,13 +21,13 @@
               <div class="has-text-centered">
                 <div class="field has-addons is-grouped is-grouped-centered">
                   <p class="control">
-                    <a class="button is-primary is-large" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
+                    <a class="button is-large" v-bind:class="{ 'is-primary': this.disliked }" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
                         <i class="fa fa-thumbs-o-down"></i>
                       </span>
                     </a>
                   </p>
                   <p class="control">
-                    <a class="button is-primary is-large" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
+                    <a class="button is-large" v-bind:class="{ 'is-primary': this.liked }" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
                         <i class="fa fa-thumbs-o-up"></i>
                       </span>
                     </a>
@@ -80,8 +80,9 @@
             </div>
           </div>
         </div>
-        <br>
-        <div class="voting-button-container" style="margin-top: 20px">
+      </router-link>
+      <br>
+      <div class="voting-button-container" style="margin-top: 20px">
           <div class="has-text-centered">
             <div class="field has-addons is-grouped is-grouped-centered">
               <p class="control">
@@ -92,14 +93,14 @@
                 </a>
               </p>
               <p class="control">
-                <a class="button is-primary is-medium" v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
+                <a class="button is-medium" v-bind:class="{ 'is-primary': this.disliked }" v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
                   <span class="icon is-small">
                     <i class="material-icons md-24">thumb_down</i>
                   </span>
                 </a>
               </p>
               <p class="control">
-                <a class="button is-primary is-medium" v-on:click.stop.prevent="like" style="border-radius: 100px;">
+                <a class="button is-medium" v-bind:class="{ 'is-primary': this.liked }" v-on:click.stop.prevent="like" style="border-radius: 100px;">
                   <span class="icon is-small">
                     <i class="material-icons md-24">thumb_up</i>
                   </span>
@@ -115,7 +116,6 @@
             </div>
           </div>
         </div>
-      </router-link>
     </div>
 
     <!-- Small Display Mode (Like Page)-->
@@ -124,29 +124,27 @@
         <div class="box">
           <div class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
             <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
-            <div class="hover-content">
-              <div class="voting-button-container">
-                <div class="has-text-centered">
-                  <div class="field has-addons is-grouped is-grouped-centered">
-                    <p class="control">
-                      <a class="button is-primary is-medium" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
-                          <i class="material-icons md-24">thumb_down</i>
-                        </span>
-                      </a>
-                    </p>
-                    <p class="control">
-                      <a class="button is-primary is-medium" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
-                          <i class="material-icons md-24">thumb_up</i>
-                        </span>
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
           <hr style="margin: 20px -20px">
           <b><p style="font-size: 1em;line-height: 1em;height: 2em;overflow: hidden;">{{ displayProduct.name }}</p></b>
+          <div class="voting-button-container" style="margin-top: 15px;">
+            <div class="has-text-centered">
+              <div class="field has-addons is-grouped">
+                <p class="control">
+                  <a class="button" v-bind:class="{ 'is-primary': this.disliked }" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
+                      <i class="material-icons md-16">thumb_down</i>
+                    </span>
+                  </a>
+                </p>
+                <p class="control">
+                  <a class="button" v-bind:class="{ 'is-primary': this.liked }" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
+                      <i class="material-icons md-16">thumb_up</i>
+                    </span>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </router-link>
     </div>
@@ -176,19 +174,25 @@ export default {
   },
   data () {
     return {
-      displayProduct: this.product
+      displayProduct: this.product,
+      user: this.$store.state.User,
+      liked: false,
+      disliked: false
     }
   },
   watch: {
     product (product) {
       this.displayProduct = product
+      this.refreshPreference()
     },
     productId (productId) {
       this.loadProductFromId(productId)
+      this.refreshPreference()
     }
   },
   created () {
     if (this.productId) this.loadProductFromId(this.productId)
+    this.refreshPreference()
   },
   methods: {
     previous () {
@@ -201,14 +205,12 @@ export default {
       var body = {
         channelId: this.channel
       }
-      console.log(body)
       this.$http.post(`/api/product/like/${this.displayProduct.id}`, body)
         .then(response => { // Success
-          console.log(response)
           if (response.data.success) {
-            this.failureMessage = response.data.message
-            console.log('liked ' + this.displayProduct.name)
             this.$parent.$emit('likedProduct', this.displayProduct)
+            this.liked = true
+            this.disliked = false
           }
         }, response => { // Error
           console.log(response)
@@ -219,9 +221,9 @@ export default {
       this.$http.post(`/api/product/dislike/${this.displayProduct.id}`)
         .then(response => { // Success
           if (response.data.success) {
-            this.failureMessage = response.data.message
-            console.log('disliked ' + this.displayProduct.name)
             this.$parent.$emit('dislikedProduct', this.displayProduct)
+            this.liked = false
+            this.disliked = true
           }
         }, response => { // Error
           console.log(response)
@@ -245,6 +247,18 @@ export default {
     },
     back () {
       this.$router.go(-1)
+    },
+    refreshPreference () {
+      this.$http.get(`/api/product/${this.displayProduct.id}/preference/${this.user.Id}`)
+        .then(response => { // Success
+          if (response.data.success) {
+            this.liked = response.data.preference === 'like'
+            this.disliked = response.data.preference === 'dislike'
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
     }
   }
 }
