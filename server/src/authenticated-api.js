@@ -519,39 +519,31 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   if (req.query.productsPer === undefined) {
     req.query.productsPer = 10
   }
-  if (req.query.query === undefined) {
-    req.query.query = ""
-    try {
+
+  try {
+    if (req.query.query === undefined) {
       res.send({
           success: true,
           page: req.query.page,
           productsPer: req.query.productsPer,
-          totalProducts: await db.getNumLikedProducts(req.params.id),
-          likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
-    })
-    } catch (e) {
-      res.send({
-        success: false,
-        message: e
+          total: await db.getNumLikedProducts(req.params.id),
+          products: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
       })
-    }
-  } else {
-    try {
+    } else {
       res.send({
         success: true,
           page: req.query.page,
           productsPer: req.query.productsPer,
-          totalProducts: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
-          likedproducts: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.uid)
-    })
-    } catch (e) {
-      res.send({
-        success: false,
-        message: e
+          total: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
+          products: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.id)
       })
     }
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
   }
-
 })
 
 /**
