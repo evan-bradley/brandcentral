@@ -519,20 +519,39 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   if (req.query.productsPer === undefined) {
     req.query.productsPer = 10
   }
-  try {
-    res.send({
-      success: true,
-      page: req.query.page,
-      productsPer: req.query.productsPer,
-      totalProducts: await db.getNumLikedProducts(req.params.id),
-      likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
+  if (req.query.query === undefined) {
+    req.query.query = ""
+    try {
+      res.send({
+          success: true,
+          page: req.query.page,
+          productsPer: req.query.productsPer,
+          totalProducts: await db.getNumLikedProducts(req.params.id),
+          likedproducts: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
     })
-  } catch (e) {
-    res.send({
-      success: false,
-      message: e
+    } catch (e) {
+      res.send({
+        success: false,
+        message: e
+      })
+    }
+  } else {
+    try {
+      res.send({
+        success: true,
+          page: req.query.page,
+          productsPer: req.query.productsPer,
+          totalProducts: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
+          likedproducts: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.uid)
     })
+    } catch (e) {
+      res.send({
+        success: false,
+        message: e
+      })
+    }
   }
+
 })
 
 /**
@@ -672,32 +691,24 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
 })
 
 /**
- * @api {get} /api/likes/search/:searchFor Search for products
- * @apiName SearchForLikes
+ * @api {get} /api/product/deletepreference/:uid deletes any input a user has entered on a product
+ * @apiName deletepreference
  * @apiGroup
  *
- * @apiParam {String} query entered search word
- * @apiParam {Number} limit limit for return (query)
+ * @apiParam {Number} uid user id that you to check their preference for
+ * @apiQuery {Number} pid product id to check (query)
  *
- * @apiSuccess {Boolean} success       true
- * @apiSuccess {Number}  limit         the number limit of the search
- * @apiSuccess {Array}   channels      array of 'Channel' objects with the
- * @apiError   {Boolean} success       false
- * @apiError   {String}  message       Error message
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {String}  preference will be deleted
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
  */
-router.get('/api/likes/search/:uid', async (req, res) => {
-    if (req.query.query === undefined) {
-    req.query.query = ""
-  }
-  if (req.query.limit === undefined) {
-    req.query.limit = 10
-  }
-  try {
-    res.send({
-      success: true,
-      limit: parseInt(req.query.limit),
-      channels: await db.getSearchLikedProducts(req.query.query, parseInt(req.query.limit), req.params.uid)
-  })
+router.get('/api/product/deletepreference/:uid', async (req, res) => {
+    try {
+      await db.deleteUserPreference(req.params.uid, req.query.pid)
+      res.send({
+      success: true
+    })
   } catch (e) {
     res.send({
       success: false,
