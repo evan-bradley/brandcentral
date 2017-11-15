@@ -177,19 +177,27 @@ pool.updateProfile = info => {
     if (info.firstName) newColumns.USER_FNAME = info.firstName
     if (info.lastName) newColumns.USER_LNAME = info.lastName
     if (info.email) newColumns.USER_EMAIL = info.email
-
     try {
       if (info.password) {
         // Separate query for user password to avoid nasty control flow.
         const hash = await bcrypt.hash(info.password, 10)
-        pool.query('UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?', [hash, info.id])
+        await pool.query('UPDATE USER SET USER_PASS_HASH = ? WHERE USER_ID = ?', [hash, info.id])
+      }
+
+      if (info.username) {
+        var res = await pool.query('SELECT count(*) as count FROM USER WHERE USERNAME = ? AND USER_ID != ?', [info.username, info.id])  
+        if (res[0].count) {
+          throw new Error('Username taken')
+        }
+        await pool.query('UPDATE USER SET USERNAME = ? WHERE USER_ID = ?', [info.username, info.id])  
       }
 
       // Check to make sure there are attributes to set
       if (Object.keys(newColumns).length !== 0) {
         const UPDATE_PROFILE_Q = `UPDATE USER SET ? WHERE USER_ID = ?`
-        pool.query(UPDATE_PROFILE_Q, [newColumns, info.id])
+        await pool.query(UPDATE_PROFILE_Q, [newColumns, info.id])
       }
+      resolve()
     } catch (e) {
       reject(e)
     }
