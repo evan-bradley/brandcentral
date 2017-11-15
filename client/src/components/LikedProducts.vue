@@ -1,5 +1,15 @@
 <template>
   <div class="liked-products-container">
+    <div class="control-container" style="margin-bottom:20px">
+      <div class="field has-addons">
+        <p class="control has-icons-left">
+          <input class="input has-icon-left" type="text" placeholder="Search" v-model="searchText" @input="searchTextDidChange()">
+          <span class="icon is-small is-left">
+            <i class="material-icons">search</i>
+          </span>
+        </p>
+      </div>
+    </div>
     <div v-if="likedProducts.length > 0">
       <div class="columns is-multiline">
         <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.name">
@@ -39,7 +49,8 @@
         likedProducts: [],
         currentPage: 1,
         numberPerPage: 12,
-        totalProducts: 0
+        totalProducts: 0,
+        searchText: ''
       }
     },
     watch: {
@@ -63,15 +74,19 @@
         var userId = this.$route.params.userId
         this.currentPage = page
         var newlikedProducts = []
-        this.$http.get(`/api/user/likedproducts/${userId}?productsPer=${this.numberPerPage}&page=${page}`)
+        var request = `/api/user/likedproducts/${userId}?productsPer=${this.numberPerPage}&page=${page}`
+        if (this.searchText !== '') {
+          request = request + `&query=${this.searchText}`
+        }
+        this.$http.get(request)
         .then(response => {
           if (response.data.success) {
-            response.body.likedproducts.forEach(function (el) {
+            response.body.products.forEach(function (el) {
               var product = new Classes.Product(el.id, el.name, el.description, el.pictureUrl)
               newlikedProducts.push(product)
             }, this)
             this.likedProducts = newlikedProducts
-            this.totalProducts = response.body.totalProducts
+            this.totalProducts = response.body.total
           }
         }, response => {
           console.log(`Failed to load products. userId=${userId}, page=${page}, numPerPage=${this.numPerPage}`)
@@ -82,6 +97,9 @@
       },
       nextPage () {
         this.loadLikedProducts(this.currentPage + 1)
+      },
+      searchTextDidChange () {
+        this.loadLikedProducts(1)
       }
     }
   }
