@@ -12,13 +12,18 @@
     <div class="column is-12">
       <RecoverPassword v-show="display === 3" v-on:navigate="changeDisplay"/>
     </div>
+    <div class="column is-12">
+      <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :channelId="0"/>
+    </div>
   </div>
 </template>
 
 <script>
-import LogIn from "./LogIn.vue";
-import Register from "./Register.vue";
-import RecoverPassword from "./RecoverPassword.vue";
+import LogIn from "./LogIn.vue"
+import Register from "./Register.vue"
+import RecoverPassword from "./RecoverPassword.vue"
+import Channel from "./Channel.vue"
+var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 var axios = require("axios");
 var instance = axios.create({
   baseURL: "https://cors-anywhere.herokuapp.com/https://brandcentral.xyz",
@@ -29,13 +34,15 @@ export default {
   data() {
     return {
       display: 1,
-      loggedIn: false
+      loggedIn: false,
+      user: new Classes.User()
     };
   },
   components: {
     LogIn: LogIn,
     Register: Register,
-    RecoverPassword: RecoverPassword
+    RecoverPassword: RecoverPassword,
+    Channel: Channel
   },
   methods: {
     changeDisplay(number) {
@@ -45,9 +52,10 @@ export default {
         this.display = number;
       }
     },
-    LogIn () {
+    LogIn (user) {
       this.loggedIn = true
       this.display = 4
+      this.user = user
     },
     LogOut () {
       this.loggedIn = false

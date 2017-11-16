@@ -72,13 +72,12 @@
 
           instance.post('/api/login', loginInfo)
             .then(response => { // Success
-            console.log(response)
               if (response.data.success) {
                 this.user.Id = response.data.id
                 this.user.FirstName = response.data.firstName
                 this.user.LastName = response.data.lastName
                 this.user.Email = response.data.email
-                this.$emit('LogIn')
+                this.$emit('LogIn', this.user)
               } else {
                 this.failureMessage = response.data.message
               }

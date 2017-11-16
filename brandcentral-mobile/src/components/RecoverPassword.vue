@@ -102,7 +102,7 @@
           email: this.Email
         }).then(response => { // Success
             if (response.data.success) {
-              this.$router.push({ name: 'Login' })
+              this.$emit('navigate', 1)
             } else {
               this.failureMessage = response.data.message
             }
@@ -118,7 +118,7 @@
         instance.post(this.baseURL + '/api/password/reset', body)
           .then(response => { // Success
             if (response.body.success) {
-              this.$router.push({ name: 'Login' })
+              this.$emit('navigate', 1)
             } else {
               this.failureMessage = response.data.message
             }
