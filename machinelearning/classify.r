@@ -163,3 +163,64 @@ classify_decision_tree <- function(tag_matrix) {
     table(p, test[,ncol(test)])
     return(fit)
 }
+
+get_weighted_training_data <- function() {
+    mydb = mysqldb
+    tags <- get_tags(mydb)
+    prod_tags <- get_product_tags(mydb)
+    likes <- get_likes(mydb)
+    dislikes <- get_dislikes(mydb)
+    #tags <- read.csv("tags.csv")
+    #prod_tags <- read.csv("prod_tags.csv")
+
+    #likes <- read.csv("likes.csv")
+    #dislikes <- read.csv("dislikes.csv")
+
+    likes_matrix <- make_tag_matrix(likes, tags, prod_tags)
+    dislikes_matrix <- make_tag_matrix(dislikes, tags, prod_tags)
+
+    likes_matrix_sums <- colSums(likes_matrix)
+    dislikes_matrix_sums <- colSums(dislikes_matrix)
+    total_sums <- likes_matrix_sums - dislikes_matrix_sums
+
+    neg_vec <- rep(-1, ncol(dislikes_matrix))
+
+    # TODO: Maybe just multiply these rather than sweeping them
+    adjusted_likes <- sweep(likes_matrix, MARGIN=2, total_sums, `*`)
+    adjusted_dislikes <- sweep(dislikes_matrix, MARGIN=2, total_sums, `*`)
+
+    class_1 <- cbind(adjusted_likes, Liked=1)
+    class_2 <- cbind(adjusted_dislikes, Liked=2)
+
+    tag_matrix <- data.frame(rbind(class_1, class_2))
+
+    store_weight_vector(mydb, id, total_sums)
+
+    return(tag_matrix)
+}
+
+train_classifiers <- function(id, tag_matrix) {
+    nb <- naiveBayes(as.factor(Liked) ~ ., tag_matrix)
+    dt <- rpart(as.factor(Liked) ~ ., tag_matrix, method="class")
+
+    tag_matrix <- cbind(tag_matrix[, 1:974], class.ind(as.factor(tag_matrix$Liked)))
+    names(tag_matrix) <- c(names(tag_matrix)[1:974],"l1","l2")
+    n <- names(tag_matrix)
+    f <- as.formula(paste("l1 + l2 ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
+    nn <- neuralnet(f, data = tag_matrix, hidden = c(50, 50), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
+
+    saveRDS(nb, file = paste(paste("user_nb", id, sep="_"), "rds", sep="."))
+    saveRDS(dt, file = paste(paste("user_dt", id, sep="_"), "rds", sep="."))
+    saveRDS(nn, file = paste(paste("user_nn", id, sep="_"), "rds", sep="."))
+}
+
+classify_product <- function(id, product, weight) {
+    #nb <- readRDS(paste(paste("user_nb", id, sep="_"), "rds", sep="."))
+    dt <- readRDS(paste(paste("user_dt", id, sep="_"), "rds", sep="."))
+    #nn <- readRDS(paste(paste("user_nn", id, sep="_"), "rds", sep="."))
+    print("Read models")
+
+    weighted_product <-products[product, ] * as.numeric(unlist(weight))
+    dt_pred <- predict(dt, weighted_product)
+}
+
