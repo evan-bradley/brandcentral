@@ -709,35 +709,4 @@ router.get('/api/product/deletepreference/:uid', async (req, res) => {
   }
 })
 
-/**
- * @api {get} api/product/general/random Get a random product
- * @apiName GetRandomProduct
- * @apiGroup Product
- *
- *
- * @apiSuccess {Boolean} success     true
- * @apiSuccess {Object}  product     Product object
- * @apiSuccess {Number}  id          Product ID
- * @apiSuccess {String}  name        Name of the product
- * @apiSuccess {String}  description Description of the product
- * @apiSuccess {String}  pictureUrl  URL pointing at the product picture
- * @apiSuccess {String}  productUrl  URL pointing at a webpage for the product
- * @apiSuccess {String}  model       Model number of the product
- * @apiError   {Boolean} success     false
- * @apiError   {String}  message     Error message
- */
-router.get('/api/product/general/random', async (req, res) => {
-    try {
-      res.send({
-      success: true,
-      product: await db.getGeneralProduct("1")
-  })
-  } catch (e) {
-    res.send({
-      success: false,
-      message: e.message
-    })
-  }
-})
-
 module.exports = router
