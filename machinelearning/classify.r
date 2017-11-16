@@ -1,6 +1,6 @@
 # Loads necessary packages into the system.
 load_packages <- function() {
-    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet", "nnet", "caret")
+    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet", "nnet", "caret", "jsonlite")
     lapply(needed, require, character.only = TRUE)
 }
 load_packages()
@@ -224,3 +224,34 @@ classify_product <- function(id, product, weight) {
     dt_pred <- predict(dt, weighted_product)
 }
 
+server <- function() {
+    tags <- read.csv("tags.csv")
+    prod_tags <- read.csv("prod_tags.csv")
+    print("Read CSV")
+    if(file.exists("products.csv")) {
+        products <- read.csv("products.csv")
+    } else {
+        products <- make_product_matrix(tags, prod_tags)
+        write.csv(products, file = "products.csv")
+    }
+
+  while(TRUE) {
+    writeLines("Listening...")
+    con <- socketConnection(host="localhost", port = 6011, blocking=FALSE,
+                            server=TRUE, open="r+")
+    while(TRUE) {
+        data <- readLines(con, 1)
+        msg <- fromJSON(data)
+        if (msg$cmd == "classify") {
+            response <- classify_product(msg$id, msg$start, msg$count, tags, prod_tags, products)
+        } else if (msg$cmd == "train") {
+            response <- train_classifiers(msg$id, get_weighted_training_data(msg$id))
+        } else if (msg$cmd == "bye") {
+            close(con)
+            break;
+        }
+        writeLines(toJSON(response), con) 
+    }
+  }
+}
+server()
