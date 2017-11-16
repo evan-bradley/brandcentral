@@ -25,6 +25,28 @@ get_product_tags <- function(db) {
     return(prod_tags)
 }
 
+get_products <- function(db) {
+    products <- dbGetQuery(db, "select product_id from PRODUCT")
+    # write.csv(prod_tags, file = "prod_tags.csv")
+    return(products)
+}
+
+# TODO: Make this more generic.
+make_product_matrix <- function(tags, prod_tags) {
+    for(product in 1:3703) {
+        product_id <- product
+        print(product_id)
+        prod_tag_list <- as.matrix((tags$TAG_ID %in% prod_tags[prod_tags$product_id == product_id,]$tag_id)*1)
+        if(!exists("prod_matrix")) {
+            prod_matrix <- t(prod_tag_list)
+        } else {
+            prod_matrix <- rbind(prod_matrix, t(prod_tag_list))
+        }
+    }
+
+    return(prod_matrix)
+}
+
 make_tag_matrix <- function(likes, tags, prod_tags) {
     for(product in likes$PRODUCT_ID) {
         product_id <- product
@@ -53,6 +75,16 @@ get_dislikes <- function(db, id) {
     return(dislikes)
 }
 
+store_weight_vector <- function(db, id, vec) {
+    weight_csv <- paste(vec, collapse=",")
+    dbGetQuery(db, paste("UPDATE USER SET USER_VECTOR = '", weight_csv , "'  WHERE USER_ID = ", id, sep = ""))
+}
+
+get_weight_vector <- function(db, id) {
+    weight_csv <- dbGetQuery(db, paste("SELECT USER_VECTOR FROM USER WHERE USER_ID =", id, sep = " "))
+    read.table(textConnection(weight_csv$USER_VECTOR), sep=",")
+}
+
 get_training_data <- function(id) {
     mydb = mysqldb
     tags <- get_tags(mydb)
@@ -63,8 +95,8 @@ get_training_data <- function(id) {
     like_tag_matrix <- make_tag_matrix(likes, tags, prod_tags)
     dislike_tag_matrix <- make_tag_matrix(dislikes, tags, prod_tags)
 
-    class_1 <- cbind(like_tag_matrix, 1)
-    class_2 <- cbind(dislike_tag_matrix, 2)
+    class_1 <- cbind(like_tag_matrix, Liked=1)
+    class_2 <- cbind(dislike_tag_matrix, Liked=2)
 
     tag_matrix <- data.frame(rbind(class_1, class_2))
 
@@ -72,9 +104,7 @@ get_training_data <- function(id) {
     return(tag_matrix)
 }
 
-classify_naive_bayes <- function(id) {
-    tag_matrix <- get_training_data(id)
-
+classify_naive_bayes <- function(tag_matrix) {
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
 
@@ -85,14 +115,6 @@ classify_naive_bayes <- function(id) {
     train <- tag_matrix[train_ind, ]
     test <- tag_matrix[-train_ind, ]
 
-    # x <- train[,-ncol(train)]
-    # y <- train[,ncol(train)]
-    # test <- test[,-ncol(test)]
-
-    # nb <- naiveBayes(train, as.factor(labels))
-    # p <- predict(nb, as.factor(test))
-
-    # Previously X2380
     m <- naiveBayes(as.factor(X975) ~ ., train)
     p <- predict(m, data.frame(test[,-ncol(test)]))
 
@@ -101,9 +123,7 @@ classify_naive_bayes <- function(id) {
     print(sort(colSums(tag_matrix)))
 }
 
-classify_neural_network <- function(id) {
-    tag_matrix <- get_training_data(id)
-    
+classify_neural_network <- function(tag_matrix) {
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
     
@@ -114,11 +134,11 @@ classify_neural_network <- function(id) {
     train <- tag_matrix[train_ind, ]
     test <- tag_matrix[-train_ind, ]
     
-    train <- cbind(train[, 1:974], class.ind(as.factor(train$X975)))
+    train <- cbind(train[, 1:974], class.ind(as.factor(train$Liked)))
     names(train) <- c(names(train)[1:974],"l1","l2")
     n <- names(train)
     f <- as.formula(paste("l1 + l2 ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
-    nn <- neuralnet(f, data = train, hidden = c(50, 50, 50, 50, 50, 50, 50), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
+    nn <- neuralnet(f, data = train, hidden = c(50, 50), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
     pr.nn <- compute(nn, test[,1:974])
     pr.nn_ <- pr.nn$net.result
     pr.nn_2 <- max.col(pr.nn_)
@@ -126,9 +146,7 @@ classify_neural_network <- function(id) {
     print(confusionMatrix(unlist(pr.nn_2), unlist(test[,975])))
 }
 
-classify_decision_tree <- function(id) {
-    tag_matrix <- get_training_data(id)
-
+classify_decision_tree <- function(tag_matrix) {
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
 
