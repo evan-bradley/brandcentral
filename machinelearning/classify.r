@@ -14,15 +14,13 @@ mysqldb <- connect_to_db()
 
 # Returns a matrix of tags.
 get_tags <- function(db) {
-    tag_query <- dbSendQuery(db, "select * from TAG where TAG_ACTIVE = 'YES'")
-    tags <- fetch(tag_query, n=-1)
+    tags <- dbGetQuery(db, "select * from TAG where TAG_ACTIVE = 'YES'")
     # write.csv(tags, file = "tags.csv")
     return(tags)
 }
 
 get_product_tags <- function(db) {
-    prod_tag_assign_query <- dbSendQuery(db, "select product_id, tag_id from PROD_TAG_ASSIGN")
-    prod_tags <- fetch(prod_tag_assign_query, n=-1)
+    prod_tags <- dbGetQuery(db, "select product_id, tag_id from PROD_TAG_ASSIGN")
     # write.csv(prod_tags, file = "prod_tags.csv")
     return(prod_tags)
 }
@@ -42,16 +40,14 @@ make_tag_matrix <- function(likes, tags, prod_tags) {
 }
 
 get_likes <- function(db, id) {
-    likes_query <- dbSendQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
-    likes <- fetch(likes_query, n=-1)
+    likes <- dbGetQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
     # write.csv(likes, file = "likes.csv")
 
     return(likes)
 }
 
 get_dislikes <- function(db, id) {
-    dislikes_query <- dbSendQuery(db, paste("select * from DISLIKES WHERE USER_ID =", id, sep = " "))
-    dislikes <- fetch(dislikes_query, n=-1)
+    dislikes <- dbGetQuery(db, paste("select * from DISLIKES WHERE USER_ID =", id, sep = " "))
     # write.csv(dislikes, file = "dislikes.csv")
 
     return(dislikes)
