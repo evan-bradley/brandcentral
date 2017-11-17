@@ -62,7 +62,7 @@
             </div>
             <p class="has-text-centered">
               Already have an account?
-              <router-link class="is-primary" :to="{ name: 'login' }">
+              <router-link class="is-primary underline-on-hover" :to="{ name: 'login' }">
                 Login
               </router-link>
             </p>

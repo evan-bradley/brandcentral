@@ -34,7 +34,7 @@
                   </button>
                 </p>
                 <p class="column is-6">
-                  <router-link class="is-pulled-right" :to="{name: 'resetPassword', params:{token: '/'}}">
+                  <router-link class="is-primary is-pulled-right underline-on-hover" :to="{name: 'resetPassword', params:{token: '/'}}">
                     Forgot password?
                   </router-link>
                 </p>
@@ -42,7 +42,7 @@
             </div>
             <p class="has-text-centered">
               Don't have an account?
-              <router-link class="is-primary" :to="{ name: 'register' }">
+              <router-link class="is-primary underline-on-hover" :to="{ name: 'register' }">
                 Sign Up
               </router-link>
             </p>
