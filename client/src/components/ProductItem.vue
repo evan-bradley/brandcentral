@@ -12,33 +12,40 @@
           </a>
         </p>
       </div>
-      <div class="columns" style="padding:10px">
+      <div class="columns" >
         <div class="column is-4">
-          <div class="image is-square" style="border: 1px solid #dedede;margin: -10px; overflow: hidden; border-radius: 5px;">
-            <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
-            <div class="hover-content">
-            <div class="voting-button-container">
+          <div class="image is-square">
+            <img :src="displayProduct.pictureUrl" alt="Placeholder image">
+          </div>
+          <div class="voting-button-container">
               <div class="has-text-centered">
-                <div class="field has-addons is-grouped is-grouped-centered">
-                  <p class="control">
-                    <a class="button is-large" v-bind:class="{ 'is-primary': this.disliked }" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
-                        <i class="fa fa-thumbs-o-down"></i>
+                <div class="field is-grouped">
+                  <p class="control" v-bind:class="{ 'display-on-hover': !this.disliked }">
+                    <a class="button dislike-button" v-bind:class="{ 'is-primary': this.disliked}" v-on:click.stop.prevent="dislike">
+                      <span class="icon is-small">
+                        <i class="material-icons md-16">thumb_down</i>
                       </span>
                     </a>
                   </p>
-                  <p class="control">
-                    <a class="button is-large" v-bind:class="{ 'is-primary': this.liked }" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
-                        <i class="fa fa-thumbs-o-up"></i>
+                  <p class="control" v-bind:class="{ 'display-on-hover': !this.liked }">
+                    <a class="button like-button" v-bind:class="{ 'is-primary': this.liked}" v-on:click.stop.prevent="like">
+                      <span class="icon is-small">
+                        <i class="material-icons md-16">thumb_up</i>
+                      </span>
+                    </a>
+                  </p>
+                  <p v-if="liked | disliked" class="control display-on-hover">
+                    <a class="button like-button" v-on:click.stop.prevent="deletePreference">
+                      <span class="icon is-small">
+                        <i class="material-icons md-16">close</i>
                       </span>
                     </a>
                   </p>
                 </div>
               </div>
             </div>
-          </div>
-          </div>
         </div>
-        <div class="column is-8" style="padding-top: 0px">
+        <div class="column is-8">
           <div class="media">
             <div class="media-content">
               <div class="title is-4">
@@ -60,8 +67,8 @@
       <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
         <div class="columns box" style="margin: 0px;">
           <div class="column is-4">
-            <div class="image-container image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-              <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
+            <div class="image-container image is-square">
+              <img :src="displayProduct.pictureUrl" alt="Placeholder image">
             </div>
           </div>
           <br>
@@ -106,6 +113,13 @@
                   </span>
                 </a>
               </p>
+              <p v-if="liked | disliked" class="control display-on-hover">
+                <a class="button is-medium" v-on:click.stop.prevent="deletePreference" style="border-radius: 100px;">
+                  <span class="icon is-small">
+                    <i class="material-icons md-24">close</i>
+                  </span>
+                </a>
+              </p>
               <p class="control">
                 <a class="button is-medium" v-on:click.stop.prevent="next" style="border-radius: 100px;">
                   <span class="icon is-small">
@@ -122,26 +136,38 @@
     <div v-if="displayMode === 'small'" class="small">
       <router-link :to="{ name: 'product', params:{ productId: this.displayProduct.id, channel: this.channel } }">
         <div class="box">
-          <div class="image is-square" style="margin: -10px; overflow: hidden; border-radius: 5px;">
-            <img :src="displayProduct.pictureUrl" alt="Placeholder image" style="object-fit: contain;">
-          </div>
-          <hr style="margin: 20px -20px">
-          <b><p style="font-size: 1em;line-height: 1em;height: 2em;overflow: hidden;">{{ displayProduct.name }}</p></b>
-          <div class="voting-button-container" style="margin-top: 15px;">
-            <div class="has-text-centered">
-              <div class="field has-addons is-grouped">
-                <p class="control">
-                  <a class="button" v-bind:class="{ 'is-primary': this.disliked }" v-on:click.stop.prevent="dislike" style="border-radius: 100px;"><span class="icon is-small">
-                      <i class="material-icons md-16">thumb_down</i>
-                    </span>
-                  </a>
-                </p>
-                <p class="control">
-                  <a class="button" v-bind:class="{ 'is-primary': this.liked }" v-on:click.stop.prevent="like" style="border-radius: 100px;"><span class="icon is-small">
-                      <i class="material-icons md-16">thumb_up</i>
-                    </span>
-                  </a>
-                </p>
+          <div class="image is-square">
+            <img :src="displayProduct.pictureUrl" alt="Placeholder image">
+            <div class="hover-content">
+              <div class="title display-on-hover">
+                {{ displayProduct.name }}
+              </div>
+              <div class="voting-button-container">
+                <div class="has-text-centered">
+                  <div class="field is-grouped">
+                    <p class="control" v-bind:class="{ 'display-on-hover': !this.disliked }">
+                      <a class="button dislike-button" v-bind:class="{ 'is-primary': this.disliked}" v-on:click.stop.prevent="dislike">
+                        <span class="icon is-small">
+                          <i class="material-icons md-16">thumb_down</i>
+                        </span>
+                      </a>
+                    </p>
+                    <p class="control" v-bind:class="{ 'display-on-hover': !this.liked }">
+                      <a class="button like-button" v-bind:class="{ 'is-primary': this.liked}" v-on:click.stop.prevent="like">
+                        <span class="icon is-small">
+                          <i class="material-icons md-16">thumb_up</i>
+                        </span>
+                      </a>
+                    </p>
+                    <p v-if="liked | disliked" class="control display-on-hover">
+                      <a class="button like-button" v-on:click.stop.prevent="deletePreference">
+                        <span class="icon is-small">
+                          <i class="material-icons md-16">close</i>
+                        </span>
+                      </a>
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -150,8 +176,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script>
 var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
@@ -183,10 +207,11 @@ export default {
   watch: {
     product (product) {
       this.displayProduct = product
-      this.refreshPreference()
     },
     productId (productId) {
       this.loadProductFromId(productId)
+    },
+    displayProduct (newDisplayProduct) {
       this.refreshPreference()
     }
   },
@@ -249,11 +274,28 @@ export default {
       this.$router.go(-1)
     },
     refreshPreference () {
+      if (!this.displayProduct || !this.user) return
+
       this.$http.get(`/api/product/${this.displayProduct.id}/preference/${this.user.Id}`)
         .then(response => { // Success
           if (response.data.success) {
             this.liked = response.data.preference === 'like'
             this.disliked = response.data.preference === 'dislike'
+          }
+        }, response => { // Error
+          console.log(response)
+          this.failureMessage = response.data.message
+        })
+    },
+    deletePreference () {
+      if (!this.displayProduct || !this.user) return
+
+      this.$http.delete(`/api/product/${this.displayProduct.id}/preference/${this.user.Id}`)
+        .then(response => { // Success
+          console.log(response)
+          if (response.data.success) {
+            this.liked = false
+            this.disliked = false
           }
         }, response => { // Error
           console.log(response)

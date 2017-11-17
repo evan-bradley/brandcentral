@@ -683,7 +683,7 @@ router.get('/api/product/:pid/preference/:uid', async (req, res) => {
 })
 
 /**
- * @api {get} /api/product/deletepreference/:uid deletes any input a user has entered on a product
+ * @api {delete} /api/product/:pid/preference/:uid deletes any input a user has entered on a product
  * @apiName deletepreference
  * @apiGroup
  *
@@ -695,12 +695,12 @@ router.get('/api/product/:pid/preference/:uid', async (req, res) => {
  * @apiError   {Boolean} success false
  * @apiError   {String}  message Error message
  */
-router.get('/api/product/deletepreference/:uid', async (req, res) => {
+router.delete('/api/product/:pid/preference/:uid', async (req, res) => {
     try {
-      await db.deleteUserPreference(req.params.uid, req.query.pid)
+      await db.deleteUserPreference(req.params.uid, req.params.pid)
       res.send({
-      success: true
-    })
+        success: true
+      })
   } catch (e) {
     res.send({
       success: false,

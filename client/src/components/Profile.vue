@@ -29,7 +29,7 @@
         <ul>
           <li v-bind:class="{ 'is-active': $route.name == 'profile' }">
             <router-link :to="{ name: 'profile' }">
-              <i class="material-icons md-16" style="margin-right: 5px;" aria-hidden="true">favorite</i>
+              <i class="material-icons md-16" style="margin-right: 5px;" aria-hidden="true">thumb_up</i>
               <span>Likes</span>
             </router-link>
           </li>

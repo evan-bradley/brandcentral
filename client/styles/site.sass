@@ -121,12 +121,34 @@ a
     .product-container
         color: black
 
+// Product Item
+.like-button
+    border-radius: 100px
+.dislike-button
+    border-radius: 100px
+
 .voting-item
     height: 100%
+    .box
+        padding: 12px
+    .image
+        overflow: hidden
+        img
+            object-fit: contain
     .small
         height: 100%
         .box
             height: 100%
+        .voting-button-container
+            margin-top: 15px
+        .title
+            font-size: 1em
+            font-weight: bold
+            line-height: 1em
+            height: 2em
+            overflow: hidden
+            flex-grow: 20
+            margin: 0px
     .medium
         .title
             font-size: 1.4rem
@@ -136,23 +158,35 @@ a
                 background: red !important
             .title
                 font-size: 1.1rem
+    .large
+        .image
+            border: 1px rgb(219, 219, 219) solid
+            border-radius: 5px
+        .voting-button-container
+            margin-top: 12px
     .hover-content
-        align-items: center
         display: flex
-        justify-content: center
+        justify-content: flex-end
+        align-items: stretch
+        flex-direction: column
         position: absolute
         width: 100%
         height: 100%
         top: 0
         left: 0
-        padding: 20px
-        background: rgba(white, 0.8)
         color: black
-        opacity: 0
+        opacity: 1
         transition: transform 0.1s, opacity 0.1s
+        .display-on-hover
+            display: none
+            .control
+                margin-right: 3px
         &:hover
-            opacity: 1
-
+            background: rgba(white, 0.8)
+            .display-on-hover
+                display: flex
+            .control
+                margin-right: 12px
 
 .side-menu
     overflow: hidden
