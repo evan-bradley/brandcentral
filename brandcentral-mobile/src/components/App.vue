@@ -13,7 +13,7 @@
       <RecoverPassword v-show="display === 3" v-on:navigate="changeDisplay"/>
     </div>
     <div class="column is-12">
-      <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :channelId="0"/>
+      <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :userId="user.Id"/>
     </div>
   </div>
 </template>
