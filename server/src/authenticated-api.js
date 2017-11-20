@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 const HOST = '127.0.0.1'
 const PORT = 6011
-const backoff = 10000
+let backoff = 10000
 const queue = []
 
 const client = new net.Socket()
