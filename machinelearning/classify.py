@@ -168,7 +168,24 @@ def data_for_uid(vector_length, uid):
 
 def data_train_test():
     dataset = data(200)
-    dataset = data_for_uid(200, [2])
+    X = dataset['data']
+    y = dataset['label']
+
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    # Fit only to the training data
+    scaler.fit(X_train)
+    # Now apply the transformations to the data:
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+
+    return X, y, X_train, X_test, y_train, y_test
+
+def data_train_test_for_uids(uids):
+    dataset = data_for_uid(200, uids)
     X = dataset['data']
     y = dataset['label']
 
@@ -236,6 +253,58 @@ def classify():
     for key, value in sorted(accuracies.items(), key=operator.itemgetter(1), reverse=True):
         print("%-*s) %-*s: %s" % (2, i, 25, key, value))
         i += 1
+
+def classify_for_uids(uids):
+    from matplotlib.colors import ListedColormap
+    from sklearn.model_selection import train_test_split
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.datasets import make_moons, make_circles, make_classification
+    from sklearn.neural_network import MLPClassifier
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.svm import SVC
+    from sklearn.gaussian_process import GaussianProcessClassifier
+    from sklearn.gaussian_process.kernels import RBF
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, VotingClassifier
+    from sklearn.naive_bayes import GaussianNB
+    from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+    from sklearn.model_selection import cross_val_score, cross_val_predict
+
+    # Retrieve the training data and test data
+    X, y, X_train, X_test, y_train, y_test = data_train_test_for_uids(uids)
+
+    # Specify the classifiers we would like to test
+    classifiers = {
+        "Nearest Neighbors (1)": KNeighborsClassifier(1),
+        "Nearest Neighbors (3)": KNeighborsClassifier(3),
+        "Nearest Neighbors (5)": KNeighborsClassifier(5),
+        "Nearest Neighbors (7)": KNeighborsClassifier(7),
+        "Naive Bayes": GaussianNB(),
+        "Neural Net (30, 30, 30)": MLPClassifier(hidden_layer_sizes=(30,30,30), max_iter=1000),
+        "Neural Net NHL": MLPClassifier(max_iter=1000),
+        "Decision Tree": DecisionTreeClassifier(max_depth=5),
+        "Random Forest (Ensemble)": RandomForestClassifier(max_depth=30, n_estimators=100, max_features=1),
+        "Linear SVM": SVC(kernel="linear", C=0.025),
+        "RBF SVM": SVC(gamma=2, C=1),
+        "AdaBoost": AdaBoostClassifier(),
+        "Voting (Ensemble)": VotingClassifier(estimators=[
+            ('nn1', MLPClassifier(max_iter=1000)),
+            ('nn2', MLPClassifier(max_iter=1000)),
+            ('nn3', MLPClassifier(max_iter=1000))], voting='hard')
+    }
+
+    # Compute the accuracy of each classifier using cross validation
+    accuracies = {}
+    for name, clf in classifiers.items():
+        print('Training', name, '...')
+        scores = cross_val_score(clf, X, y, cv=5)
+        accuracies[name] = np.mean(scores)
+        
+    # Print a sorted list of accuracies to the console
+    i = 1
+    for key, value in sorted(accuracies.items(), key=operator.itemgetter(1), reverse=True):
+        print("%-*s) %-*s: %s" % (2, i, 25, key, value))
+        i += 1
         
 
 def print_header(text):
@@ -261,6 +330,8 @@ def rabbitmq_setup():
 def update_db(cluster_id):
     print(cluster_id)
     clustered_users = cluster_users(5)
+    print(clustered_users)
+    classify_for_uids([2])
     
 
 def main():
@@ -270,9 +341,10 @@ def main():
 
         print_header("Classification")
         classify()
+
+        rabbitmq_setup()
     finally:
         connection.close()
-    rabbitmq_setup()
 
 if __name__ == "__main__":
     main()
