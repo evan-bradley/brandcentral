@@ -111,14 +111,14 @@ classify_naive_bayes <- function(tag_matrix) {
 classify_neural_network <- function(tag_matrix) {
     ## 75% of the sample size
     smp_size <- floor(0.75 * nrow(tag_matrix))
-    
+
     ## set the seed to make your partition reproductible
     set.seed(123)
     train_ind <- sample(seq_len(nrow(tag_matrix)), size = smp_size)
-    
+
     train <- tag_matrix[train_ind, ]
     test <- tag_matrix[-train_ind, ]
-    
+
     train <- cbind(train[, 1:974], class.ind(as.factor(train$Liked)))
     names(train) <- c(names(train)[1:974],"l1","l2")
     n <- names(train)
