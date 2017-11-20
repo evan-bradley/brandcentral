@@ -82,10 +82,12 @@ def cluster_users(number_of_clusters):
 
     # Perform clustering using K Means
     user_weights_array = np.array(list(user_weights.values()))
+    print(user_weights_array.shape)
     kmeans = KMeans(n_clusters=number_of_clusters).fit(user_weights_array)
     print("Number of Clusters:", number_of_clusters)
     print("Cluster Labels:", kmeans.labels_)
     print("Cluster Means:", kmeans.cluster_centers_)
+    return kmean.labels_
 
 def data(vector_length):
     product_vectors = calculate_product_vectors(vector_length)
@@ -201,15 +203,23 @@ def print_header(text):
 
 def rabbitmq_setup():
     import pika
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host='http://brandcentral.xyz'))
+    credentials = pika.PlainCredentials('brandcentral', 'brandcentral')
+    parameters = pika.ConnectionParameters('brandcentral.xyz', 5672, '/', credentials)
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
     def callback(ch, method, properties, body):
+        update_db(1) 
         print(" [x] Received %r" % body)
 
-    channel.basic_consume(callback, queue='hello', no_ack=True)
+    channel.basic_consume(callback, queue='train', no_ack=True)
 
     print(' [*] Waiting for messages. To exit press CTRL+C')
     channel.start_consuming()
+
+def update_db(cluster_id):
+    print(cluster_id)
+    clustered_users = cluster_users(5)
+
 
 def main():
     try:
@@ -220,6 +230,7 @@ def main():
         classify()
     finally:
         connection.close()
+    rabbitmq_setup()
 
 if __name__ == "__main__":
     main()
