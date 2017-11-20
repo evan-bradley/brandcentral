@@ -3,6 +3,7 @@
  */
 'use strict'
 
+const net = require('net')
 const router = require('express').Router()
 const db = require('./db')
 const nodemailer = require('nodemailer')
@@ -15,6 +16,110 @@ const transporter = nodemailer.createTransport({
     pass: 'brandcentral' // generated ethereal password
   }
 })
+
+const HOST = '127.0.0.1'
+const PORT = 6011
+const backoff = 10000
+const queue = []
+
+const client = new net.Socket()
+client.on('error', err => {
+  if (err.code === 'ECONNREFUSED') {
+    setTimeout(connectToR, 10000)
+    backoff = 2 * backoff
+  }
+})
+
+const connectToR = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      client.connect(PORT, HOST, (err) => {
+        console.log(`CONNECTED TO: ${HOST}:${PORT}`)
+        resolve(true)
+      })
+   } catch(e) {
+     reject(false)
+   }
+  })
+}
+connectToR()
+
+const cleanup = () => {
+  try {
+    console.log("Closing connection")
+    client.write(`${JSON.stringify({ cmd: 'bye' })}\n`)
+    client.destroy()
+    process.exit(0)
+  } catch (e) {
+    console.warn(e)
+  }
+}
+
+process.on('SIGINT', cleanup)
+
+client.on('data', async data => {
+  try {
+    const request = queue.shift()
+    const result = JSON.parse(data.toString())[0]
+    const cnnResult = await db.getCNNLikePercent(request.userId, request.product.id)
+    console.log("Got results: ", result)
+    console.log("Queue length: ", queue.length)
+
+    if (queue.length > 0) {
+      const newRequest = queue[0]
+
+      client.write(`${JSON.stringify({
+        cmd: 'classify',
+        product: (await db.getRandomProduct(newRequest.channel)).id,
+        id: newRequest.id
+      })}\n`)
+    }
+
+    if (parseInt(result, 10) === 1 && parseFloat(cnnResult) >= 0.50) {
+      request.res.send({
+        success: true,
+        ...request.product
+      })
+    } else {
+      request.product = await db.getRandomProduct(request.channel)
+      enqueue(request)
+    }
+  } catch(e) {
+    console.error(e)
+  }
+})
+
+const enqueue = async request => {
+  try {
+    queue.push(request)
+    if (queue.length === 1) {
+      client.write(`${JSON.stringify({
+        cmd: 'classify',
+        product: request.product.id,
+        id: request.userId
+      })}\n`)
+      console.log('Sent first request')
+    }
+  } catch(e) {
+    console.error(e)
+  }
+}
+
+const queueRequest = async (userId, channel, count, res) => {
+  try {
+    const request = {
+      userId,
+      product: await db.getRandomProduct(channel),
+      channel,
+      count,
+      res,
+    }
+
+    enqueue(request)
+  } catch(e) {
+    console.error(e)
+  }
+}
 
 /**
  * @api {post} api/profile/:id Update user information
@@ -696,6 +801,23 @@ router.get('/api/product/changepreference/:uid', async (req, res) => {
       message: e
     })
   }
+})
+
+/**
+ * @api {get} /api/product/predicted/:id Gets recommended product
+ * @apiName GetRecommendedProduct
+ * @apiGroup product
+ *
+ * @apiParam {Number} id  ID for the user
+ * @apiQuery {Number} num Number of products
+ *
+ * @apiSuccess {Boolean} success  true
+ * @apiSuccess {Array}   products Array of recommended products
+ * @apiError   {Boolean} success  false
+ * @apiError   {String}  message  Error message
+ */
+router.get('/api/product/predicted/:id', async (req, res) => {
+  queueRequest(req.session.userId, req.params.id, 1, res)
 })
 
 module.exports = router
