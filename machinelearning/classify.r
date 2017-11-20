@@ -19,21 +19,15 @@ mysqldb <- connect_to_db()
 
 # Returns a matrix of tags.
 get_tags <- function(db) {
-    tags <- dbGetQuery(db, "select * from TAG where TAG_ACTIVE = 'YES'")
-    # write.csv(tags, file = "tags.csv")
-    return(tags)
+    dbGetQuery(db, "select * from TAG where TAG_ACTIVE = 'YES'")
 }
 
 get_product_tags <- function(db) {
-    prod_tags <- dbGetQuery(db, "select product_id, tag_id from PROD_TAG_ASSIGN")
-    # write.csv(prod_tags, file = "prod_tags.csv")
-    return(prod_tags)
+    dbGetQuery(db, "select product_id, tag_id from PROD_TAG_ASSIGN")
 }
 
 get_products <- function(db) {
-    products <- dbGetQuery(db, "select product_id from PRODUCT")
-    # write.csv(prod_tags, file = "prod_tags.csv")
-    return(products)
+    dbGetQuery(db, "select product_id from PRODUCT")
 }
 
 # TODO: Make this more generic.
@@ -67,17 +61,19 @@ make_tag_matrix <- function(likes, tags, prod_tags) {
 }
 
 get_likes <- function(db, id) {
-    likes <- dbGetQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
-    # write.csv(likes, file = "likes.csv")
-
-    return(likes)
+    dbGetQuery(db, "SELECT * FROM LIKES")
 }
 
 get_dislikes <- function(db, id) {
-    dislikes <- dbGetQuery(db, paste("select * from DISLIKES WHERE USER_ID =", id, sep = " "))
-    # write.csv(dislikes, file = "dislikes.csv")
+    dbGetQuery(db, "SELECT * FROM DISLIKES")
+}
 
-    return(dislikes)
+get_likes_user <- function(db, id) {
+    dbGetQuery(db, paste("select * from LIKES WHERE USER_ID =", id, sep = " "))
+}
+
+get_dislikes_user <- function(db, id) {
+    dbGetQuery(db, paste("select * from DISLIKES WHERE USER_ID =", id, sep = " "))
 }
 
 store_weight_vector <- function(db, id, vec) {
