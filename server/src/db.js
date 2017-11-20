@@ -378,16 +378,42 @@ pool.getRandomProduct = channel => {
   })
 }
 
-const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID) VALUES(?, ?)`
-pool.likeProduct = (user, product) => {
+const GET_PRODUCT_Q = `SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?`
+pool.getProduct = (productId) => {
   return new Promise(async (resolve, reject) => {
-    if (!user || !product) {
+    try {
+      const results = await pool.query(GET_PRODUCT_Q, [productId])
+      if(results.length == 0) {
+        reject(new Error(`No such product exists with id: ${productId}`))
+        return
+      }
+      const product = {
+        id: results[0].PRODUCT_ID,
+        name: results[0].PROD_NAME,
+        description: results[0].PROD_DESC,
+        pictureUrl: results[0].PROD_PICT_URL,
+        productUrl: results[0].PROD_URL,
+        model: results[0].PROD_MODEL
+      }
+      resolve(product)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+const LIKE_Q = `INSERT INTO LIKES (USER_ID, PRODUCT_ID, CHANNEL_ID, TIME_LIKED) VALUES(?, ?, ?, ?)`
+pool.likeProduct = (user, product, channelId) => {
+  return new Promise(async (resolve, reject) => {
+    if (user === null || product === null  || channelId === null ) {
+      console.log(user)
+      console.log(product)
+      console.log(channelId)
       reject(new Error('Missing a required field'))
       return
     }
 
     try {
-      await pool.query(LIKE_Q, [user, product])
+      await pool.query(LIKE_Q, [user, product, channelId, moment().format('YYYY-MM-DD HH:mm:ss')])
       resolve()
     } catch (e) {
       reject(e)
@@ -448,7 +474,7 @@ pool.unfollowUser = (follower, followee) => {
   })
 }
 
-const FOLLOWING_Q = 'SELECT USERNAME, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
+const FOLLOWING_Q = 'SELECT USERNAME, USER.USER_FNAME, USER.USER_LNAME, USER.USER_EMAIL, FOLLOWING.USER_FOLLOWED_ID FROM (FOLLOWING INNER JOIN USER ON FOLLOWING.USER_FOLLOWED_ID = USER.USER_ID) WHERE FOLLOWING.FOLLOWER_ID = ?'
 pool.getFollowing = user => {
   return new Promise(async (resolve, reject) => {
     if (!user) {
@@ -462,7 +488,10 @@ pool.getFollowing = user => {
         for (let i = 0; i < results.length; i++) {
           const userObject = {
             username: results[i].USERNAME,
-            id: results[i].USER_FOLLOWED_ID
+            id: results[i].USER_FOLLOWED_ID,
+            firstName: results[i].USER_FNAME,
+            lastName: results[i].USER_LNAME,
+            emailHash: (await crypto.hash('md5')(results[i].USER_EMAIL)).toString('hex')
           }
           following.push(userObject)
         }
@@ -497,7 +526,9 @@ pool.getLikedProducts = (user, page, productsPer) => {
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
             productUrl: results[i].PROD_URL,
-            model: results[i].PROD_MODEL
+            model: results[i].PROD_MODEL,
+            channelid: results[i].CHANNEL_ID,
+            time: results[i].TIME_LIKED
           }
           productsarray[i] = product
         }
@@ -582,7 +613,7 @@ pool.subscribeChannel = (user, channel) => {
   })
 }
 
-const SEARCHUSERS_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ? LIMIT ?'
+const SEARCHUSERS_Q = 'SELECT USER_ID, USERNAME, USER_FNAME, USER_LNAME, USER_EMAIL FROM USER WHERE CONCAT(USERNAME, USER_FNAME, USER_LNAME) LIKE ? LIMIT ?'
 pool.getSearchForUsers = (searchFor, limit) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !limit) {
@@ -591,14 +622,17 @@ pool.getSearchForUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEARCHUSERS_Q, [wildcard, limit])
       const userArray = []
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
           const USER = {
             id: results[i].USER_ID,
-            name: results[i].USERNAME
+            username: results[i].USERNAME,
+            firstName: results[i].USER_FNAME,
+            lastName: results[i].USER_LNAME,
+            emailHash: (await crypto.hash('md5')(results[i].USER_EMAIL)).toString('hex')
           }
           userArray[i] = USER
         }
@@ -613,7 +647,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
   })
 }
 
-const NUMUSERSSEARCH_Q = 'SELECT USERNAME, USER_ID FROM USER WHERE USERNAME LIKE ?'
+const NUMUSERSSEARCH_Q = 'SELECT USER_ID, USERNAME, USER_FNAME, USER_LNAME FROM USER WHERE CONCAT(USERNAME, USER_FNAME, USER_LNAME) LIKE ?'
 pool.getNumUsersSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
       if (!searchFor) {
@@ -622,7 +656,7 @@ pool.getNumUsersSearch = searchFor => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMUSERSSEARCH_Q, [wildcard])
       resolve(results.length)
     } catch (e) {
@@ -640,7 +674,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
     const channelArray = []
     if (results.length > 0) {
@@ -662,7 +696,7 @@ pool.getSearchForChannels = (searchFor, limit) => {
 })
 }
 
-const NUMCHANNELSSEARCH_Q = 'SELECT CAHNNEL_NAME, CHANNEL_ID FROM CAHNNEL WHERE CHANNEL_NAME LIKE ?'
+const NUMCHANNELSSEARCH_Q = 'SELECT CHANNEL_NAME, CHANNEL_ID FROM CHANNEL WHERE CHANNEL_NAME LIKE ?'
 pool.getNumChannelsSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor) {
@@ -671,7 +705,7 @@ pool.getNumChannelsSearch = searchFor => {
   }
 
   try {
-    const wildcard = searchFor.concat('%')
+    const wildcard = '%' + searchFor + '%'
     const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
     resolve(results.length)
   } catch (e) {
@@ -690,7 +724,7 @@ pool.getSearchForChannelsAndUsers = (searchFor, limit) => {
     }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(SEACHUSERANDCHANNEL_Q, [wildcard, wildcard, limit])
       const channelUserArray = []
       if (results.length > 0) {
@@ -724,7 +758,7 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
       }
 
     try {
-      const wildcard = searchFor.concat('%')
+      const wildcard = '%' + searchFor + '%'
       const results = await pool.query(NUMCHANNELSANDUSERSEARCH_Q, [wildcard, wildcard])
       resolve(results.length)
     } catch (e) {
@@ -749,6 +783,33 @@ pool.getUserPreference = (userID, productID) => {
         resolve('like')
       } else if (dislikeresults.length > 0) {
         resolve('dislike')
+      } else {
+        resolve('none')
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const REMOVELIKE_Q = 'DELETE FROM LIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+const REMOVEDISLIKE_Q = 'DELETE FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
+pool.changePreference = (userID, productID) => {
+  return new Promise(async (resolve, reject) => {
+      if (!userID || !productID) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const likeresults = await pool.query(CHECKLIKES_Q, [userID, productID])
+      const dislikeresults = await pool.query(CHECKDISLIKES_Q, [userID, productID])
+      if (likeresults.length > 0) {
+        await pool.query(REMOVELIKE_Q, [userID, productID])
+        resolve('removelike')
+      } else if (dislikeresults.length > 0) {
+        await pool.query(REMOVEDISLIKE_Q, [userID, productID])
+        resolve('removedislike')
       } else {
         resolve('none')
       }

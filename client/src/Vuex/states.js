@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 
 export default new Vuex.Store({
   state: {

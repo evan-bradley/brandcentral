@@ -34,15 +34,17 @@ export namespace Classes {
     }
   }
 
-  export class Item {
-    public ProductName : string;
-    public ItemDescription : string;
-    public ImmageURL : string;
+  export class Product {
+    public id: string;
+    public name : string;
+    public description : string;
+    public pictureUrl : string;
 
-    constructor(productName: string = "", itemDescription: string = "", immageURL: string) {
-      this.ProductName = productName;
-      this.ItemDescription = itemDescription;
-      this.ImmageURL = immageURL;
+    constructor(id: string, name: string = "", description: string = "", pictureUrl: string) {
+      this.id = id;
+      this.name = name;
+      this.description = description;
+      this.pictureUrl = pictureUrl;
     }
   }
 }

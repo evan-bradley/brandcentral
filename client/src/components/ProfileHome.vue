@@ -6,13 +6,13 @@
           <p class="menu-label">Settings</p>
           <ul class="menu-list">
             <li>
-              <router-link v-bind:class="{ 'is-active': $route.name == 'EditProfile' }" :to="{ name: 'EditProfile' }">Profile</router-link>
+              <router-link v-bind:class="{ 'is-active': $route.name == 'editProfile' }" :to="{ name: 'editProfile' }">Profile</router-link>
             </li>
             <li>
-              <router-link v-bind:class="{ 'is-active': $route.name == 'ChangePassword' }" :to="{ name: 'ChangePassword' }">Password</router-link>
+              <router-link v-bind:class="{ 'is-active': $route.name == 'changePassword' }" :to="{ name: 'changePassword' }">Password</router-link>
             </li>
             <li>
-              <router-link v-bind:class="{ 'is-active': $route.name == 'ChangeEmail' }" :to="{ name: 'ChangeEmail' }">Email</router-link>
+              <router-link v-bind:class="{ 'is-active': $route.name == 'changeEmail' }" :to="{ name: 'changeEmail' }">Email</router-link>
             </li>
           </ul>
         </aside>

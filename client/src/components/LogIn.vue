@@ -33,11 +33,11 @@
             </div>
             <p class="has-text-centered">
               Don't have an account?
-              <router-link :to="{ name: 'Register' }"><u>Register</u></router-link>
+              <router-link :to="{ name: 'register' }"><u>Register</u></router-link>
             </p>
             <p class="has-text-centered">
               Forgot your password?
-              <router-link :to="{name: 'ResetPassword', params:{token: '/'}}"><u>Reset Password</u></router-link>
+              <router-link :to="{name: 'resetPassword', params:{token: '/'}}"><u>Reset Password</u></router-link>
             </p>
           </div>
         </div>
@@ -50,7 +50,7 @@
   import Register from './Register'
   import ResetPassword from './RecoverPassword'
   import { mapMutations } from 'vuex'
-  var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
+  var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 
   export default {
     name: 'LogIn',
@@ -83,7 +83,7 @@
                 this.user.LastName = response.data.lastName
                 this.user.Email = response.data.email
                 this.$store.commit('setUser', this.user)
-                this.$router.push({ name: 'Browse' })
+                this.$router.push({ name: 'home' })
               } else {
                 this.failureMessage = response.data.message
               }
