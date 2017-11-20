@@ -597,8 +597,8 @@ router.get('/api/channels/:id', async (req, res) => {
 
 /**
  * @api {get} api/user/likedproducts/:id Get a user's liked products
- * @apiName GetChannel
- * @apiGroup Channel
+ * @apiName GetLikedProducts
+ * @apiGroup user
  *
  * @apiParam {Number} id          User's ID
  * @apiParam {Number} page        Page number (query)
@@ -643,7 +643,7 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
 /**
  * @api {get} /api/users/search Search for users
  * @apiName SearchForUsers
- * @apiGroup
+ * @apiGroup users
  *
  * @apiParam {String} query entered search word
  * @apiParam {Number} limit limit for return (query)
@@ -678,7 +678,7 @@ router.get('/api/users/search', async (req, res) => {
 /**
  * @api {get} /api/channel/search/:searchFor Search for users
  * @apiName SearchForChannels
- * @apiGroup
+ * @apiGroup channel
  *
  * @apiParam {String} query entered search word
  * @apiParam {Number} limit limit for return (query)
@@ -713,7 +713,7 @@ router.get('/api/channel/search', async (req, res) => {
 /**
  * @api {get} /api/search Search for users and channels
  * @apiName SearchForChannelsAndUsers
- * @apiGroup
+ * @apiGroup product
  *
  * @apiParam {String} query      entered search word
  * @apiParam {Number} limit      limit for return (query)
@@ -750,8 +750,8 @@ router.get('/api/search', async (req, res) => {
 
 /**
  * @api {get} /api/product/userpreference/:uid returns what input a user has given for a product
- * @apiName userpreference
- * @apiGroup
+ * @apiName UserPreference
+ * @apiGroup product
  *
  * @apiParam {Number} uid user id that you to check their preference for
  * @apiQuery {Number} pid product id to check (query)
@@ -778,8 +778,8 @@ router.get('/api/product/userpreference/:uid', async (req, res) => {
 
 /**
  * @api {get} /api/product/changepreference/:uid removes the already entered preference of a product
- * @apiName changepreference
- * @apiGroup
+ * @apiName ChangePreference
+ * @apiGroup product
  *
  * @apiParam {Number} uid user id that you to check their preference for
  * @apiQuery {Number} pid product id to check (query)
