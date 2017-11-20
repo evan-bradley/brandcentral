@@ -185,11 +185,11 @@ pool.updateProfile = info => {
       }
 
       if (info.username) {
-        var res = await pool.query('SELECT count(*) as count FROM USER WHERE USERNAME = ? AND USER_ID != ?', [info.username, info.id])  
+        var res = await pool.query('SELECT count(*) as count FROM USER WHERE USERNAME = ? AND USER_ID != ?', [info.username, info.id])
         if (res[0].count) {
           throw new Error('Username taken')
         }
-        await pool.query('UPDATE USER SET USERNAME = ? WHERE USER_ID = ?', [info.username, info.id])  
+        await pool.query('UPDATE USER SET USERNAME = ? WHERE USER_ID = ?', [info.username, info.id])
       }
 
       // Check to make sure there are attributes to set
@@ -355,7 +355,8 @@ const GET_RAND_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN 
 const GET_GENERAL_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID);'
 pool.getRandomProduct = channel => {
   return new Promise(async (resolve, reject) => {
-    if (!channel) {
+    if (!channel || parseInt(channel) === 0) {
+    console.log(channel)
       try {
         const generalresults = await pool.query(GET_GENERAL_PRODUCT_Q, [])
 
@@ -899,7 +900,7 @@ pool.deleteUserPreference = (userID, productID) => {
       reject(new Error('Missing required field'))
       return
     }
-    
+
     try {
       await pool.query(REMOVELIKE_Q, [userID, productID])
       await pool.query(REMOVEDISLIKE_Q, [userID, productID])
