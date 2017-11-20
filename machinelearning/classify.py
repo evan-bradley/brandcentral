@@ -87,7 +87,7 @@ def cluster_users(number_of_clusters):
     print("Number of Clusters:", number_of_clusters)
     print("Cluster Labels:", kmeans.labels_)
     print("Cluster Means:", kmeans.cluster_centers_)
-    return kmean.labels_
+    return kmeans.labels_
 
 def data(vector_length):
     product_vectors = calculate_product_vectors(vector_length)
@@ -114,7 +114,48 @@ def data(vector_length):
             if item['uid'] not in user_weights:
                 user_weights[item['uid']] = np.zeros(vector_length)
             user_weights[item['uid']] = np.subtract(user_weights[item['uid']], product_vectors[item['pid']])
-        
+
+        print(len(user_weights))
+        # Multiply each product by the like/dislike and add it to the dataset
+        dataset = {'data':[], 'label':[]}
+        for item in like_results:
+            dataset['data'].append(user_weights[item['uid']] * product_vectors[item['pid']])
+            dataset['label'].append(1)
+        for item in dislike_result:
+            dataset['data'].append(user_weights[item['uid']] * product_vectors[item['pid']])
+            dataset['label'].append(0)
+        return dataset
+
+def data_for_uid(vector_length, uid):
+    product_vectors = calculate_product_vectors(vector_length)
+
+    with connection.cursor() as cursor:
+        like_results = []
+        dislike_result = []
+        for user_id in uid:
+            # Get the products that the user likes
+            sql = "SELECT USER_ID as uid, PRODUCT_ID as pid FROM LIKES WHERE USER_ID = " + str(user_id)
+            cursor.execute(sql)
+            like_results += cursor.fetchall()
+
+            # Get the products that the user dislikes
+            sql = "SELECT USER_ID as uid, PRODUCT_ID as pid FROM DISLIKES WHERE USER_ID = " + str(user_id)
+            cursor.execute(sql)
+            dislike_result += cursor.fetchall()
+
+        # Construct the user wights by adding liked products and subtracting disliked products
+        user_weights = {}
+        for item in like_results:
+            if item['uid'] not in user_weights:
+                user_weights[item['uid']] = np.zeros(vector_length)
+            user_weights[item['uid']] = np.add(user_weights[item['uid']], product_vectors[item['pid']])
+
+        for item in dislike_result:
+            if item['uid'] not in user_weights:
+                user_weights[item['uid']] = np.zeros(vector_length)
+            user_weights[item['uid']] = np.subtract(user_weights[item['uid']], product_vectors[item['pid']])
+
+        print(len(user_weights))
         # Multiply each product by the like/dislike and add it to the dataset
         dataset = {'data':[], 'label':[]}
         for item in like_results:
@@ -127,6 +168,7 @@ def data(vector_length):
 
 def data_train_test():
     dataset = data(200)
+    dataset = data_for_uid(200, [2])
     X = dataset['data']
     y = dataset['label']
 
@@ -219,7 +261,7 @@ def rabbitmq_setup():
 def update_db(cluster_id):
     print(cluster_id)
     clustered_users = cluster_users(5)
-
+    
 
 def main():
     try:
