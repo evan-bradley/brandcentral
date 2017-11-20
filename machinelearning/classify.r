@@ -1,6 +1,11 @@
+needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet", "nnet", "caret", "jsonlite")
+
+install_packages <- function() {
+    install.packages(needed)
+}
+
 # Loads necessary packages into the system.
 load_packages <- function() {
-    needed <- c("DBI", "RMySQL", "e1071", "rpart", "gridExtra", "neuralnet", "nnet", "caret", "jsonlite")
     lapply(needed, require, character.only = TRUE)
 }
 load_packages()
