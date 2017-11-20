@@ -911,4 +911,27 @@ pool.deleteUserPreference = (userID, productID) => {
   })
 }
 
+const GET_CNN_LIKE_PERCENT_Q = `select LIKE_PCT from (USER INNER JOIN CNN_RESULTS
+ON USER.USER_CLUSTER_ID = CNN_RESULTS.CLUSTER_ID) WHERE USER_ID = ? AND PRODUCT_ID = ?`
+pool.getCNNLikePercent = (userID, productID) => {
+  return new Promise(async (resolve, reject) => {
+      if (!userID || !productID) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const results = await pool.query(GET_CNN_LIKE_PERCENT_Q, [ userID, productID ])
+ 
+      if (results.length > 0) {
+        resolve(results[0].LIKE_PCT)
+      } else {
+        reject(new Error('No product found'))
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 module.exports = pool
