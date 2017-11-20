@@ -30,34 +30,18 @@ get_products <- function(db) {
     dbGetQuery(db, "select product_id from PRODUCT")
 }
 
-# TODO: Make this more generic.
-make_product_matrix <- function(tags, prod_tags) {
-    for(product in 1:3703) {
+make_tag_matrix <- function(products, tags, prod_tags) {
+    for(product in products$PRODUCT_ID) {
         product_id <- product
-        print(product_id)
         prod_tag_list <- as.matrix((tags$TAG_ID %in% prod_tags[prod_tags$product_id == product_id,]$tag_id)*1)
-        if(!exists("prod_matrix")) {
-            prod_matrix <- t(prod_tag_list)
+        if(!exists("product_tag_matrix")) {
+            product_tag_matrix <- t(prod_tag_list)
         } else {
-            prod_matrix <- rbind(prod_matrix, t(prod_tag_list))
+            product_tag_matrix <- rbind(product_tag_matrix, t(prod_tag_list))
         }
     }
 
-    return(prod_matrix)
-}
-
-make_tag_matrix <- function(likes, tags, prod_tags) {
-    for(product in likes$PRODUCT_ID) {
-        product_id <- product
-        prod_tag_list <- as.matrix((tags$TAG_ID %in% prod_tags[prod_tags$product_id == product_id,]$tag_id)*1)
-        if(!exists("like_tag_matrix")) {
-            like_tag_matrix <- t(prod_tag_list)
-        } else {
-            like_tag_matrix <- rbind(like_tag_matrix, t(prod_tag_list))
-        }
-    }
-
-    return(like_tag_matrix)
+    return(product_tag_matrix)
 }
 
 get_likes <- function(db, id) {
