@@ -1,7 +1,8 @@
 <template>
   <div class="columns is-multiline">
     <div class="column is-12" v-show="loggedIn">
-      <button class="is-pulled-right button is-primary" @click="LogOut">Log out</button>
+      <Navbar :user="user" v-on:LogOut="LogOut" />
+      <!-- <button class="is-pulled-right button is-primary" @click="LogOut">Log out</button> -->
     </div>
     <div class="column is-12">
       <LogIn v-show="display === 1"  v-on:navigate="changeDisplay" v-on:LogIn="LogIn" />
@@ -23,6 +24,7 @@ import LogIn from "./LogIn.vue"
 import Register from "./Register.vue"
 import RecoverPassword from "./RecoverPassword.vue"
 import Channel from "./Channel.vue"
+import Navbar from "./Navbar.vue"
 var Classes = require('../TypeScriptFolder/Compliled/Classes').Classes
 var axios = require("axios");
 var instance = axios.create({
@@ -42,7 +44,8 @@ export default {
     LogIn: LogIn,
     Register: Register,
     RecoverPassword: RecoverPassword,
-    Channel: Channel
+    Channel: Channel,
+    Navbar: Navbar
   },
   methods: {
     changeDisplay(number) {
