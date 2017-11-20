@@ -1,12 +1,12 @@
 <template>
   <div class="hero is-fullheight">
-    <div class="hero-body">
+    <div class="hero-body" style="padding: 10px 24px;">
       <div class="container">
-        <div class="columns is-vcentered">
+        <div class="columns is-centered">
           <div class="column is-4 is-offset-4">
-            <h4 class="title has-text-centered is-4">
-              <!-- <img src="../Assets/brand_central_icon.png" style="max-width: 20%"> -->
-            </h4>
+            <!--<h4 class="title has-text-centered is-4">
+               <img src="../Assets/brand_central_icon.png" style="max-width: 20%"> 
+            </h4>-->
             <div class="box">
               <h4 class="title has-text-centered is-4">Register Account</h4>
               <article class="message is-danger" v-show="failureMessage">

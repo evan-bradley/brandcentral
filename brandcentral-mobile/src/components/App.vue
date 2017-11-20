@@ -1,19 +1,19 @@
 <template>
   <div class="columns is-multiline">
-    <div class="column is-12" v-show="loggedIn">
+    <div class="column is-12" v-show="loggedIn" :class="{ 'no-pading-or-margins' : (!loggedIn) }">
       <Navbar :user="user" v-on:LogOut="LogOut" />
       <!-- <button class="is-pulled-right button is-primary" @click="LogOut">Log out</button> -->
     </div>
-    <div class="column is-12">
+    <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 1) }">
       <LogIn v-show="display === 1"  v-on:navigate="changeDisplay" v-on:LogIn="LogIn" />
     </div>
-    <div class="column is-12">
+    <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 2) }">
       <Register v-show="display === 2" v-on:navigate="changeDisplay"/>
     </div>
-    <div class="column is-12">
+    <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 3) }">
       <RecoverPassword v-show="display === 3" v-on:navigate="changeDisplay"/>
     </div>
-    <div class="column is-12">
+    <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 4 && loggedIn) }"> 
       <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :userId="user.Id"/>
     </div>
   </div>
