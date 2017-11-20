@@ -155,11 +155,6 @@ get_weighted_training_data <- function() {
     prod_tags <- get_product_tags(mydb)
     likes <- get_likes(mydb)
     dislikes <- get_dislikes(mydb)
-    #tags <- read.csv("tags.csv")
-    #prod_tags <- read.csv("prod_tags.csv")
-
-    #likes <- read.csv("likes.csv")
-    #dislikes <- read.csv("dislikes.csv")
 
     likes_matrix <- make_tag_matrix(likes, tags, prod_tags)
     dislikes_matrix <- make_tag_matrix(dislikes, tags, prod_tags)
@@ -179,13 +174,30 @@ get_weighted_training_data <- function() {
 
     tag_matrix <- data.frame(rbind(class_1, class_2))
 
-    store_weight_vector(mydb, id, total_sums)
-
     return(tag_matrix)
+    #return(list(tag_matrix, total_sums))
 }
 
-train_classifiers <- function(id, tag_matrix) {
+make_user_weight_vector <- function() {
+    mydb = mysqldb
+    tags <- get_tags(mydb)
+    prod_tags <- get_product_tags(mydb)
+    likes <- get_likes_user(mydb, id)
+    dislikes <- get_dislikes_user(mydb, id)
+
+    likes_matrix <- make_tag_matrix(likes, tags, prod_tags)
+    dislikes_matrix <- make_tag_matrix(dislikes, tags, prod_tags)
+
+    likes_matrix_sums <- colSums(likes_matrix)
+    dislikes_matrix_sums <- colSums(dislikes_matrix)
+    total_sums <- likes_matrix_sums - dislikes_matrix_sums
+
+    store_weight_vector(mydb, id, total_sums)
+}
+
+train_classifiers <- function(tag_matrix) {
     nb <- naiveBayes(as.factor(Liked) ~ ., tag_matrix)
+    lr <- lm(as.factor(Liked) ~ ., tag_matrix)
     dt <- rpart(as.factor(Liked) ~ ., tag_matrix, method="class")
 
     tag_matrix <- cbind(tag_matrix[, 1:974], class.ind(as.factor(tag_matrix$Liked)))
@@ -194,49 +206,45 @@ train_classifiers <- function(id, tag_matrix) {
     f <- as.formula(paste("l1 + l2 ~", paste(n[!n %in% c("l1","l2")], collapse = " + ")))
     nn <- neuralnet(f, data = tag_matrix, hidden = c(50, 50), act.fct = "logistic", linear.output = FALSE, lifesign = "minimal")
 
-    saveRDS(nb, file = paste(paste("user_nb", id, sep="_"), "rds", sep="."))
-    saveRDS(dt, file = paste(paste("user_dt", id, sep="_"), "rds", sep="."))
-    saveRDS(nn, file = paste(paste("user_nn", id, sep="_"), "rds", sep="."))
+    saveRDS(nb, file = "general_nb.rds")
+    saveRDS(lr, file = "general_lr.rds")
+    saveRDS(dt, file = "general_dt.rds")
+    saveRDS(nn, file = "general_nn.rds")
 }
 
-classify_product <- function(id, product, weight) {
-    #nb <- readRDS(paste(paste("user_nb", id, sep="_"), "rds", sep="."))
-    dt <- readRDS(paste(paste("user_dt", id, sep="_"), "rds", sep="."))
-    #nn <- readRDS(paste(paste("user_nn", id, sep="_"), "rds", sep="."))
-    print("Read models")
-
-    weighted_product <-products[product, ] * as.numeric(unlist(weight))
-    dt_pred <- predict(dt, weighted_product)
+classify_product <- function(model, product, weight) {
+    weighted_product <- product * as.numeric(unlist(weight))
+    predict(model, weighted_product)
 }
 
 server <- function() {
-    tags <- read.csv("tags.csv")
-    prod_tags <- read.csv("prod_tags.csv")
-    print("Read CSV")
-    if(file.exists("products.csv")) {
-        products <- read.csv("products.csv")
-    } else {
-        products <- make_product_matrix(tags, prod_tags)
-        write.csv(products, file = "products.csv")
-    }
+    db = mysqldb
+    tags <- get_tags(db)
+    prod_tags <- get_product_tags(db)
+    products <- get_products(db)
+    print("Read tables")
+    nb_model <- readRDS("general_nb.rds")
+    print("Read model")
 
-  while(TRUE) {
-    writeLines("Listening...")
-    con <- socketConnection(host="localhost", port = 6011, blocking=FALSE,
-                            server=TRUE, open="r+")
     while(TRUE) {
-        data <- readLines(con, 1)
-        msg <- fromJSON(data)
-        if (msg$cmd == "classify") {
-            response <- classify_product(msg$id, msg$start, msg$count, tags, prod_tags, products)
-        } else if (msg$cmd == "train") {
-            response <- train_classifiers(msg$id, get_weighted_training_data(msg$id))
-        } else if (msg$cmd == "bye") {
-            close(con)
-            break;
+        writeLines("Listening...")
+        con <- socketConnection(host="localhost", port = 6011, blocking=TRUE,
+                                server=TRUE, open="r+")
+        while(TRUE) {
+            data <- readLines(con, 1)
+            msg <- fromJSON(data)
+            print(msg)
+            if (msg$cmd == "classify") {
+                response <- classify_product(nb_model, products[as.numeric(msg$product), ],
+                                             get_weight_vector(mysqldb, msg$id))
+            } else if (msg$cmd == "train") {
+                response <- train_classifiers(msg$id, get_weighted_training_data(msg$id))
+            } else if (msg$cmd == "bye") {
+                close(con)
+                break;
+            }
+            writeLines(toJSON(response), con)
         }
-        writeLines(toJSON(response), con) 
     }
-  }
 }
 server()
