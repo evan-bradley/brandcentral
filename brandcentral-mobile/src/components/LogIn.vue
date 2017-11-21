@@ -1,8 +1,8 @@
 <template>
-  <div class="hero is-fullheight">
+  <div class="hero is-almost-fulheight">
     <div class="hero-body">
       <div class="container">
-        <div class="columns is-vcentered">
+        <div class="columns is-centered">
           <div class="column is-4 is-offset-4">
             <h4 class="title has-text-centered is-4">
               <!-- <imag src="../Assets/brand_central_icon.png" style="max-width: 20%" alt="BrandCentral" /> -->

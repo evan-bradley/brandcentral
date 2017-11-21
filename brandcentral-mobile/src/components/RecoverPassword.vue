@@ -1,5 +1,5 @@
 <template>
-  <div class="hero is-fullheight">
+  <div class="hero is-almost-fulheight">
     <div v-if="true" class="hero-body">
       <div class="container">
         <div class="columns is-vcentered">

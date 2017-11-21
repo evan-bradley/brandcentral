@@ -1,5 +1,5 @@
 <template>
-  <div class="hero is-fullheight">
+  <div class="hero is-almost-fulheight">
     <div class="hero-body" style="padding: 10px 24px;">
       <div class="container">
         <div class="columns is-centered">
