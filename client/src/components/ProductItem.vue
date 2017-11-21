@@ -53,11 +53,21 @@
                   {{ displayProduct.name}}
                 </p>
               </div>
+              <br>
               <p class="has-text-left is-pulled-left">
                 {{ displayProduct.description}}
               </p>
             </div>
           </div>
+          <br>
+          <p v-if="displayProduct.productUrl != ''" class="control display-on-hover">
+            <a class="button " v-bind:href="displayProduct.productUrl" @click.stop="">
+              <span class="icon is-small">
+                <i class="material-icons md-16">shopping_cart</i>
+              </span>
+              <span> Show me on Amazon</span>
+            </a>
+          </p>
         </div>
       </div>
     </div>
@@ -166,6 +176,13 @@
                         </span>
                       </a>
                     </p>
+                    <p v-if="displayProduct.productUrl != ''" class="control display-on-hover">
+                      <a class="button like-button" v-bind:href="displayProduct.productUrl" @click.stop="">
+                        <span class="icon is-small">
+                          <i class="material-icons md-16">shopping_cart</i>
+                        </span>
+                      </a>
+                    </p>
                   </div>
                 </div>
               </div>
@@ -259,11 +276,13 @@ export default {
       this.$http.get(`/api/product/${productId}`)
         .then(response => { // Success
           if (response.data.success) {
+            console.log(response)
             this.displayProduct = new Classes.Product(
               response.data.product.id,
               response.data.product.name,
               response.data.product.description,
-              response.data.product.pictureUrl)
+              response.data.product.pictureUrl,
+              response.data.product.productUrl)
           }
         }, response => { // Error
           console.log(response)

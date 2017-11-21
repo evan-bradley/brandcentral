@@ -36,13 +36,15 @@ var Classes;
     }());
     Classes.PasswordVerification = PasswordVerification;
     var Product = /** @class */ (function () {
-        function Product(id, name, description, pictureUrl) {
+        function Product(id, name, description, pictureUrl, productUrl) {
             if (name === void 0) { name = ""; }
             if (description === void 0) { description = ""; }
+            if (productUrl === void 0) { productUrl = ""; }
             this.id = id;
             this.name = name;
             this.description = description;
             this.pictureUrl = pictureUrl;
+            this.productUrl = productUrl;
         }
         return Product;
     }());

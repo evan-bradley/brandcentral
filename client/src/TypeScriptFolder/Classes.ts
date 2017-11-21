@@ -39,12 +39,14 @@ export namespace Classes {
     public name : string;
     public description : string;
     public pictureUrl : string;
+    public productUrl : string;
 
-    constructor(id: string, name: string = "", description: string = "", pictureUrl: string) {
+    constructor(id: string, name: string = "", description: string = "", pictureUrl: string, productUrl: string = "") {
       this.id = id;
       this.name = name;
       this.description = description;
       this.pictureUrl = pictureUrl;
+      this.productUrl = productUrl;
     }
   }
 }

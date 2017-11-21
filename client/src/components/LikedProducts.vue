@@ -82,7 +82,7 @@
         .then(response => {
           if (response.data.success) {
             response.body.products.forEach(function (el) {
-              var product = new Classes.Product(el.id, el.name, el.description, el.pictureUrl)
+              var product = new Classes.Product(el.id, el.name, el.description, el.pictureUrl, el.productUrl)
               newlikedProducts.push(product)
             }, this)
             this.likedProducts = newlikedProducts
