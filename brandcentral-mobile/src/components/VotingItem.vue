@@ -80,11 +80,6 @@
           itemID: ''
         }
       },
-      computed: {
-        CurrentItem: () => {
-          return this.item
-        }
-      },
       watch: {
         channel () {
           this.next()
@@ -95,7 +90,7 @@
           console.log('clicked previous')
         },
         next () {
-          instance.get(`/api/product/random?channelId=2`)
+          instance.get(`/api/product/random?channelId=${this.channel}`)
             .then(response => { // Success
               if (response.data.success) {
                 this.itemName = response.data.product.name.substring(0, 30)
@@ -111,30 +106,32 @@
             })
         },
         like () {
-          instance.post(`/api/product/like/${this.itemID}`)
-            .then(response => { // Success
-              if (response.data.success) {
-                this.failureMessage = response.data.message
-                console.log('liked ' + this.itemName)
-                this.next()
-              }
-            }, response => { // Error
-              console.log(response)
-              this.failureMessage = response.data.message
-            })
+          this.next()
+          // instance.post(`/api/product/like/${this.itemID}`)
+          //   .then(response => { // Success
+          //     if (response.data.success) {
+          //       this.failureMessage = response.data.message
+          //       console.log('liked ' + this.itemName)
+          //       this.next()
+          //     }
+          //   }, response => { // Error
+          //     console.log(response)
+          //     this.failureMessage = response.data.message
+          //   })
         },
         dislike () {
-          instance.post(`/api/product/dislike/${this.itemID}`)
-            .then(response => { // Success
-              if (response.data.success) {
-                this.failureMessage = response.data.message
-                console.log('disliked ' + this.itemName)
-                this.next()
-              }
-            }, response => { // Error
-              console.log(response)
-              this.failureMessage = response.data.message
-            })
+          this.next()
+          // instance.post(`/api/product/dislike/${this.itemID}`)
+          //   .then(response => { // Success
+          //     if (response.data.success) {
+          //       this.failureMessage = response.data.message
+          //       console.log('disliked ' + this.itemName)
+          //       this.next()
+          //     }
+          //   }, response => { // Error
+          //     console.log(response)
+          //     this.failureMessage = response.data.message
+          //   })
         }
       },
       mounted () {
