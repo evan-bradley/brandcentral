@@ -71,4 +71,3 @@ def updatePredictions():
             print(strUpdate)
             cursor.execute(strUpdate)
             db.commit()
-updatePredictions()

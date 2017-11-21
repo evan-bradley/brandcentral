@@ -243,7 +243,7 @@ def trainClusters(iterations):
         cursor.execute(dislikeStmt)
         for prod in range(0, cursor.rowcount):
             product = cursor.fetchone()
-            urllib.request.urlretrieve(product[1], train_path+'/Like/product'+str(prod)+'.jpg')
+            urllib.request.urlretrieve(product[1], train_path+'/Dislike/product'+str(prod)+'.jpg')
 
         train(num_iteration=iterations, clusterNum=cluster)
         shutil.rmtree('./'+train_path+'/Like')

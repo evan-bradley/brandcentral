@@ -1,2 +1,6 @@
-model_checkpoint_path: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model0"
-all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model0"
+model_checkpoint_path: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model5"
+all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model1"
+all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model2"
+all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model3"
+all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model4"
+all_model_checkpoint_paths: "C:\\Users\\bjack\\Documents\\brandcentralstation\\CNN/like-dislike-model5"
