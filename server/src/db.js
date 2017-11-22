@@ -922,7 +922,7 @@ pool.getCNNLikePercent = (userID, productID) => {
 
     try {
       const results = await pool.query(GET_CNN_LIKE_PERCENT_Q, [ userID, productID ])
- 
+
       if (results.length > 0) {
         resolve(results[0].LIKE_PCT)
       } else {
@@ -934,4 +934,34 @@ pool.getCNNLikePercent = (userID, productID) => {
   })
 }
 
+const POPULAR_CHANNELS_QUERY = `
+SELECT CHANNEL_ID,
+  CHANNEL_NAME,
+  count(*) CHANNEL_RANK
+FROM (
+  SELECT CHANNEL.CHANNEL_ID,
+    CHANNEL_NAME,
+    TIME_LIKED
+  FROM LIKES JOIN CHANNEL
+  ON CHANNEL.CHANNEL_ID = LIKES.CHANNEL_ID) AS CHANNEL_LIKES
+WHERE TIME_LIKED > NOW() - INTERVAL ? DAY
+GROUP BY CHANNEL_LIKES.CHANNEL_ID
+ORDER BY CHANNEL_RANK desc
+LIMIT ?;`
+pool.getPopularChannels = async (limit = 12, days_ago = 7) => {
+  try {
+    const results = await pool.query(POPULAR_CHANNELS_QUERY, [days_ago, parseInt(limit)])
+    var channelArray = results.map((result) => {
+      return {
+        id: result.CHANNEL_ID,
+        name: result.CHANNEL_NAME,
+        number_of_likes: result.CHANNEL_RANK
+      }
+    })
+    return channelArray
+    resolve(channelArray)
+  } catch (e) {
+    throw e
+  }
+}
 module.exports = pool

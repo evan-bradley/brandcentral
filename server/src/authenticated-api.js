@@ -596,6 +596,33 @@ router.get('/api/channels/:id', async (req, res) => {
 })
 
 /**
+ * @api {get} api/channel/trending Get a list of the trending channels
+ * @apiName GetTrendingChannels
+ * @apiGroup Channel
+ *
+ * @apiParam {Number} limit Maximum number of channels to retrieve.
+ * @apiParam {Number} days_ago The number of days we want to get trending
+ * channels.
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Object}  channels Trending channels
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/channel/trending', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      channels: await db.getPopularChannels(req.query.limit, req.query.days_ago)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+/**
  * @api {get} api/user/likedproducts/:id Get a user's liked products
  * @apiName GetLikedProducts
  * @apiGroup user
@@ -738,7 +765,7 @@ router.get('/api/channel/search', async (req, res) => {
 router.get('/api/search', async (req, res) => {
   if (req.query.query === undefined) {
     req.query.query = ""
-  }  
+  }
   if (req.query.limit === undefined) {
     req.query.limit = 10
   }
