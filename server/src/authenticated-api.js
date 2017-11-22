@@ -858,4 +858,55 @@ router.get('/api/product/predicted/:id', async (req, res) => {
   queueRequest(req.session.userId, req.params.id, 1, res)
 })
 
+/**
+ * @api {post} api/mobile/product/like/:id Like a product
+ * @apiName LikeProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product ID
+ * @apiParam {Number} channelId Id of the channel where the product was liked
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.post('/api/mobile/product/like/:id', async (req, res) => {
+    try {
+      await db.likeProduct(req.body.userId, req.params.id, req.body.channelId)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
+/**
+ * @api {post} api/mobile/product/dislike/:id Dislike a product
+ * @apiName DislikeProduct
+ * @apiGroup Product
+ *
+ * @apiParam {Number} id Product ID
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.post('/api/mobile/product/dislike/:id', async (req, res) => {
+    try {
+      await db.dislikeProduct(req.body.userId, req.params.id)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
 module.exports = router
