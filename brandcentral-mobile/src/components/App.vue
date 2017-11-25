@@ -5,7 +5,7 @@
       <!-- <button class="is-pulled-right button is-primary" @click="LogOut">Log out</button> -->
     </div>
     <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 1) }">
-      <LogIn v-show="display === 1"  v-on:navigate="changeDisplay" v-on:LogIn="LogIn" />
+      <LogIn v-show="display === 1"  v-on:navigate="changeDisplay" v-on:LogIn="LogIn" :loggedIn="loggedIn" />
     </div>
     <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 2) }">
       <Register v-show="display === 2" v-on:navigate="changeDisplay"/>

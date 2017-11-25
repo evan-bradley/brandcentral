@@ -10,13 +10,13 @@
             </div>
           </div>
           <div class="column is-12">
-            <voting-item :item ="this.currentItem" :channel="this.channel.id" />
+            <voting-item :item ="this.currentItem" :channel="this.channel.id" :userId="this.userId" />
           </div>
       </div>
       <div class="columns is-mobile is-multiline is-centered" v-show="!(channelId)">
-        <div class="column is-4" v-for="item in channels" :key="item.id">
-          <button class="button is-primary" @click="channelId = item.id">
-            <i class="fa fa-tag" style="opacity: 0.8; margin-right: 5px;" aria-hidden="true"></i> {{ item.name }}
+        <div class="column is-6" v-for="item in channels" :key="item.id">
+          <button class="button is-primary is-inverted channel-select-buttons subtitle" @click="channelId = item.id">
+            <i class="fa fa-tag" style="opacity: 0.8; margin-right: 8px;" aria-hidden="true"></i> {{ item.name }}
             </button>
         </div>
       </div>

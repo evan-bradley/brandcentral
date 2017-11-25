@@ -70,7 +70,7 @@
   })
 
     export default {
-      props: ['item', 'channel'],
+      props: ['item', 'channel', 'userId'],
       data () {
         return {
           displayMode: true,
@@ -106,32 +106,40 @@
             })
         },
         like () {
-          this.next()
-          // instance.post(`/api/product/like/${this.itemID}`)
-          //   .then(response => { // Success
-          //     if (response.data.success) {
-          //       this.failureMessage = response.data.message
-          //       console.log('liked ' + this.itemName)
-          //       this.next()
-          //     }
-          //   }, response => { // Error
-          //     console.log(response)
-          //     this.failureMessage = response.data.message
-          //   })
+          const payload = {
+            userId: this.userId,
+            channelId: this.channel
+          }
+
+          instance.post(`/api/mobile/product/like/${this.itemID}`, payload)
+            .then(response => { // Success
+              if (response.data.success) {
+                this.failureMessage = response.data.message
+                console.log('liked ' + this.itemName)
+                this.next()
+              }
+            }, response => { // Error
+              console.log(response)
+              this.failureMessage = response.data.message
+            })
         },
         dislike () {
-          this.next()
-          // instance.post(`/api/product/dislike/${this.itemID}`)
-          //   .then(response => { // Success
-          //     if (response.data.success) {
-          //       this.failureMessage = response.data.message
-          //       console.log('disliked ' + this.itemName)
-          //       this.next()
-          //     }
-          //   }, response => { // Error
-          //     console.log(response)
-          //     this.failureMessage = response.data.message
-          //   })
+          const payload = {
+            userId: this.userId,
+            channelId: this.channel
+          }
+
+          instance.post(`/api/mobile/product/dislike/${this.itemID}`, payload)
+            .then(response => { // Success
+              if (response.data.success) {
+                this.failureMessage = response.data.message
+                console.log('disliked ' + this.itemName)
+                this.next()
+              }
+            }, response => { // Error
+              console.log(response)
+              this.failureMessage = response.data.message
+            })
         }
       },
       mounted () {

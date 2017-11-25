@@ -56,6 +56,17 @@
 
   export default {
     name: 'LogIn',
+    props: ['loggedIn'],
+    watch: {
+      loggedIn: function(newValue, oldValue) {
+        console.log('new value: ' + newValue)
+        console.log('old value' + oldValue)
+        if(newValue === false) {
+          this.user = new Classes.User()
+          this.failureMessage = ''
+        }
+      }
+    },
     data () {
       return {
         user: new Classes.User(),
