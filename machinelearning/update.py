@@ -218,12 +218,12 @@ def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
 
     with connection.cursor() as cursor:
         # Get the products that the user likes
-        sql = "SELECT PRODUCT_ID as pid FROM LIKES WHERE USER_ID = {user_id}"
+        sql = "SELECT PRODUCT_ID as pid FROM LIKES WHERE USER_ID = "+str(user_id)
         cursor.execute(sql)
         like_results = cursor.fetchall()
 
         # Get the products that the user dislikes
-        sql = "SELECT PRODUCT_ID as pid FROM DISLIKES WHERE USER_ID = {user_id}"
+        sql = "SELECT PRODUCT_ID as pid FROM DISLIKES WHERE USER_ID = "+str(user_id)
         cursor.execute(sql)
         dislike_result = cursor.fetchall()
 
@@ -252,7 +252,7 @@ def update_predictions_for_user(user_id):
     product_vectors = calculate_product_vectors()
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM USER WHERE USER_ID = {user_id}")
+        cursor.execute("SELECT * FROM USER WHERE USER_ID = "+str(user_id))
         user = cursor.fetchone()
         user_id = user['USER_ID']
         cluster_id = user['USER_CLUSTER_ID']
@@ -262,15 +262,15 @@ def update_predictions_for_user(user_id):
         for product_id, product_vector in product_vectors.items():
             input_vector = product_vector * user_weight_vector
             prediction = classification_models[cluster_id].predict([input_vector])
-            #TODO: Store the prediction in a table using prediction, user_id, product_id.
-            cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS ({user_id}, {product_id}, {prediction})")
+            cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS (USER_ID, PRODUCT_ID, PREDICTION) VALUES ("+str(user_id)+", "+str(product_id)+", "+str(prediction[0])+") ON DUPLICATE KEY UPDATE PREDICTION = "+str(prediction[0]))
             connection.commit()
 
 def main():
     try:
         train_models_for_clusters()
-        CNNUpdate.update()
-        rabbitmq_start()
+        update_predictions_for_user(2)
+        # CNNUpdate.update()
+        # rabbitmq_start()
     finally:
         connection.close()
 
