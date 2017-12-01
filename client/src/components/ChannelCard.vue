@@ -1,24 +1,26 @@
 <template>
-  <li class="channel-row"
-    style="padding: 0px; border-radius: 4px; overflow: hidden; background-color: #EC2841;">
     <router-link
-      style="height:120px;display: flex; justify-content: center;align-items: center; background-position: center;"
+      class="channel-card" 
       v-bind:style="{ backgroundImage: getHashImageUrl() }" 
       v-bind:class="{ 'is-active': channel.id == $route.params.channelId }" 
       v-on:click.native="select()" 
-      class="item-link channel-row-link" 
       :to="{ name: 'channel', params:{ channelId: channel.id } }">
-      <span class="channel-name"
-        style="color: white; font-weight: bold;">{{ channel.name }}
+      <span class="channel-label">
+        {{ channel.name }}
       </span>
+      <div class="hover-content">
+        <span v-if="channel.number_of_likes" class="tag trending-label">
+          <i class="trending-icon material-icons md-16">whatshot</i>
+          <span>{{ channel.number_of_likes }}</span>
+        </span>
+      </div>
     </router-link>
-  </li>
 </template>
 
 <script>
   var GeoPattern = require('geopattern')
   export default {
-    name: 'ChannelRow',
+    name: 'ChannelCard',
     props: {
       channel: {
         type: Object,
