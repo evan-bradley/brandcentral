@@ -1,7 +1,7 @@
 <template>
   <div class="columns is-multiline">
     <div class="column is-12" v-show="loggedIn" :class="{ 'no-pading-or-margins' : (!loggedIn) }">
-      <Navbar :user="user" v-on:LogOut="LogOut" />
+      <Navbar :user="user" v-on:LogOut="LogOut" :channelName="channelName" v-on:GoBackAChannel="GoBackAChannel"/>
       <!-- <button class="is-pulled-right button is-primary" @click="LogOut">Log out</button> -->
     </div>
     <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 1) }">
@@ -14,7 +14,7 @@
       <RecoverPassword v-show="display === 3" v-on:navigate="changeDisplay"/>
     </div>
     <div class="column is-12" :class="{ 'no-pading-or-margins' : (display !== 4 && loggedIn) }"> 
-      <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :userId="user.Id"/>
+      <Channel v-show="display === 4 && loggedIn" v-on:navigate="changeDisplay" :userId="user.Id" v-on:changeChannel="setChannelName" :showChannelSelect="showChannelSelect" v-on:selectedChannel="showChannelSelect = false"/>
     </div>
   </div>
 </template>
@@ -37,7 +37,9 @@ export default {
     return {
       display: 1,
       loggedIn: false,
-      user: new Classes.User()
+      user: new Classes.User(),
+      channelName: "",
+      showChannelSelect: true
     };
   },
   components: {
@@ -63,6 +65,15 @@ export default {
     LogOut () {
       this.loggedIn = false
       this.display = 1
+    },
+    setChannelName(nameToChangeTo) {
+      if (nameToChangeTo !== 'General') {
+        this.channelName = nameToChangeTo
+      }
+    },
+    GoBackAChannel (){
+      this.channelName = ""
+      this.showChannelSelect = true;
     }
   }
 };
