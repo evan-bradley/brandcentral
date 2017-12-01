@@ -7,7 +7,7 @@
             Trending
           </p>
           <p class="subtitle">
-            Browse the trending channels and discover products you never knew you needed.
+            Discover products you never knew you needed.
           </p>
         </div>
       </div>
@@ -32,7 +32,7 @@
 <script>
   import ChannelCard from './ChannelCard.vue'
   export default {
-    name: 'Welcome',
+    name: 'Trending',
     data () {
       return {
         channels: []

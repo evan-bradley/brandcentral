@@ -11,7 +11,7 @@ import ProfileHome from '@/components/ProfileHome'
 import ChangeEmail from '@/components/ChangeEmail'
 import ResetPassword from '@/components/RecoverPassword'
 import Interests from '@/components/Interests'
-import Welcome from '@/components/Welcome'
+import Trending from '@/components/Trending'
 import Channel from '@/components/Channel'
 import LikedProducts from '@/components/LikedProducts'
 import SubscribedChannels from '@/components/SubscribedChannels'
@@ -102,7 +102,7 @@ const router = new Router({
         {
           path: '/',
           name: 'home',
-          component: Welcome
+          component: Trending
         },
         {
           path: 'channel/:channelId',

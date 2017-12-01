@@ -1,13 +1,12 @@
 
-$primary: #EF233C
+$primary: #EC2841 //#EF233C
 $secondary: #323237
 $danger: $primary
 $section-padding: 20px
+$family-sans-serif: 'Montserrat', 'Roboto'
+$text: black
 
 @import '../node_modules/bulma/bulma'
-
-html
-    font-family: 'Roboto', sans-serif
 
 .is-centered
     text-align: center
@@ -58,6 +57,12 @@ html
 li
     list-style: none
 
+.hero
+    .title
+        padding-bottom: 20px
+    .subtitle
+        color: rgba(black, 0.5)
+
 .title-bar
     margin-right: -20px
     margin-left: -20px
@@ -101,6 +106,35 @@ li
     background-color: $info
     color:  $white
     padding: 10px
+
+// Grow element on hover
+.grow
+    transition: all .2s ease-in-out
+    &:hover
+        transform: scale(1.05)
+
+// Hover Content
+.hover-container
+    position: relative
+.hover-content
+    &.right
+        justify-content: flex-end
+    display: flex
+    align-items: right
+    flex-direction: row
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    color: black
+    .display-on-hover
+        display: none
+        .control
+            margin-right: 3px
+    &:hover
+        .display-on-hover
+            display: flex
 
 // Links
 a
@@ -166,7 +200,7 @@ a
             .control
                 margin-right: 3px
         &:hover
-            background: rgba(white, 0.2)
+            background: rgba(white, 0.0)
             .display-on-hover
                 display: flex
             .control
@@ -260,13 +294,18 @@ a
 
 .user-row
     padding: 8px 14px
+    .hover-content
+        padding: 8px 14px
+    .button
+        width: 28px
+        height: 28px
     .information-container
         display: grid
     .name
         font-weight: 500
         color: black
     .username
-        color: #4a4a4a
+        color: black
     .profile-image
         width: 28px
         height: 28px
@@ -277,8 +316,13 @@ a
 
 .channel-row
     padding: 8px 14px
+    .hover-content
+        padding: 8px 14px
+    .button
+        width: 28px
+        height: 28px
     .channel-name
-        color: #4a4a4a
+        color: black
     .tag
         border-radius: 100px
         width: 28px
@@ -338,6 +382,12 @@ body
     border-right: 1px solid #DBDBDB
 
 // Navigation Bar
+.navbar-link
+    color: black
+.navbar-item
+    color: black
+.navigation
+    color: black
 .navbar-burger
     +desktop
         display: none

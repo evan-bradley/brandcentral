@@ -25,13 +25,13 @@
       </ul>
       <hr>
     </div>
-    <div class="information-container">
+    <div v-if="searchText.length === 0" class="information-container">
       <ul v-show="this.$store.state.channels.length > 0" class="subscribed-channels">
-        <p class="label">Subscribed</p>
+        <p class="label">Channels</p>
         <ChannelRow v-for="channel in this.$store.state.channels" :key="channel.id" :channel="channel"></ChannelRow>
       </ul>
       <ul v-show="this.$store.state.followedUsers.length > 0" class="followed-users">
-        <p class="label">Following</p>
+        <p class="label">Users</p>
         <UserRow v-for="user in this.$store.state.followedUsers" :key="user.id" :user="user"></UserRow>
       </ul>
     </div>

@@ -1,6 +1,6 @@
 <template>
     <router-link
-      class="channel-card" 
+      class="channel-card grow" 
       v-bind:style="{ backgroundImage: getHashImageUrl() }" 
       v-bind:class="{ 'is-active': channel.id == $route.params.channelId }" 
       v-on:click.native="select()" 
