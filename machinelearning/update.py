@@ -191,7 +191,7 @@ def rabbitmq_start():
         print(" [x] Updating user: {user_id}")
         update_user(user_id)
     channel.basic_consume(on_message, queue='user_update_queue', no_ack=True)
-
+    channel.basic_consume(CNNUpdate.on_message, queue='cnn_training', no_ack=True)
     # Start listening for messages
     print('[*] Waiting for messages. To exit press CTRL+C')
     try:

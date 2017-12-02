@@ -8,6 +8,7 @@ import tensorflow as tf
 from tensorflow import set_random_seed
 import time
 import MySQLdb
+import json
 from numpy.random import seed
 
 # db = MySQLdb.connect(host="138.197.85.34", user="root", password="somethingeasy", db="BRAND_CENTRAL")
@@ -350,22 +351,28 @@ def trainClusters(iterations):
         shutil.rmtree(dir_path + '/' + train_path + '/Dislike')
 
 
-def updatePredictions(clusterNum = 0):
+def updatePredictions(clusterNum = 0, userID = 0):
     image_path = 'products/'
     file_path = dir_path + '/' + image_path
 
     image_size = 128
     num_channels = 3
 
-    sqlGetClusterProducts = "SELECT PRODUCT_ID FROM PRODUCT"
+    sqlGetClusterProducts = "SELECT PRODUCT_ID FROM `PRODUCT`"
     cursor.execute(sqlGetClusterProducts)
     products = cursor.fetchall()
 
     if (clusterNum == 0):
-        sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM CNN_RESULTS"
+        sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM `CNN_RESULTS`"
         cursor.execute(sqlGetClusters)
         clusterCount = cursor.rowcount
         clusterNum = 1
+    elif (userID != 0):
+        sqlGetCluster = "SELECT CLUSTER_ID FROM `USER` WHERE USER_ID ="+str(userID)
+        cursor.execute(sqlGetCluster)
+        results = cursor.fetchone()
+        clusterNum = results[0]
+        clusterCount = clusterNum
     else:
         clusterCount = clusterNum
 
@@ -408,10 +415,12 @@ def updatePredictions(clusterNum = 0):
             cursor.execute(strUpdate)
             db.commit()
 
+def on_message(channel, method, properties, body):
+    body_json = json.loads(body)
+    user_id = body_json['user_id']
+    print(" [x] Updating user: {user_id}")
+    updatePredictions(0, user_id)
+
 def update():
     trainClusters(120)
     updatePredictions()
-
-update()
-#TODO: Add RabbitMQ listener
-#TODO: Update functions to update one cluster according to userID recevied from RabbitMQ
