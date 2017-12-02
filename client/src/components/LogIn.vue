@@ -27,13 +27,13 @@
                 </div>
               </div>
               <hr>
-              <div class="columns is-vcentered">
-                <p class="column is-6">
+              <div class="columns is-mobile is-vcentered">
+                <p class="column is-narrow">
                   <button class="button is-primary" @click="login">
                     Login
                   </button>
                 </p>
-                <p class="column is-6">
+                <p class="column">
                   <router-link class="is-primary is-pulled-right underline-on-hover" :to="{name: 'resetPassword', params:{token: '/'}}">
                     Forgot password?
                   </router-link>
