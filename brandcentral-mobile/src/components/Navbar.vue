@@ -1,8 +1,16 @@
 <template>
 <div>
   <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
-     <div class="navbar-brand">
-      <div class="navbar-burger burger" @click="toggleBurger"
+    <div class="navbar-menu" >
+    </div>
+    <div class="navbar-brand">
+      <div class="navbar-start navbar-item" style="width: 52px;">
+        <a @click="GoBackAChannel">
+          <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+        </a>
+      </div>
+      <div class="navbar-item center-div">{{ this.channelName }}</div>
+      <div class="navbar-burger burger" style="margin: 0;" @click="toggleBurger"
            :class="{ 'is-active': burgerActive }">
          <!-- Note: these spans generate the burger lines -->
         <span></span>
@@ -18,13 +26,6 @@
               <b>{{ user.FirstName ? user.FirstName : "" }} {{ user.LastName ? user.LastName : "" }}</b>
               <br> @{{ user.UserName ? user.UserName : ""  }}
             </div>
-            <hr class="navbar-divider"> 
-            <!-- To Do Later -->
-            <!-- <router-link :to="{ name: 'profile', params:{ userId: this.$store.state.User.Id } }"
-                         class="dropdown-item">Profile</router-link>
-            <router-link :to="{ name: 'editProfile' }" class="dropdown-item">Settings</router-link> -->
-            <!-- <a class="navbar-item">About</a> -->
-            <!-- about is empty right now. we can add it back when we get something to put here -->
              <hr class="navbar-divider">
             <a class="dropdown-item" @click="signOut">Sign out</a>
           </div>
@@ -54,6 +55,9 @@
       user: {
         type: Classes.User,
         default: new Classes.User() 
+      },
+      channelName: {
+        default: "" 
       }
     },
     methods: {
@@ -68,6 +72,9 @@
       },
       toggleBurger () {
         this.burgerActive = !this.burgerActive
+      },
+      GoBackAChannel () {
+        this.$emit('GoBackAChannel')
       }
     }
   }

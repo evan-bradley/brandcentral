@@ -1,23 +1,24 @@
 <template>
-  <div>
+  <div style="">
       <div class="columns is-multiline is-centered" v-show="channelId">
-          <div class="column is-12 columns is-mobile">
-            <div class="column is-6">
-              <span style="font-size: 1.4rem; color: black;">{{ this.channel.name }}</span>
-            </div>
-            <div class="column is-6">
-              <button class="button is-primary" @click="channelId = null">Back to channel select</button>
-            </div>
-          </div>
-          <div class="column is-12">
-            <voting-item :item ="this.currentItem" :channel="this.channel.id" :userId="this.userId" />
-          </div>
+        <div class="column is-12">
+          <voting-item :item ="this.currentItem" :channel="this.channel.id" :userId="this.userId" />
+        </div>
       </div>
       <div class="columns is-mobile is-multiline is-centered" v-show="!(channelId)">
-        <div class="column is-6" v-for="item in channels" :key="item.id">
-          <button class="button is-primary is-inverted channel-select-buttons subtitle" @click="channelId = item.id">
-            <i class="fa fa-tag" style="opacity: 0.8; margin-right: 8px;" aria-hidden="true"></i> {{ item.name }}
+        <div class="column is-12" v-for="item in channels" :key="item.id">
+          <li class="channel-row" >
+            <button class="button is-primary is-outlined" @click="selectChannel(item)">
+              <span class="tag">
+                <i class="fa fa-tag" aria-hidden="true"></i>
+                <!-- <i class="material-icons md-16">local_offer</i> -->
+              </span>
+              <span class="channel-name">{{ item.name }}</span>
             </button>
+          </li>
+          <!-- <button class="button is-primary is-inverted channel-select-buttons subtitle" >
+            <i class="fa fa-tag" style="opacity: 0.8; margin-right: 8px;" aria-hidden="true"></i> {{ item.name }}
+            </button> -->
         </div>
       </div>
   </div>
@@ -32,7 +33,7 @@
   })
 
   export default {
-    props: ['userId'],
+    props: ['userId','showChannelSelect'],
     data () {
       return {
         currentItem: undefined,
@@ -47,6 +48,9 @@
       },
       userId: function(){
         this.getAllChannelsForUser()
+      },
+      showChannelSelect: function () {
+        this.showChannelReset()
       }
     },
     components: {
@@ -73,10 +77,22 @@
         .then(response => {
           if (response.data.success) {
             this.channel = response.data.channel
+            this.$emit('changeChannel', response.data.channel.name)
           }
         }, response => {
           console.log('Failed to load channel information')
         })
+      },
+      showChannelReset () {
+        console.log(this.channelId)
+        if (this.showChannelSelect === true) {
+          this.$emit('setChannelName', "") 
+          this.channelId = null
+        }
+      },
+      selectChannel (item) {
+        this.channelId = item.id 
+        this.$emit('selectedChannel')
       }
     }
   }

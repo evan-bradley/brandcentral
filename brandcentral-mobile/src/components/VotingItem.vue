@@ -5,7 +5,7 @@
           <img :src="itemImageURL ? itemImageURL : item.ImmageURL" alt="Placeholder image">
       </figure>
       <hr style="margin: 20px -20px">
-      <div class="media">
+      <div class="media" @click="showFullDescription = !showFullDescription">
         <div class="media-content">
           <div class="title is-4" >
             <p class="has-text-left is-pulled-left">
@@ -14,42 +14,48 @@
           </div>
         </div>
       </div>
-      <div class="content has-text-left" >
+      <div class="content has-text-left" v-show="!showFullDescription" @click="showFullDescription = !showFullDescription">
         {{ itemDescription ? itemDescription : item.ProductDescription  }}
       </div>
+      <div class="content has-text-left" v-show="showFullDescription" @click="showFullDescription = !showFullDescription">
+        {{ itemDescriptionFull ? itemDescriptionFull : item.ProductDescription  }}
+      </div>
     </div>
-    <div>
+    <div class="voting-button-container" style="margin-top: 20px">
       <div class="has-text-centered">
         <div class="field has-addons is-grouped is-grouped-centered">
-          <p class="control">
-            <a class="button" v-on:click="previous" style="border-radius: 100px;">
+          <p class="control" v-show="previousItems.length > 0">
+            <a class="button is-medium" v-on:click.stop.prevent="previous" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-angle-left"></i>
+                <i class="material-icons md-24">chevron_left</i>
               </span>
-              <span>Prev</span>
-            </a>
-          </p>
-          <p class="control" style="margin-right: -1px;">
-            <a class="button" v-on:click="dislike" style="border-bottom-left-radius: 100px; border-top-left-radius: 100px;">
-              <span class="icon is-small">
-                <i class="fa fa-thumbs-o-down"></i>
-              </span>
-              <span>Dislike</span>
             </a>
           </p>
           <p class="control">
-            <a class="button" v-on:click="like" style="border-bottom-right-radius: 100px; border-top-right-radius: 100px;">
+            <a class="button is-medium"  v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-thumbs-o-up"></i>
+                <i class="material-icons md-24">thumb_down</i>
               </span>
-              <span>Like</span>
             </a>
           </p>
           <p class="control">
-            <a class="button" v-on:click="next" style="border-radius: 100px;">
-              <span>Next</span>
+            <a class="button is-medium"  v-on:click.stop.prevent="like" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-angle-right"></i>
+                <i class="material-icons md-24">thumb_up</i>
+              </span>
+            </a>
+          </p>
+          <!-- <p class="control display-on-hover">
+            <a class="button is-medium" v-on:click.stop.prevent="deletePreference" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="material-icons md-24">close</i>
+              </span>
+            </a>
+          </p> -->
+          <p class="control">
+            <a class="button is-medium" v-on:click.stop.prevent="next" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="material-icons md-24">chevron_right</i>
               </span>
             </a>
           </p>
@@ -76,17 +82,26 @@
           displayMode: true,
           itemName: '',
           itemDescription: '',
+          itemDescriptionFull: '',
+          showFullDescription: false,
           itemImageURL: '',
-          itemID: ''
+          itemID: '',
+          previousItems: []
         }
       },
       watch: {
         channel () {
+          this.previousItems = []
           this.next()
         }
       },
       methods: {
         previous () {
+          var previousItem = this.previousItems.pop()
+          this.itemName = previousItem.itemName.substring(0, 30)
+          this.itemDescription = previousItem.itemDescription.substring(0, 80) + '...'
+          this.itemImageURL = previousItem.itemImageURL
+          this.itemID = previousItem.itemID
           console.log('clicked previous')
         },
         next () {
@@ -95,8 +110,10 @@
               if (response.data.success) {
                 this.itemName = response.data.product.name.substring(0, 30)
                 this.itemDescription = response.data.product.description.substring(0, 80) + '...'
+                this.itemDescriptionFull = response.data.product.description
                 this.itemImageURL = response.data.product.pictureUrl
                 this.itemID = response.data.product.id
+                this.showFullDescription = false
               } else {
                 this.failureMessage = response.data.message
               }
@@ -114,6 +131,7 @@
           instance.post(`/api/mobile/product/like/${this.itemID}`, payload)
             .then(response => { // Success
               if (response.data.success) {
+                this.pushToPreviousArray()
                 this.failureMessage = response.data.message
                 console.log('liked ' + this.itemName)
                 this.next()
@@ -132,6 +150,7 @@
           instance.post(`/api/mobile/product/dislike/${this.itemID}`, payload)
             .then(response => { // Success
               if (response.data.success) {
+                this.pushToPreviousArray()
                 this.failureMessage = response.data.message
                 console.log('disliked ' + this.itemName)
                 this.next()
@@ -140,6 +159,16 @@
               console.log(response)
               this.failureMessage = response.data.message
             })
+        },
+        pushToPreviousArray () {
+          const itemToPush = {
+            itemName: this.itemName,
+            itemDescription: this.itemDescription,
+            itemImageURL: this.itemImageURL,
+            itemID: this.itemID
+          }
+
+          this.previousItems.push(itemToPush)
         }
       },
       mounted () {
