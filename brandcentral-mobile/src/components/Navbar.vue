@@ -6,7 +6,7 @@
     <div class="navbar-brand">
       <div class="navbar-start navbar-item" style="width: 52px;">
         <a @click="GoBackAChannel">
-          <i class="fa fa-chevron-circle-left" aria-hidden="true"></i>
+          <i class="fa fa-chevron-circle-left" aria-hidden="true" style="font-size: 25px; color: #EF233C;"></i>
         </a>
       </div>
       <div class="navbar-item center-div">{{ this.channelName }}</div>
