@@ -18,38 +18,41 @@
         {{ itemDescription ? itemDescription : item.ProductDescription  }}
       </div>
     </div>
-    <div>
+    <div class="voting-button-container" style="margin-top: 20px">
       <div class="has-text-centered">
         <div class="field has-addons is-grouped is-grouped-centered">
-          <p class="control">
-            <a class="button" v-on:click="previous" style="border-radius: 100px;">
+          <!-- <p class="control">
+            <a class="button is-medium" v-on:click.stop.prevent="previous" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-angle-left"></i>
+                <i class="material-icons md-24">chevron_left</i>
               </span>
-              <span>Prev</span>
             </a>
-          </p>
-          <p class="control" style="margin-right: -1px;">
-            <a class="button" v-on:click="dislike" style="border-bottom-left-radius: 100px; border-top-left-radius: 100px;">
-              <span class="icon is-small">
-                <i class="fa fa-thumbs-o-down"></i>
-              </span>
-              <span>Dislike</span>
-            </a>
-          </p>
+          </p> -->
           <p class="control">
-            <a class="button" v-on:click="like" style="border-bottom-right-radius: 100px; border-top-right-radius: 100px;">
+            <a class="button is-medium"  v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-thumbs-o-up"></i>
+                <i class="material-icons md-24">thumb_down</i>
               </span>
-              <span>Like</span>
             </a>
           </p>
           <p class="control">
-            <a class="button" v-on:click="next" style="border-radius: 100px;">
-              <span>Next</span>
+            <a class="button is-medium"  v-on:click.stop.prevent="like" style="border-radius: 100px;">
               <span class="icon is-small">
-                <i class="fa fa-angle-right"></i>
+                <i class="material-icons md-24">thumb_up</i>
+              </span>
+            </a>
+          </p>
+          <!-- <p class="control display-on-hover">
+            <a class="button is-medium" v-on:click.stop.prevent="deletePreference" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="material-icons md-24">close</i>
+              </span>
+            </a>
+          </p> -->
+          <p class="control">
+            <a class="button is-medium" v-on:click.stop.prevent="next" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="material-icons md-24">chevron_right</i>
               </span>
             </a>
           </p>
@@ -97,6 +100,7 @@
                 this.itemDescription = response.data.product.description.substring(0, 80) + '...'
                 this.itemImageURL = response.data.product.pictureUrl
                 this.itemID = response.data.product.id
+                window.focus()
               } else {
                 this.failureMessage = response.data.message
               }

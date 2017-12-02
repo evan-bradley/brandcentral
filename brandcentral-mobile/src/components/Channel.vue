@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="">
       <div class="columns is-multiline is-centered" v-show="channelId">
         <div class="column is-12">
           <voting-item :item ="this.currentItem" :channel="this.channel.id" :userId="this.userId" />

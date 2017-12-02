@@ -28,9 +28,6 @@ html
     border-color: $primary
     box-shadow: none
 
-.search-bar:focus
-    outline: none
-
 .large-buttons
     min-width: 600px
     min-height: 120px
@@ -396,6 +393,9 @@ body
 #side
     border-right: 1px solid #DBDBDB
 
+.voting-button-container .has-text-centered .field.has-addons.is-grouped.is-grouped-centered p a.button:hover
+    color: #363636
+
 // Navigation Bar
 .navbar-burger
     +desktop
@@ -410,3 +410,10 @@ body
     font-size: 16px
 .material-icons.md-24
     font-size: 24px
+
+.voting-button-container
+    position: absolute;
+    width: 280px
+    bottom: 10px
+    left: 50%;
+    margin: 100px 0 0 -140px;
