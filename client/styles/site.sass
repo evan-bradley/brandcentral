@@ -109,9 +109,18 @@ li
 
 // Grow element on hover
 .grow
-    transition: all .1s ease-out
+    display: inline-block
+    vertical-align: middle
+    -webkit-transform: perspective(1px) translateZ(0)
+    transform: perspective(1px) translateZ(0)
+    box-shadow: 0 0 1px transparent
+    -webkit-transition-duration: 0.1s
+    transition-duration: 0.1s
+    -webkit-transition-property: transform
+    transition-property: transform
     &:hover
-        transform: scale(1.05)
+        -webkit-transform: scale(1.06)
+        transform: scale(1.06)
 
 // Hover Content
 .hover-container
