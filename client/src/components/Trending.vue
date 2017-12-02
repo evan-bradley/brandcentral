@@ -12,25 +12,35 @@
         </div>
       </div>
     </div>
-    <div v-if="channels.length > 0">
-      <div class="columns is-multiline">
-        <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="channel in channels" :key="channel.id">
-          <ChannelCard :channel="channel" />
+    <tabs>
+      <tab name="Channels">
+        <div v-if="channels.length > 0">
+          <div class="columns is-multiline">
+            <div class="column is-one-quarter is-half-tablet is-12-mobile"
+              v-for="channel in channels" :key="channel.id">
+              <ChannelCard :channel="channel" />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <div v-else>
-      <article class="message">
-        <div class="message-body">
-          There are no trending channels
+        <div v-else>
+          <article class="message">
+            <div class="message-body">
+              There are no trending channels
+            </div>
+          </article>
         </div>
-      </article>
-    </div>
+      </tab>
+      <tab name="Products">
+        Popular products will be displayed here
+      </tab>
+    </tabs>
   </div>
 </template>
 
 <script>
   import ChannelCard from './ChannelCard.vue'
+  import Tab from './Tab.vue'
+  import Tabs from './Tabs.vue'
   export default {
     name: 'Trending',
     data () {
@@ -39,7 +49,9 @@
       }
     },
     components: {
-      'ChannelCard': ChannelCard
+      'ChannelCard': ChannelCard,
+      'tabs': Tabs,
+      'tab': Tab
     },
     created () {
       this.loadTrendingChannels()
