@@ -5,16 +5,26 @@
           <voting-item :item ="this.currentItem" :channel="this.channel.id" :userId="this.userId" />
         </div>
       </div>
-      <div class="columns is-mobile is-multiline is-centered" v-show="!(channelId)">
-        <div class="column is-12" v-for="item in channels" :key="item.id">
-          <li class="channel-row" >
-            <button class="button is-primary is-outlined" @click="selectChannel(item)">
+      <div class="columns is-mobile is-multiline" v-show="!(channelId)">
+        <div class="column is-12">
+          <h1 class="title is-4 is-centered">Your Channels</h1>
+        </div>
+        <div class="column is-12">
+          <li class="channel-row" @click="selectChannel(item)"  v-for="item in channels" :key="item.id">
+            <div class="channel-row-element">
+            <!-- <button class="button is-primary is-outlined" @click="selectChannel(item)"> -->
               <span class="tag">
                 <i class="fa fa-tag" aria-hidden="true"></i>
                 <!-- <i class="material-icons md-16">local_offer</i> -->
               </span>
               <span class="channel-name">{{ item.name }}</span>
-            </button>
+               <a class="button is-small is-pulled-right" style="border-radius: 100px;">
+              <span class="icon is-small">
+                <i class="material-icons md-24">chevron_right</i>
+              </span>
+            </a>
+            <!-- </button> -->
+            </div>
           </li>
           <!-- <button class="button is-primary is-inverted channel-select-buttons subtitle" >
             <i class="fa fa-tag" style="opacity: 0.8; margin-right: 8px;" aria-hidden="true"></i> {{ item.name }}
