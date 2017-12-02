@@ -5,7 +5,7 @@
           <img :src="itemImageURL ? itemImageURL : item.ImmageURL" alt="Placeholder image">
       </figure>
       <hr style="margin: 20px -20px">
-      <div class="media">
+      <div class="media" @click="showFullDescription = !showFullDescription">
         <div class="media-content">
           <div class="title is-4" >
             <p class="has-text-left is-pulled-left">
@@ -14,20 +14,23 @@
           </div>
         </div>
       </div>
-      <div class="content has-text-left" >
+      <div class="content has-text-left" v-show="!showFullDescription" @click="showFullDescription = !showFullDescription">
         {{ itemDescription ? itemDescription : item.ProductDescription  }}
+      </div>
+      <div class="content has-text-left" v-show="showFullDescription" @click="showFullDescription = !showFullDescription">
+        {{ itemDescriptionFull ? itemDescriptionFull : item.ProductDescription  }}
       </div>
     </div>
     <div class="voting-button-container" style="margin-top: 20px">
       <div class="has-text-centered">
         <div class="field has-addons is-grouped is-grouped-centered">
-          <!-- <p class="control">
+          <p class="control" v-show="previousItems.length > 0">
             <a class="button is-medium" v-on:click.stop.prevent="previous" style="border-radius: 100px;">
               <span class="icon is-small">
                 <i class="material-icons md-24">chevron_left</i>
               </span>
             </a>
-          </p> -->
+          </p>
           <p class="control">
             <a class="button is-medium"  v-on:click.stop.prevent="dislike" style="border-radius: 100px;">
               <span class="icon is-small">
@@ -79,17 +82,26 @@
           displayMode: true,
           itemName: '',
           itemDescription: '',
+          itemDescriptionFull: '',
+          showFullDescription: false,
           itemImageURL: '',
-          itemID: ''
+          itemID: '',
+          previousItems: []
         }
       },
       watch: {
         channel () {
+          this.previousItems = []
           this.next()
         }
       },
       methods: {
         previous () {
+          var previousItem = this.previousItems.pop()
+          this.itemName = previousItem.itemName.substring(0, 30)
+          this.itemDescription = previousItem.itemDescription.substring(0, 80) + '...'
+          this.itemImageURL = previousItem.itemImageURL
+          this.itemID = previousItem.itemID
           console.log('clicked previous')
         },
         next () {
@@ -98,9 +110,10 @@
               if (response.data.success) {
                 this.itemName = response.data.product.name.substring(0, 30)
                 this.itemDescription = response.data.product.description.substring(0, 80) + '...'
+                this.itemDescriptionFull = response.data.product.description
                 this.itemImageURL = response.data.product.pictureUrl
                 this.itemID = response.data.product.id
-                window.focus()
+                this.showFullDescription = false
               } else {
                 this.failureMessage = response.data.message
               }
@@ -118,6 +131,7 @@
           instance.post(`/api/mobile/product/like/${this.itemID}`, payload)
             .then(response => { // Success
               if (response.data.success) {
+                this.pushToPreviousArray()
                 this.failureMessage = response.data.message
                 console.log('liked ' + this.itemName)
                 this.next()
@@ -136,6 +150,7 @@
           instance.post(`/api/mobile/product/dislike/${this.itemID}`, payload)
             .then(response => { // Success
               if (response.data.success) {
+                this.pushToPreviousArray()
                 this.failureMessage = response.data.message
                 console.log('disliked ' + this.itemName)
                 this.next()
@@ -144,6 +159,16 @@
               console.log(response)
               this.failureMessage = response.data.message
             })
+        },
+        pushToPreviousArray () {
+          const itemToPush = {
+            itemName: this.itemName,
+            itemDescription: this.itemDescription,
+            itemImageURL: this.itemImageURL,
+            itemID: this.itemID
+          }
+
+          this.previousItems.push(itemToPush)
         }
       },
       mounted () {
