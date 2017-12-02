@@ -268,9 +268,8 @@ def update_predictions_for_user(user_id):
 def main():
     try:
         train_models_for_clusters()
-        update_predictions_for_user(2)
-        # CNNUpdate.update()
-        # rabbitmq_start()
+        CNNUpdate.update()
+        rabbitmq_start()
     finally:
         connection.close()
 

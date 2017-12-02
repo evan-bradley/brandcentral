@@ -350,24 +350,26 @@ def trainClusters(iterations):
         shutil.rmtree(dir_path + '/' + train_path + '/Dislike')
 
 
-def updatePredictions():
+def updatePredictions(clusterNum = 0):
     image_path = 'products/'
     file_path = dir_path + '/' + image_path
 
     image_size = 128
     num_channels = 3
 
-    updateStmt = ""
-
-    sqlGetClusterProducts = "SELECT PRODUCT_ID, PROD_PICT_URL FROM PRODUCT"
+    sqlGetClusterProducts = "SELECT PRODUCT_ID FROM PRODUCT"
     cursor.execute(sqlGetClusterProducts)
     products = cursor.fetchall()
 
-    sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM CNN_RESULTS"
-    cursor.execute(sqlGetClusters)
-    clusterCount = cursor.rowcount
+    if (clusterNum == 0):
+        sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM CNN_RESULTS"
+        cursor.execute(sqlGetClusters)
+        clusterCount = cursor.rowcount
+        clusterNum = 1
+    else:
+        clusterCount = clusterNum
 
-    for cluster in range(1, clusterCount+1):
+    for cluster in range(clusterNum, clusterCount+1):
         print("Updating Cluster " + str(cluster) + " CNN Predictions")
         # Restore the saved model
         sess = tf.Session()
@@ -386,7 +388,6 @@ def updatePredictions():
         y_test_images = np.zeros((1, 2))
 
         for product in range(1, len(products)+1):
-            # urllib.request.urlretrieve(products[product][1], 'product.jpg')
 
             # Reading the image using OpenCV
             image = cv2.imread(file_path+'product'+str(product)+'.jpg')
@@ -410,3 +411,7 @@ def updatePredictions():
 def update():
     trainClusters(120)
     updatePredictions()
+
+update()
+#TODO: Add RabbitMQ listener
+#TODO: Update functions to update one cluster according to userID recevied from RabbitMQ
