@@ -949,19 +949,39 @@ GROUP BY CHANNEL_LIKES.CHANNEL_ID
 ORDER BY CHANNEL_RANK desc
 LIMIT ?;`
 pool.getPopularChannels = async (limit = 12, days_ago = 7) => {
-  try {
-    const results = await pool.query(POPULAR_CHANNELS_QUERY, [days_ago, parseInt(limit)])
-    var channelArray = results.map((result) => {
-      return {
-        id: result.CHANNEL_ID,
-        name: result.CHANNEL_NAME,
-        number_of_likes: result.CHANNEL_RANK
-      }
-    })
-    return channelArray
-    resolve(channelArray)
-  } catch (e) {
-    throw e
-  }
+  const results = await pool.query(POPULAR_CHANNELS_QUERY, [days_ago, parseInt(limit)])
+  var channelArray = results.map((result) => {
+    return {
+      id: result.CHANNEL_ID,
+      name: result.CHANNEL_NAME,
+      number_of_likes: result.CHANNEL_RANK
+    }
+  })
+  return channelArray
+}
+
+const POPULAR_PRODUCTS_QUERY = `
+SELECT PRODUCT_ID,
+    count(*) PRODUCT_RANK
+FROM (
+    SELECT PRODUCT.PRODUCT_ID,
+        TIME_LIKED
+    FROM LIKES JOIN PRODUCT
+    ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID
+) AS PRODUCT_LIKES
+WHERE TIME_LIKED > NOW() - INTERVAL ? DAY
+GROUP BY PRODUCT_LIKES.PRODUCT_ID
+ORDER BY PRODUCT_RANK desc
+LIMIT ?;
+`
+pool.getPopularProducts = async (limit = 12, days_ago = 7) => {
+  const results = await pool.query(POPULAR_PRODUCTS_QUERY, [days_ago, parseInt(limit)])
+  var productsArray = results.map((result) => {
+    return {
+      id: result.PRODUCT_ID,
+      number_of_likes: result.PRODUCT_RANK
+    }
+  })
+  return productsArray
 }
 module.exports = pool

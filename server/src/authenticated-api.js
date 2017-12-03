@@ -622,6 +622,35 @@ router.get('/api/channel/trending', async (req, res) => {
     })
   }
 })
+
+/**
+ * @api {get} api/products/trending Get a list of the trending products
+ * @apiName GetTrendingProducts
+ * @apiGroup Product
+ *
+ * @apiParam {Number} limit Maximum number of products to retrieve.
+ * @apiParam {Number} days_ago The number of days we want to get trending
+ * channels.
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiSuccess {Object}  products Trending products
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.get('/api/products/trending', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      channels: await db.getPopularProducts(req.query.limit, req.query.days_ago)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
 /**
  * @api {get} api/user/likedproducts/:id Get a user's liked products
  * @apiName GetLikedProducts
