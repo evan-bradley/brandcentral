@@ -641,7 +641,7 @@ router.get('/api/products/trending', async (req, res) => {
   try {
     res.send({
       success: true,
-      channels: await db.getPopularProducts(req.query.limit, req.query.days_ago)
+      products: await db.getPopularProducts(req.query.limit, req.query.days_ago)
     })
   } catch (e) {
     res.send({

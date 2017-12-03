@@ -31,7 +31,21 @@
         </div>
       </tab>
       <tab name="Products">
-        Popular products will be displayed here
+        <div v-if="products.length > 0">
+          <div class="columns is-multiline">
+            <div class="column is-one-quarter is-half-tablet is-12-mobile"
+              v-for="product in products" :key="product.id">
+              <ProductItem :productId="product.id" :displayMode="'small'" />
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <article class="message">
+            <div class="message-body">
+              There are no trending products
+            </div>
+          </article>
+        </div>
       </tab>
     </tabs>
   </div>
@@ -39,22 +53,26 @@
 
 <script>
   import ChannelCard from './ChannelCard.vue'
+  import ProductItem from './ProductItem.vue'
   import Tab from './Tab.vue'
   import Tabs from './Tabs.vue'
   export default {
     name: 'Trending',
     data () {
       return {
-        channels: []
+        channels: [],
+        products: []
       }
     },
     components: {
       'ChannelCard': ChannelCard,
+      'ProductItem': ProductItem,
       'tabs': Tabs,
       'tab': Tab
     },
     created () {
       this.loadTrendingChannels()
+      this.loadTrendingProducts()
     },
     methods: {
       loadTrendingChannels () {
@@ -62,6 +80,16 @@
           .then(response => {
             if (response.data.success) {
               this.channels = response.data.channels
+            }
+          }, response => {
+            // Could not get any channels
+          })
+      },
+      loadTrendingProducts () {
+        this.$http.get(`/api/products/trending?limit=12&days_ago=30`)
+          .then(response => {
+            if (response.data.success) {
+              this.products = response.data.products
             }
           }, response => {
             // Could not get any channels
