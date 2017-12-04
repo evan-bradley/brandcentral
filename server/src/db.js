@@ -389,8 +389,11 @@ pool.getRandomProduct = (channel, number = 1) => {
   })
 }
 
-const GET_CNN_RESULT_Q = 'select PRODUCT_ID from CNN_RESULTS where CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?) and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)'
-const GET_WEIGHT_VECTOR_RESULT_Q = 'select PRODUCT_ID from WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)'
+const GET_CNN_RESULT_Q = `select PRODUCT_ID from CNN_RESULTS where
+CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?)
+and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)`
+const GET_WEIGHT_VECTOR_RESULT_Q = `select PRODUCT_ID from
+WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)`
 pool.getRecommendedProduct = (cid, uid) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -401,7 +404,7 @@ pool.getRecommendedProduct = (cid, uid) => {
 
       cnnResults = await pool.query(GET_CNN_RESULT_Q, [ uid, productIds ])
       wvResults = await pool.query(GET_WEIGHT_VECTOR_RESULT_Q, [ uid, productIds ])
-      if (wvResults.length > 0 && cnnResults > 0) {
+      if (wvResults.length > 0 && cnnResults.length > 0) {
         cnnResults.forEach(prod => {
           if (prod.PRODUCT_ID === wvResults[0].PRODUCT_ID) {
             products.forEach(origProd => {
