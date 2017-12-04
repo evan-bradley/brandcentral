@@ -8,6 +8,7 @@ from sklearn.metrics import classification_report,confusion_matrix,accuracy_scor
 from sklearn.neural_network import MLPClassifier
 from random import *
 import json
+from CNN import CNNUpdate
 
 # Create a connection to the mysql database
 connection = pymysql.connect(host='localhost',
@@ -150,10 +151,14 @@ def data_train_test_for_uids(uids):
 
 def train_models_for_clusters():
     global classification_models
-    clustered_users, centers = cluster_users(1)
-    for cluster_id in range(1):
+    num_clusters = 0
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT DISTINCT USER_CLUSTER_ID FROM USER")
+        num_clusters = cursor.rowcount
+    clustered_users, centers = cluster_users(num_clusters)
+    for cluster_id in range(1, num_clusters + 1):
         # Retrieve all users in the cluster
-        print(f"Training Cluster: {cluster_id}")
+        print("Training Cluster: " + str(cluster_id))
         users = []
         for inx in range(len(clustered_users)):
             if clustered_users[inx] == cluster_id:
@@ -183,10 +188,10 @@ def rabbitmq_start():
     def on_message(channel, method, properties, body):
         body_json = json.loads(body)
         user_id = body_json['user_id']
-        print(f" [x] Updating user: {user_id}")
+        print(" [x] Updating user: {user_id}")
         update_user(user_id)
     channel.basic_consume(on_message, queue='user_update_queue', no_ack=True)
-
+    channel.basic_consume(CNNUpdate.on_message, queue='cnn_training', no_ack=True)
     # Start listening for messages
     print('[*] Waiting for messages. To exit press CTRL+C')
     try:
@@ -213,12 +218,12 @@ def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
 
     with connection.cursor() as cursor:
         # Get the products that the user likes
-        sql = f"SELECT PRODUCT_ID as pid FROM LIKES WHERE USER_ID = {user_id}"
+        sql = "SELECT PRODUCT_ID as pid FROM LIKES WHERE USER_ID = "+str(user_id)
         cursor.execute(sql)
         like_results = cursor.fetchall()
 
         # Get the products that the user dislikes
-        sql = f"SELECT PRODUCT_ID as pid FROM DISLIKES WHERE USER_ID = {user_id}"
+        sql = "SELECT PRODUCT_ID as pid FROM DISLIKES WHERE USER_ID = "+str(user_id)
         cursor.execute(sql)
         dislike_result = cursor.fetchall()
 
@@ -233,21 +238,21 @@ def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
 
 def update_weight_vector_for_user(user_id):
     "Updates a users weight vector and inserts it into the database"
-    print(f"   Updating weight vector for user: {user_id}...")
+    print("   Updating weight vector for user: {user_id}...")
     weight_vector = calculate_weight_vector_for_user(user_id)
     #TODO: Insert the weight vector into the user table using user_id.
 
 def update_similarities_for_user(user_id):
-    print(f"   Updating similarities for user: {user_id}...")
+    print("   Updating similarities for user: {user_id}...")
     #TODO: Calculate similarity between this user and all other users.
 
 def update_predictions_for_user(user_id):
-    print(f"   Updating neural network classifications for user: {user_id}...")
+    print("   Updating neural network classifications for user: {user_id}...")
     # TODO: This should probably be pre calculated.
     product_vectors = calculate_product_vectors()
 
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT * FROM USER WHERE USER_ID = {user_id}")
+        cursor.execute("SELECT * FROM USER WHERE USER_ID = "+str(user_id))
         user = cursor.fetchone()
         user_id = user['USER_ID']
         cluster_id = user['USER_CLUSTER_ID']
@@ -257,11 +262,13 @@ def update_predictions_for_user(user_id):
         for product_id, product_vector in product_vectors.items():
             input_vector = product_vector * user_weight_vector
             prediction = classification_models[cluster_id].predict([input_vector])
-            #TODO: Store the prediction in a table using prediction, user_id, product_id.
+            cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS (USER_ID, PRODUCT_ID, PREDICTION) VALUES ("+str(user_id)+", "+str(product_id)+", "+str(prediction[0])+") ON DUPLICATE KEY UPDATE PREDICTION = "+str(prediction[0]))
+            connection.commit()
 
 def main():
     try:
         train_models_for_clusters()
+        CNNUpdate.update()
         rabbitmq_start()
     finally:
         connection.close()

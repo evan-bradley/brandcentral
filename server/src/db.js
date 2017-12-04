@@ -353,54 +353,81 @@ pool.retrieveUserChannels = user => {
 
 const GET_RAND_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ?;'
 const GET_GENERAL_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID);'
-pool.getRandomProduct = channel => {
+pool.getRandomProduct = (channel, number = 1) => {
   return new Promise(async (resolve, reject) => {
-    if (!channel || parseInt(channel) === 0) {
-    console.log(channel)
-      try {
-        const generalresults = await pool.query(GET_GENERAL_PRODUCT_Q, [])
-
-        if (generalresults.length > 0) {
-          const productNum = parseInt(Math.random() * (generalresults.length - 0) + 0, 10)
-          const product = {
-            id: generalresults[productNum].PRODUCT_ID,
-            name: generalresults[productNum].PROD_NAME,
-            description: generalresults[productNum].PROD_DESC,
-            pictureUrl: generalresults[productNum].PROD_PICT_URL,
-            productUrl: generalresults[productNum].PROD_URL,
-            model: generalresults[productNum].PROD_MODEL
-          }
-
-          resolve(product)
-        } else {
-          reject(new Error('No product found.'))
-        }
-      } catch (e) {
-        reject(e)
-      }
-    }
-
-    // const productCount = await pool.query('SELECT COUNT(*) FROM PRODUCT')
-    // const productId = parseInt(Math.random() * (productCount[0]['COUNT(*)'] - 0) + 0, 10)
-    // const code = [...(await crypto.randomBytes(6))].map(num => num % 10).join('')
-    // console.log(productId)
     try {
-      const results = await pool.query(GET_RAND_PRODUCT_Q, [ channel ])
+      const isGeneralChannel = (!channel || parseInt(channel) === 0)
+      const productList = []
+      const results = isGeneralChannel
+        ? await pool.query(GET_GENERAL_PRODUCT_Q, [])
+        : await pool.query(GET_RAND_PRODUCT_Q, [ channel ])
 
       if (results.length > 0) {
-        const productNum = parseInt(Math.random() * (results.length - 0) + 0, 10)
-        const product = {
-          id: results[productNum].PRODUCT_ID,
-          name: results[productNum].PROD_NAME,
-          description: results[productNum].PROD_DESC,
-          pictureUrl: results[productNum].PROD_PICT_URL,
-          productUrl: results[productNum].PROD_URL,
-          model: results[productNum].PROD_MODEL
+        for (let i = 0; i < number; i++) {
+          const productNum = parseInt(Math.random() * (results.length - 0) + 0, 10)
+          productList.push({
+            id: results[productNum].PRODUCT_ID,
+            name: results[productNum].PROD_NAME,
+            description: results[productNum].PROD_DESC,
+            pictureUrl: results[productNum].PROD_PICT_URL,
+            productUrl: results[productNum].PROD_URL,
+            model: results[productNum].PROD_MODEL
+          })
         }
 
-        resolve(product)
+        if (number > 1) {
+          resolve(productList)
+        } else {
+          resolve(productList[0])
+        }
       } else {
         reject(new Error('No product found.'))
+      }
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const GET_CNN_RESULT_Q = 'select PRODUCT_ID from CNN_RESULTS where CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?) and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)'
+const GET_WEIGHT_VECTOR_RESULT_Q = 'select PRODUCT_ID from WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)'
+pool.getRecommendedProduct = (cid, uid) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const products = await pool.getRandomProduct(cid, 10)
+      const productIds = products.map(prod => prod.id)
+      let cnnResults
+      let wvResults
+
+      cnnResults = await pool.query(GET_CNN_RESULT_Q, [ uid, productIds ])
+      wvResults = await pool.query(GET_WEIGHT_VECTOR_RESULT_Q, [ uid, productIds ])
+      if (wvResults.length > 0 && cnnResults > 0) {
+        cnnResults.forEach(prod => {
+          if (prod.PRODUCT_ID === wvResults[0].PRODUCT_ID) {
+            products.forEach(origProd => {
+              if (origProd.id === prod.PRODUCT_ID) {
+                console.log("Found item agreed upon in ensemble.")
+                resolve(origProd)
+              }
+            })
+          }
+        })
+      } else if (cnnResults.length > 0) {
+        products.forEach(prod => {
+          if (prod.id === cnnResults[0].PRODUCT_ID) {
+            console.log("Found item in CNN.")
+            resolve(prod)
+          }
+        })
+      } else if (wvResults.length > 0) {
+        products.forEach(prod => {
+          if (prod.id === wvResults[0].PRODUCT_ID) {
+            console.log("Found item in weight vector.")
+            resolve(prod)
+          }
+        })
+      } else {
+        resolve(products[0])
       }
     } catch (e) {
       reject(e)
