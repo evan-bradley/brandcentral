@@ -125,7 +125,7 @@
             this.previousProducts.shift()
           }
         }
-        this.$http.get(`/api/product/random?channelId=${this.channelId}`)
+        this.$http.get(`/api/product/predicted/${this.channelId}`)
           .then(response => { // Success
             if (response.data.success) {
               var id = response.data.product.id
