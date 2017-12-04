@@ -353,32 +353,41 @@ pool.retrieveUserChannels = user => {
 
 const GET_RAND_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ?;'
 const GET_GENERAL_PRODUCT_Q = 'SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID);'
-pool.getRandomProduct = channel => {
+pool.getRandomProduct = (channel, number = 1) => {
   return new Promise(async (resolve, reject) => {
-    if (!channel || parseInt(channel) === 0) {
-    console.log(channel)
-      try {
-        const generalresults = await pool.query(GET_GENERAL_PRODUCT_Q, [])
+    try {
+      const isGeneralChannel = (!channel || parseInt(channel) === 0)
+      const productList = []
+      const results = isGeneralChannel
+        ? await pool.query(GET_GENERAL_PRODUCT_Q, [])
+        : await pool.query(GET_RAND_PRODUCT_Q, [ channel ])
 
-        if (generalresults.length > 0) {
-          const productNum = parseInt(Math.random() * (generalresults.length - 0) + 0, 10)
-          const product = {
-            id: generalresults[productNum].PRODUCT_ID,
-            name: generalresults[productNum].PROD_NAME,
-            description: generalresults[productNum].PROD_DESC,
-            pictureUrl: generalresults[productNum].PROD_PICT_URL,
-            productUrl: generalresults[productNum].PROD_URL,
-            model: generalresults[productNum].PROD_MODEL
-          }
-
-          resolve(product)
-        } else {
-          reject(new Error('No product found.'))
+      if (results.length > 0) {
+        for (let i = 0; i < number; i++) {
+          const productNum = parseInt(Math.random() * (results.length - 0) + 0, 10)
+          productList.push({
+            id: results[productNum].PRODUCT_ID,
+            name: results[productNum].PROD_NAME,
+            description: results[productNum].PROD_DESC,
+            pictureUrl: results[productNum].PROD_PICT_URL,
+            productUrl: results[productNum].PROD_URL,
+            model: results[productNum].PROD_MODEL
+          })
         }
-      } catch (e) {
-        reject(e)
+
+        if (number > 1) {
+          resolve(productList)
+        } else {
+          resolve(productList[0])
+        }
+      } else {
+        reject(new Error('No product found.'))
       }
+    } catch (e) {
+      reject(e)
     }
+  })
+}
 
     // const productCount = await pool.query('SELECT COUNT(*) FROM PRODUCT')
     // const productId = parseInt(Math.random() * (productCount[0]['COUNT(*)'] - 0) + 0, 10)
