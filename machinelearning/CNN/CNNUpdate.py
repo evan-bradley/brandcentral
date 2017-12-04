@@ -343,7 +343,7 @@ def trainClusters(iterations):
         cursor.execute(dislikeStmt)
         for prod in range(0, cursor.rowcount):
             product = cursor.fetchone()
-            shutil.copyfile(dir_path+'./products/product' + str(product[0]) + '.jpg', train_path + '/Dislike/product' + str(prod) + '.jpg')
+            shutil.copyfile(dir_path+'/products/product' + str(product[0]) + '.jpg', train_path + '/Dislike/product' + str(prod) + '.jpg')
             # urllib.request.urlretrieve(product[1], train_path + '/Dislike/product' + str(prod) + '.jpg')
         print("CNN Training Cluster "+ str(cluster) + "...")
         train(num_iteration=iterations, clusterNum=cluster)
@@ -362,17 +362,17 @@ def updatePredictions(clusterNum = 0, userID = 0):
     cursor.execute(sqlGetClusterProducts)
     products = cursor.fetchall()
 
-    if (clusterNum == 0):
-        sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM `CNN_RESULTS`"
-        cursor.execute(sqlGetClusters)
-        clusterCount = cursor.rowcount
-        clusterNum = 1
-    elif (userID != 0):
-        sqlGetCluster = "SELECT CLUSTER_ID FROM `USER` WHERE USER_ID ="+str(userID)
+    if (userID != 0):
+        sqlGetCluster = "SELECT USER_CLUSTER_ID FROM `USER` WHERE USER_ID ="+str(userID)
         cursor.execute(sqlGetCluster)
         results = cursor.fetchone()
         clusterNum = results[0]
         clusterCount = clusterNum
+    elif (clusterNum == 0):
+        sqlGetClusters = "SELECT DISTINCT CLUSTER_ID FROM `CNN_RESULTS`"
+        cursor.execute(sqlGetClusters)
+        clusterCount = cursor.rowcount
+        clusterNum = 1
     else:
         clusterCount = clusterNum
 
@@ -399,7 +399,7 @@ def updatePredictions(clusterNum = 0, userID = 0):
             # Reading the image using OpenCV
             image = cv2.imread(file_path+'product'+str(product)+'.jpg')
             # Resizing the image to our desired size and preprocessing will be done exactly as done during training
-            image = cv2.resize(image, (image_size, image_size), cv2.INTER_LINEAR)
+            image = cv2.resize(image, (image_size, image_size), interpolation=cv2.INTER_LINEAR)
             image = np.array(image, dtype=np.uint8)
             image = image.astype('float32')
             image = np.multiply(image, 1.0 / 255.0)
