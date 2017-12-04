@@ -1013,6 +1013,11 @@ PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRO
 JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
 WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?) LIMIT ?, ?
 `
+const GET_CHANNEL_PRODUCT_Q = `
+SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) 
+INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) 
+WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ? LIMIT ?, ?;
+`
 pool.getChannelProducts = (cid, page, productsPer) => {
     return new Promise(async (resolve, reject) => {
       if (!cid || !productsPer || !page) {
@@ -1022,7 +1027,7 @@ pool.getChannelProducts = (cid, page, productsPer) => {
     try {
       const startproduct = ((page - 1) * productsPer)
       const endproduct = (page * productsPer)
-      const results = await pool.query(CHANNELPRODUCTS_Q, [ cid, startproduct, endproduct ])
+      const results = await pool.query(GET_CHANNEL_PRODUCT_Q, [ cid, startproduct, endproduct ])
       const productsarray = []
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
@@ -1033,6 +1038,7 @@ pool.getChannelProducts = (cid, page, productsPer) => {
             pictureUrl: results[i].PROD_PICT_URL,
             productUrl: results[i].PROD_URL,
             model: results[i].PROD_MODEL,
+            channelid: results[i].CHANNEL_ID,
             tagid: results[i].TAG_ID
           }
           productsarray[i] = product
