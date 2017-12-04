@@ -741,7 +741,8 @@ router.delete('/api/product/:pid/preference/:uid', async (req, res) => {
  * @apiName GetRecommendedProduct
  * @apiGroup product
  *
- * @apiParam {Number} id  ID for the user
+ * @apiParam {Number} cid ID of the channel
+ * @apiQuery {Number} userId User ID (optional)
  * @apiQuery {Number} num Number of products
  *
  * @apiSuccess {Boolean} success  true
@@ -749,8 +750,19 @@ router.delete('/api/product/:pid/preference/:uid', async (req, res) => {
  * @apiError   {Boolean} success  false
  * @apiError   {String}  message  Error message
  */
-router.get('/api/product/predicted/:id', async (req, res) => {
-  queueRequest(req.session.userId, req.params.id, 1, res)
+router.get('/api/product/predicted/:cid', async (req, res) => {
+  try {
+    res.send({
+      success: true,
+      product: await db.getRecommendedProduct(req.params.cid,
+        req.session.userId || req.query.userId)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
 })
 
 /**
