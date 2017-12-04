@@ -984,4 +984,30 @@ router.get('/api/channel/products/:cid', async (req, res) => {
   }
 })
 
+/**
+ * @api {post} /api/tag/delete/:pid delete a tag
+ * @apiName DeleteTag
+ * @apiGroup Tag
+ *
+ * @apiParam {Number} pid Product ID
+ * @apiParam {Number} tagid Tag ID (query)
+ *
+ * @apiSuccess {Boolean} success true
+ * @apiError   {Boolean} success false
+ * @apiError   {String}  message Error message
+ */
+router.post('/api/tag/delete/:pid', async (req, res) => {
+    try {
+      await db.deleteTagAssign(req.params.pid, req.body.tagid)
+      res.send({
+      success: true
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e.message
+    })
+  }
+})
+
 module.exports = router

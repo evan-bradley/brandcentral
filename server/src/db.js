@@ -1047,4 +1047,21 @@ pool.getChannelProducts = (cid, page, productsPer) => {
     }
   })
 }
+
+const DELETETAGASSIGN_Q = 'DELETE FROM PROD_TAG_ASSIGN WHERE PRODUCT_ID = ? AND TAG_ID = ?'
+pool.deleteTagAssign = (pid, tagid) => {
+    return new Promise(async (resolve, reject) => {
+      if (!pid || !tagid) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      await pool.query(DELETETAGASSIGN_Q, [pid, tagid])
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 module.exports = pool
