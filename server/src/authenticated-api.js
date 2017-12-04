@@ -938,4 +938,50 @@ router.post('/api/mobile/product/dislike/:id', async (req, res) => {
   }
 })
 
+/**
+ * @api {get} /api/channel/products/:cid Get a user's liked products
+ * @apiName GetChannelProducts
+ * @apiGroup channel
+ *
+ * @apiParam {Number} cid          channel ID
+ * @apiParam {Number} page        Page number (query)
+ * @apiParam {Number} productsPer Products per page (query)
+ *
+ * @apiSuccess {Boolean}  success     true
+ * @apiSuccess {Number}   page        Page indicated in query
+ * @apiSuccess {Number}   productsPer Products per page indicated in query
+ * @apiSuccess {Number}   id          Product ID
+ * @apiSuccess {String}   name        Name of the product
+ * @apiSuccess {String}   description Description of the product
+ * @apiSuccess {String}   pictureUrl  URL pointing at the product picture
+ * @apiSuccess {String}   productUrl  URL pointing at a webpage for the product
+ * @apiSuccess {String}   model       Model number of the product
+ * @apiSuccess {String}   tagid       Tag ID
+ * @apiError   {Boolean}  success     false
+ * @apiError   {String}   message     Error message
+ */
+router.get('/api/channel/products/:cid', async (req, res) => {
+    if (req.query.page === undefined) {
+    req.query.page = 1
+  }
+  if (req.query.productsPer === undefined) {
+    req.query.productsPer = 10
+  }
+
+  try {
+      res.send({
+          success: true,
+          page: req.query.page,
+          productsPer: req.query.productsPer,
+          total: await db.getNumChannelProducts(req.params.cid),
+          products: await db.getChannelProducts(req.params.cid, req.query.page, req.query.productsPer)
+    })
+  } catch (e) {
+    res.send({
+      success: false,
+      message: e
+    })
+  }
+})
+
 module.exports = router

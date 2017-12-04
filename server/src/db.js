@@ -984,4 +984,67 @@ pool.getPopularProducts = async (limit = 12, days_ago = 7) => {
   })
   return productsArray
 }
+
+const NUMPRODUCTS_Q = `
+SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, 
+PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRODUCT 
+JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
+WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?)
+`
+pool.getNumChannelProducts = cid => {
+    return new Promise(async (resolve, reject) => {
+      if (!cid) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const results = await pool.query(NUMPRODUCTS_Q, [cid])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const CHANNELPRODUCTS_Q = `
+SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, 
+PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRODUCT 
+JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
+WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?) LIMIT ?, ?
+`
+pool.getChannelProducts = (cid, page, productsPer) => {
+    return new Promise(async (resolve, reject) => {
+      if (!cid || !productsPer || !page) {
+      reject(new Error('Missing required field'))
+    }
+
+    try {
+      const startproduct = ((page - 1) * productsPer)
+      const endproduct = (page * productsPer)
+      const results = await pool.query(CHANNELPRODUCTS_Q, [ cid, startproduct, endproduct ])
+      const productsarray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL,
+            tagid: results[i].TAG_ID
+          }
+          productsarray[i] = product
+        }
+        resolve(productsarray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
+}
 module.exports = pool
