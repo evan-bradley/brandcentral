@@ -394,43 +394,40 @@ CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?)
 and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)`
 const GET_WEIGHT_VECTOR_RESULT_Q = `select PRODUCT_ID from
 WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)`
+const GET_FILT_RAND_PRODUCT_Q = `SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?);`
+const GET_PRED_PRODUCT_Q = `SELECT Q.PRODUCT_ID FROM CNN_RESULTS JOIN WEIGHT_VECTOR_RESULTS ON CNN_RESULTS.PRODUCT_ID = WEIGHT_VECTOR_RESULTS.PRODUCT_ID JOIN (SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?)) AS Q ON CNN_RESULTS.PRODUCT_ID = Q.PRODUCT_ID WHERE WEIGHT_VECTOR_RESULTS.USER_ID = ? AND LIKE_PCT > 0.5 AND CLUSTER_ID = (SELECT USER_CLUSTER_ID FROM USER WHERE USER_ID = ?);`
 pool.getRecommendedProduct = (cid, uid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const products = await pool.getRandomProduct(cid, 10)
-      const productIds = products.map(prod => prod.id)
-      let cnnResults
-      let wvResults
+      const predResults = await pool.query(GET_PRED_PRODUCT_Q, [ cid, uid, uid, uid, uid ])
+      console.log("got results")
 
-      cnnResults = await pool.query(GET_CNN_RESULT_Q, [ uid, productIds ])
-      wvResults = await pool.query(GET_WEIGHT_VECTOR_RESULT_Q, [ uid, productIds ])
-      if (wvResults.length > 0 && cnnResults.length > 0) {
-        cnnResults.forEach(prod => {
-          if (prod.PRODUCT_ID === wvResults[0].PRODUCT_ID) {
-            products.forEach(origProd => {
-              if (origProd.id === prod.PRODUCT_ID) {
-                console.log("Found item agreed upon in ensemble.")
-                resolve(origProd)
-              }
-            })
-          }
-        })
-      } else if (cnnResults.length > 0) {
-        products.forEach(prod => {
-          if (prod.id === cnnResults[0].PRODUCT_ID) {
-            console.log("Found item in CNN.")
-            resolve(prod)
-          }
-        })
-      } else if (wvResults.length > 0) {
-        products.forEach(prod => {
-          if (prod.id === wvResults[0].PRODUCT_ID) {
-            console.log("Found item in weight vector.")
-            resolve(prod)
-          }
+      if (predResults.length > 0) {
+        console.log("got predicted results")
+        const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
+        console.log(predResults[productNum].PRODUCT_ID)
+        const results = await pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [ predResults[productNum].PRODUCT_ID ])
+        resolve({
+          id: results[0].PRODUCT_ID,
+          name: results[0].PROD_NAME,
+          description: results[0].PROD_DESC,
+          pictureUrl: results[0].PROD_PICT_URL,
+          productUrl: results[0].PROD_URL,
+          model: results[0].PROD_MODEL
         })
       } else {
-        resolve(products[0])
+        console.log("got random results")
+        const randResults = await pool.query(GET_FILT_RAND_PRODUCT_Q, [ cid, uid, uid ])
+        const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
+        const results = await pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [ randResults[productNum].PRODUCT_ID ])
+        resolve({
+          id: results[0].PRODUCT_ID,
+          name: results[0].PROD_NAME,
+          description: results[0].PROD_DESC,
+          pictureUrl: results[0].PROD_PICT_URL,
+          productUrl: results[0].PROD_URL,
+          model: results[0].PROD_MODEL
+        })
       }
     } catch (e) {
       reject(e)
