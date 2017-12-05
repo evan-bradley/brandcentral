@@ -1,39 +1,53 @@
 <template>
-<div>
-  <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
-    <div class="navbar-menu" >
-    </div>
-    <div class="navbar-brand">
-      <div class="navbar-start navbar-item" style="width: 52px;">
-        <a @click="GoBackAChannel">
-          <i class="fa fa-chevron-circle-left" aria-hidden="true" style="font-size: 25px; color: #EF233C;"></i>
+  <div>
+    <nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <div class="navbar-start navbar-item" style="width: 52px;">
+          <a @click="GoBackAChannel">
+            <i class="fa fa-chevron-circle-left" aria-hidden="true" style="font-size: 25px; color: #EF233C;"></i>
+          </a>
+        </div>
+        <div class="navbar-item center-div is-hidden-tablet">{{ this.channelName }}</div>
+        <div class="navbar-burger burger" style="margin: 0;" @click="toggleBurger"
+            :class="{ 'is-active': burgerActive }">
+          <!-- Note: these spans generate the burger lines -->
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div class="navbar-item center-div is-hidden-mobile ">{{ this.channelName }}</div>
+
+      <div class="navbar-end navbar-item has-dropdown is-hidden-mobile " :class="{ 'is-active': burgerActive }">
+        <a class="navbar-item" @click="toggleBurger">
+          <i class="fa" :class="{'fa-bars' : !burgerActive, 'fa-times' : burgerActive }"></i>
         </a>
-      </div>
-      <div class="navbar-item center-div">{{ this.channelName }}</div>
-      <div class="navbar-burger burger" style="margin: 0;" @click="toggleBurger"
-           :class="{ 'is-active': burgerActive }">
-         <!-- Note: these spans generate the burger lines -->
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div> 
-    <div class="navbar-menu" :class="{ 'is-active': burgerActive }">
-      <div class="navbar-end">
-        <div class="navbar-item has-dropdown is-hoverable">
-          <div class="navbar-dropdown is-right">
+        <div class="navbar-dropdown is-right">
             <div class="dropdown-item" style="display:block;">
               <b>{{ user.FirstName ? user.FirstName : "" }} {{ user.LastName ? user.LastName : "" }}</b>
               <br> @{{ user.UserName ? user.UserName : ""  }}
             </div>
-             <hr class="navbar-divider">
-            <a class="dropdown-item" @click="signOut">Sign out</a>
+          <hr class="navbar-divider">
+          <a class="dropdown-item" @click="signOut">Sign out</a>
+        </div>
+      </div>
+
+      <div class="navbar-menu is-hidden-tablet" :class="{ 'is-active': burgerActive }">
+        <div class="navbar-end">
+          <div class="navbar-item has-dropdown">
+            <div class="navbar-dropdown is-right">
+              <div class="dropdown-item" style="display:block;">
+                <b>{{ user.FirstName ? user.FirstName : "" }} {{ user.LastName ? user.LastName : "" }}</b>
+                <br> @{{ user.UserName ? user.UserName : ""  }}
+              </div>
+              <hr class="navbar-divider">
+              <a class="dropdown-item" @click="signOut">Sign out</a>
+            </div>
           </div>
         </div>
       </div>
+    </nav>
     </div>
-  </nav>
-  </div>
 </template>
 
 <script>
