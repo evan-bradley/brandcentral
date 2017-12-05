@@ -418,7 +418,8 @@ pool.getRecommendedProduct = (cid, uid) => {
       } else {
         console.log("got random results")
         const randResults = await pool.query(GET_FILT_RAND_PRODUCT_Q, [ cid, uid, uid ])
-        const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
+        const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
+        console.log(randResults[productNum].PRODUCT_ID)
         const results = await pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [ randResults[productNum].PRODUCT_ID ])
         resolve({
           id: results[0].PRODUCT_ID,
