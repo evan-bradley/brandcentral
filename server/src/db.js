@@ -1026,7 +1026,7 @@ pool.getChannelProducts = (cid, page, productsPer) => {
 
     try {
       const startproduct = ((page - 1) * productsPer)
-      const endproduct = (page * productsPer)
+      const endproduct = parseInt(productsPer)
       const results = await pool.query(GET_CHANNEL_PRODUCT_Q, [ cid, startproduct, endproduct ])
       const productsarray = []
       if (results.length > 0) {
