@@ -394,41 +394,107 @@ CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?)
 and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)`
 const GET_WEIGHT_VECTOR_RESULT_Q = `select PRODUCT_ID from
 WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)`
-const GET_FILT_RAND_PRODUCT_Q = `SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?);`
-const GET_PRED_PRODUCT_Q = `SELECT Q.PRODUCT_ID FROM CNN_RESULTS JOIN WEIGHT_VECTOR_RESULTS ON CNN_RESULTS.PRODUCT_ID = WEIGHT_VECTOR_RESULTS.PRODUCT_ID JOIN (SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?)) AS Q ON CNN_RESULTS.PRODUCT_ID = Q.PRODUCT_ID WHERE WEIGHT_VECTOR_RESULTS.USER_ID = ? AND LIKE_PCT > 0.5 AND CLUSTER_ID = (SELECT USER_CLUSTER_ID FROM USER WHERE USER_ID = ?);`
+const GET_FILT_RAND_PRODUCT_Q = `SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN 
+AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? 
+AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) 
+AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?);`
+
+const GET_GENERAL_FILT_RAND_PRODUCT_Q = `SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN 
+AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE 
+P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) 
+AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID WHERE DISLIKES.USER_ID = ?);`
+
+const GET_PRED_PRODUCT_Q = `SELECT Q.PRODUCT_ID FROM CNN_RESULTS JOIN WEIGHT_VECTOR_RESULTS 
+ON CNN_RESULTS.PRODUCT_ID = WEIGHT_VECTOR_RESULTS.PRODUCT_ID JOIN (SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON 
+P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? 
+AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID 
+WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID 
+WHERE DISLIKES.USER_ID = ?)) AS Q ON CNN_RESULTS.PRODUCT_ID = Q.PRODUCT_ID WHERE WEIGHT_VECTOR_RESULTS.USER_ID = ? AND LIKE_PCT > 0.5 
+AND CLUSTER_ID = (SELECT USER_CLUSTER_ID FROM USER WHERE USER_ID = ?);`
+
+const GET_GENERAL_PRED_PRODUCT_Q = `SELECT Q.PRODUCT_ID FROM CNN_RESULTS JOIN WEIGHT_VECTOR_RESULTS 
+ON CNN_RESULTS.PRODUCT_ID = WEIGHT_VECTOR_RESULTS.PRODUCT_ID JOIN (SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN AS PT ON 
+P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE P.PRODUCT_ID NOT IN 
+(SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID 
+WHERE LIKES.USER_ID = ?) AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN DISLIKES ON PRODUCT.PRODUCT_ID = DISLIKES.PRODUCT_ID 
+WHERE DISLIKES.USER_ID = ?)) AS Q ON CNN_RESULTS.PRODUCT_ID = Q.PRODUCT_ID WHERE WEIGHT_VECTOR_RESULTS.USER_ID = ? AND LIKE_PCT > 0.5 
+AND CLUSTER_ID = (SELECT USER_CLUSTER_ID FROM USER WHERE USER_ID = ?);`
 pool.getRecommendedProduct = (cid, uid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const predResults = await pool.query(GET_PRED_PRODUCT_Q, [ cid, uid, uid, uid, uid ])
-      console.log("got results")
+      if(parseInt(cid) === 0) {
+        const predResults = await
+        pool.query(GET_GENERAL_PRED_PRODUCT_Q, [uid, uid, uid, uid])
+        console.log("got results")
 
-      if (predResults.length > 0) {
-        console.log("got predicted results")
-        const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
-        console.log(predResults[productNum].PRODUCT_ID)
-        const results = await pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [ predResults[productNum].PRODUCT_ID ])
-        resolve({
-          id: results[0].PRODUCT_ID,
-          name: results[0].PROD_NAME,
-          description: results[0].PROD_DESC,
-          pictureUrl: results[0].PROD_PICT_URL,
-          productUrl: results[0].PROD_URL,
-          model: results[0].PROD_MODEL
-        })
-      } else {
-        console.log("got random results")
-        const randResults = await pool.query(GET_FILT_RAND_PRODUCT_Q, [ cid, uid, uid ])
-        const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
-        console.log(randResults[productNum].PRODUCT_ID)
-        const results = await pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [ randResults[productNum].PRODUCT_ID ])
-        resolve({
-          id: results[0].PRODUCT_ID,
-          name: results[0].PROD_NAME,
-          description: results[0].PROD_DESC,
-          pictureUrl: results[0].PROD_PICT_URL,
-          productUrl: results[0].PROD_URL,
-          model: results[0].PROD_MODEL
-        })
+        if (predResults.length > 0) {
+          console.log("got predicted results")
+          const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
+          console.log(predResults[productNum].PRODUCT_ID)
+          const results = await
+          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
+          resolve({
+            id: results[0].PRODUCT_ID,
+            name: results[0].PROD_NAME,
+            description: results[0].PROD_DESC,
+            pictureUrl: results[0].PROD_PICT_URL,
+            productUrl: results[0].PROD_URL,
+            model: results[0].PROD_MODEL
+          })
+        } else {
+          console.log("got random results")
+          const randResults = await
+          pool.query(GET_GENERAL_FILT_RAND_PRODUCT_Q, [uid, uid])
+          const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
+          console.log(randResults[productNum].PRODUCT_ID)
+          const results = await
+          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
+          resolve({
+            id: results[0].PRODUCT_ID,
+            name: results[0].PROD_NAME,
+            description: results[0].PROD_DESC,
+            pictureUrl: results[0].PROD_PICT_URL,
+            productUrl: results[0].PROD_URL,
+            model: results[0].PROD_MODEL
+          })
+        }
+
+    } else {
+        const predResults = await
+        pool.query(GET_PRED_PRODUCT_Q, [cid, uid, uid, uid, uid])
+        console.log("got results")
+
+        if (predResults.length > 0) {
+          console.log("got predicted results")
+          const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
+          console.log(predResults[productNum].PRODUCT_ID)
+          const results = await
+          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
+          resolve({
+            id: results[0].PRODUCT_ID,
+            name: results[0].PROD_NAME,
+            description: results[0].PROD_DESC,
+            pictureUrl: results[0].PROD_PICT_URL,
+            productUrl: results[0].PROD_URL,
+            model: results[0].PROD_MODEL
+          })
+        } else {
+          console.log("got random results")
+          const randResults = await
+          pool.query(GET_FILT_RAND_PRODUCT_Q, [cid, uid, uid])
+          const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
+          console.log(randResults[productNum].PRODUCT_ID)
+          const results = await
+          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
+          resolve({
+            id: results[0].PRODUCT_ID,
+            name: results[0].PROD_NAME,
+            description: results[0].PROD_DESC,
+            pictureUrl: results[0].PROD_PICT_URL,
+            productUrl: results[0].PROD_URL,
+            model: results[0].PROD_MODEL
+          })
+        }
       }
     } catch (e) {
       reject(e)
