@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "bulma": "^0.5.2",
+    "ejs": "^2.5.7",
     "geopattern": "^1.2.3",
     "md5": "^2.2.1",
     "vee-validate": "^2.0.0-rc.17",
