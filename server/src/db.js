@@ -1078,4 +1078,90 @@ pool.getPopularProducts = async (limit = 12, days_ago = 7) => {
   })
   return productsArray
 }
+
+const NUMPRODUCTS_Q = `
+SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, 
+PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRODUCT 
+JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
+WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?)
+`
+pool.getNumChannelProducts = cid => {
+    return new Promise(async (resolve, reject) => {
+      if (!cid) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      const results = await pool.query(NUMPRODUCTS_Q, [cid])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const CHANNELPRODUCTS_Q = `
+SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, 
+PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRODUCT 
+JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
+WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?) LIMIT ?, ?
+`
+const GET_CHANNEL_PRODUCT_Q = `
+SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) 
+INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) 
+WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ? LIMIT ?, ?;
+`
+pool.getChannelProducts = (cid, page, productsPer) => {
+    return new Promise(async (resolve, reject) => {
+      if (!cid || !productsPer || !page) {
+      reject(new Error('Missing required field'))
+    }
+
+    try {
+      const startproduct = ((page - 1) * productsPer)
+      const endproduct = parseInt(productsPer)
+      const results = await pool.query(GET_CHANNEL_PRODUCT_Q, [ cid, startproduct, endproduct ])
+      const productsarray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL,
+            channelid: results[i].CHANNEL_ID,
+            tagid: results[i].TAG_ID
+          }
+          productsarray[i] = product
+        }
+        resolve(productsarray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
+}
+
+const DELETETAGASSIGN_Q = 'DELETE FROM PROD_TAG_ASSIGN WHERE PRODUCT_ID = ? AND TAG_ID = ?'
+pool.deleteTagAssign = (pid, tagid) => {
+    return new Promise(async (resolve, reject) => {
+      if (!pid || !tagid) {
+      reject(new Error('Missing required field'))
+      return
+    }
+
+    try {
+      await pool.query(DELETETAGASSIGN_Q, [pid, tagid])
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
 module.exports = pool
