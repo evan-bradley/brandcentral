@@ -20,7 +20,7 @@ import ProductItem from '@/components/ProductItem'
 import Admin from '@/components/Admin'
 
 // var store = require('../Vuex/states')
-// var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
+var Classes = require('../TypeScriptFolder/Compiled/Classes').Classes
 Vue.use(Router)
 
 const router = new Router({
