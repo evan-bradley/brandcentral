@@ -274,8 +274,8 @@ session.run(tf.global_variables_initializer())
 def show_progress(epoch, feed_dict_train, feed_dict_validate, val_loss):
     acc = session.run(accuracy, feed_dict=feed_dict_train)
     val_acc = session.run(accuracy, feed_dict=feed_dict_validate)
-    msg = "Training Epoch {0} --- Training Accuracy: {1:>6.1%}, Validation Accuracy: {2:>6.1%},  Validation Loss: {3:.3f}"
-    print(msg.format(epoch + 1, acc, val_acc, val_loss))
+    msg = "Training Accuracy: {1:>6.1%}, Validation Accuracy: {2:>6.1%}"
+    return (msg.format(epoch + 1, acc, val_acc, val_loss))
 
 saver = tf.train.Saver()
 
@@ -309,9 +309,10 @@ def train(num_iteration, clusterNum):
             val_loss = session.run(cost, feed_dict=feed_dict_val)
             epoch = int(i / int(data.train.num_examples / batch_size))
 
-            # show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
+            progress = show_progress(epoch, feed_dict_tr, feed_dict_val, val_loss)
             saver.save(session,
                        dir_path + '/like-dislike-model' + str(clusterNum))
+    print(progress)
 
 
 def trainClusters(iterations):
