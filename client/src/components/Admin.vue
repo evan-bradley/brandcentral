@@ -1,29 +1,35 @@
 <template>
-    <div>    
-        <div class="columns is-multiline" v-show="currentChannel === null">
-            <div v-for="channel in userChannels" :key="channel.id" class="column is-2">
-                <button class="button is-primary" @click="currentChannel = channel">{{ channel.name }}</button>
-            </div>
-        </div>
-    <div v-if="currentChannel">
-      <div class="columns is-multiline">
-        <div class="column is-12">
-          <button class="button is-primary" @click="currentChannel = null">Back to channel select</button>
-        </div>
-        <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.id">
-          <div>
-            <h3 class="title is-4"> {{ product.name }} </h3>
-            <img :src="product.pictureUrl" alt="Placeholder image">
-            <button class="button is-primary" @click="RemoveFromChannel(product)">Remove from channel</button>
+  <div>
+      <div class="columns is-multiline" v-show="currentChannel === null">
+          <div v-for="channel in userChannels" :key="channel.id" class="column is-2">
+              <button class="button is-primary" @click="currentChannel = channel">{{ channel.name }}</button>
           </div>
-        </div>
       </div>
-      <nav class="pagination" v-show="totalProducts > numberPerPage" role="navigation" aria-label="pagination">
-        <a class="pagination-previous" @click="previousPage()" :disabled="currentPage == 1">Previous</a>
-        <a class="pagination-next" @click="nextPage()" :disabled="currentPage * numberPerPage >= totalProducts">Next page</a>
-      </nav>
-    </div>
-    </div>
+      <div v-if="currentChannel">
+          <div class="columns is-multiline">
+              <div class="column is-12">
+                  <button class="button is-primary" @click="currentChannel = null">Back to channel select</button>
+              </div>
+              <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.id">
+                  <div class="columns is-multiline">
+                      <div class="column is-12">
+                          <h3 class="title is-4"> {{ product.name }} </h3>
+                      </div>
+                      <div class="column is-12">
+                          <img :src="product.pictureUrl" alt="Placeholder image" class="column is-12">
+                      </div>
+                      <div class="column is-12">
+                          <button class="button is-primary" @click="RemoveFromChannel(product)">Remove from channel</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <nav class="pagination" v-show="totalProducts > numberPerPage" role="navigation" aria-label="pagination">
+              <a class="pagination-previous" @click="previousPage()" :disabled="currentPage == 1">Previous</a>
+              <a class="pagination-next" @click="nextPage()" :disabled="currentPage * numberPerPage >= totalProducts">Next page</a>
+          </nav>
+      </div>
+  </div>
 </template>
 
 <script>
