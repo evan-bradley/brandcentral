@@ -244,7 +244,7 @@ router.get('/api/product/random', async (req, res) => {
   try {
     res.send({
       success: true,
-      product: await db.getRandomProduct(req.query.channelId)
+      product: await db.getRandomProduct(req.query.channelId, 1)
     })
   } catch (e) {
     res.send({
