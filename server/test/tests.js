@@ -70,8 +70,9 @@ const followedUserData = {
 let userId
 let cookie
 const likeData = {
-  productID: '15',
-  productName: 'testname'
+  productID: '1056',
+  productName: 'testname',
+  channelId: '1'
 }
 const channelId = 1
 let followedUserId
@@ -292,7 +293,7 @@ describe('Getting a user\'s profile', () => {
 })
 
 describe('Channel navigation', () => {
-  it('Should GET /api/product', () => {
+  it('Should GET /api/product/random', () => {
     return new Promise((resolve, reject) => {
       chai.request(server)
         .get('/api/product/random?channelId=1')
@@ -307,6 +308,18 @@ describe('Channel navigation', () => {
         })
     })
   })
+
+  it('Should GET /api/product/predicted/:cid', () => {
+    return new Promise((resolve, reject) => {
+      chai.request(server)
+        .get('/api/product/predicted/1')
+        .set('cookie', cookie)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
 })
 
 describe('Liking a product', () => {
@@ -314,6 +327,9 @@ describe('Liking a product', () => {
     return new Promise((resolve, reject) => {
       chai.request(server)
         .post(`/api/product/like/${likeData.productID}`)
+        .send({
+          channelId: likeData.channelId
+        })
         .set('cookie', cookie)
         .end((err, res) => {
           should.not.exist(err)
@@ -496,6 +512,100 @@ describe('Unsubscribing from a channel', () => {
       } catch (e) {
         reject(e)
       }
+    })
+  })
+})
+
+describe('Product preferences', () => {
+  it('Should GET /api/user/likedproducts/:id', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/user/likedproducts/${userId}`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+
+  it('Should GET /api/product/:pid/preference/:uid', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/user/product/${likeData.productId}/preference/${userId}`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+
+  it('Should DELETE /api/product/:pid/preference/:uid', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .del(`/api/product/${likeData.productId}/preference/${userId}`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+})
+
+describe('Getting trending products and channels', () => {
+  it('Should GET /api/channel/trending', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/channel/trending`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+
+  it('Should GET /api/products/trending', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/products/trending`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+})
+
+describe('Searching for users and channels', () => {
+  it('Should GET /api/search', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/search?query=desktop&limit=1`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+
+  it('Should GET /api/channel/search', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/channels/search?query=desktop&limit=1`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
+    })
+  })
+
+  it('Should GET /api/users/search', () => {
+    return new Promise(async (resolve, reject) => {
+      chai.request(server)
+        .get(`/api/users/search?query=john&limit=1`)
+        .end((err, res) => {
+          should.not.exist(err)
+          resolve()
+        })
     })
   })
 })
