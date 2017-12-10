@@ -210,7 +210,7 @@ router.post('/api/user/:id/channels', async (req, res) => {
 router.get('/api/user/:id/channels', async (req, res) => {
   try {
     const channels = await db.retrieveUserChannels(req.params.id)
-      res.send({
+    res.send({
       success: true,
       channels
     })
@@ -579,19 +579,19 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
   try {
     if (req.query.query === undefined) {
       res.send({
-          success: true,
-          page: req.query.page,
-          productsPer: req.query.productsPer,
-          total: await db.getNumLikedProducts(req.params.id),
-          products: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
+        success: true,
+        page: req.query.page,
+        productsPer: req.query.productsPer,
+        total: await db.getNumLikedProducts(req.params.id),
+        products: await db.getLikedProducts(req.params.id, req.query.page, req.query.productsPer)
       })
     } else {
       res.send({
         success: true,
-          page: req.query.page,
-          productsPer: req.query.productsPer,
-          total: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
-          products: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.id)
+        page: req.query.page,
+        productsPer: req.query.productsPer,
+        total: await db.getNumSearchLikedProducts(req.query.query, req.params.id),
+        products: await db.getSearchLikedProducts(req.query.query, req.query.page, req.query.productsPer, req.params.id)
       })
     }
   } catch (e) {
@@ -618,7 +618,7 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
  */
 router.get('/api/users/search', async (req, res) => {
   if (req.query.query === undefined) {
-    req.query.query = ""
+    req.query.query = ''
   }
   if (req.query.limit === undefined) {
     req.query.limit = 10
@@ -653,7 +653,7 @@ router.get('/api/users/search', async (req, res) => {
  */
 router.get('/api/channel/search', async (req, res) => {
   if (req.query.query === undefined) {
-    req.query.query = ""
+    req.query.query = ''
   }
   if (req.query.limit === undefined) {
     req.query.limit = 10
@@ -724,7 +724,6 @@ router.get('/api/search', async (req, res) => {
  * @apiError   {String}  message Error message
  */
 router.get('/api/product/:pid/preference/:uid', async (req, res) => {
-
   try {
     res.send({
       success: true,
@@ -752,11 +751,11 @@ router.get('/api/product/:pid/preference/:uid', async (req, res) => {
  * @apiError   {String}  message Error message
  */
 router.delete('/api/product/:pid/preference/:uid', async (req, res) => {
-    try {
-      await db.deleteUserPreference(req.params.uid, req.params.pid)
-      res.send({
-        success: true
-      })
+  try {
+    await db.deleteUserPreference(req.params.uid, req.params.pid)
+    res.send({
+      success: true
+    })
   } catch (e) {
     res.send({
       success: false,
@@ -832,9 +831,9 @@ router.post('/api/mobile/product/like/:id', async (req, res) => {
  * @apiError   {String}  message Error message
  */
 router.post('/api/mobile/product/dislike/:id', async (req, res) => {
-    try {
-      await db.dislikeProduct(req.body.userId, req.params.id)
-      res.send({
+  try {
+    await db.dislikeProduct(req.body.userId, req.params.id)
+    res.send({
       success: true
     })
   } catch (e) {
@@ -868,7 +867,7 @@ router.post('/api/mobile/product/dislike/:id', async (req, res) => {
  * @apiError   {String}   message     Error message
  */
 router.get('/api/channel/products/:cid', async (req, res) => {
-    if (req.query.page === undefined) {
+  if (req.query.page === undefined) {
     req.query.page = 1
   }
   if (req.query.productsPer === undefined) {
@@ -876,12 +875,12 @@ router.get('/api/channel/products/:cid', async (req, res) => {
   }
 
   try {
-      res.send({
-          success: true,
-          page: req.query.page,
-          productsPer: req.query.productsPer,
-          total: await db.getNumChannelProducts(req.params.cid),
-          products: await db.getChannelProducts(req.params.cid, req.query.page, req.query.productsPer)
+    res.send({
+      success: true,
+      page: req.query.page,
+      productsPer: req.query.productsPer,
+      total: await db.getNumChannelProducts(req.params.cid),
+      products: await db.getChannelProducts(req.params.cid, req.query.page, req.query.productsPer)
     })
   } catch (e) {
     res.send({
@@ -904,9 +903,9 @@ router.get('/api/channel/products/:cid', async (req, res) => {
  * @apiError   {String}  message Error message
  */
 router.post('/api/tag/delete/:pid', async (req, res) => {
-    try {
-      await db.deleteTagAssign(req.params.pid, req.body.tagid)
-      res.send({
+  try {
+    await db.deleteTagAssign(req.params.pid, req.body.tagid)
+    res.send({
       success: true
     })
   } catch (e) {
