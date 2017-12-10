@@ -49,4 +49,22 @@ var Classes;
         return Product;
     }());
     Classes.Product = Product;
+  var ChannelProduct = /** @class */ (function () {
+    function ChannelProduct(id, name, description, pictureUrl, productUrl, channelid, tagid) {
+      if (name === void 0) { name = ""; }
+      if (description === void 0) { description = ""; }
+      if (productUrl === void 0) { productUrl = ""; }
+      if (channelid === void 0) { channelid = ""; }
+      if (tagid === void 0) { tagid = ""; }
+      this.id = id;
+      this.name = name;
+      this.description = description;
+      this.pictureUrl = pictureUrl;
+      this.productUrl = productUrl;
+      this.channelid = channelid;
+      this.tagid = tagid;
+    }
+    return ChannelProduct;
+  }());
+  Classes.ChannelProduct = ChannelProduct;
 })(Classes = exports.Classes || (exports.Classes = {}));

@@ -8,17 +8,20 @@
     -->
       <div class="columns is-multiline" v-show="currentChannel === null">
           <div v-for="channel in userChannels" :key="channel.id" class="column is-2">
-              <button class="button is-primary" @click="currentChannel = channel">{{ channel.name }}</button>
+              <button class="button is-primary" @click="currentChannel = channel, loadLikedProducts(1)">{{ channel.name }}</button>
           </div>
       </div>
       <div v-if="currentChannel">
           <div class="columns is-multiline">
-            <div class="column is-12"> {{ currentChannel.name }} </div>
+            <div class="column is-12"> Channel Name: {{ currentChannel.name }} <br> Channel ID: {{ currentChannel.id }} <br> Number Of Products: {{ totalProducts }}</div>
               <div class="column is-12">
                 <button class="button is-primary" @click="currentChannel = null">Back to channel select</button>
               </div>
               <div class="column is-12">
-                <button class="button is-primary" @click="loadLikedProducts(1)">Load Products</button>
+                <nav class="pagination" v-show="totalProducts > numberPerPage" role="navigation" aria-label="pagination">
+                  <a class="pagination-previous" @click="previousPage()" :disabled="currentPage == 1">Previous</a>
+                  <a class="pagination-next" @click="nextPage()" :disabled="currentPage * numberPerPage >= totalProducts">Next page</a>
+                </nav>
               </div>
               <div class="column is-one-quarter is-half-tablet is-12-mobile" v-for="product in likedProducts" :key="product.id">
                 <div class="box">
@@ -30,6 +33,9 @@
                     <div class="content has-text-left">
                       {{ product.name.substring(0, 80) + '...' }}
                     </div>
+                  </div>
+                  <div class="content has-text-left">
+                    Product ID: {{ product.id }}
                   </div>
                   <div class="content has-text-left">
                     Channel ID: {{ product.channelid }}
@@ -105,13 +111,9 @@
         var url = `/api/channel/products/${this.currentChannel.id}?productsPer=${this.numberPerPage}&page=${page}`
         this.$http.get(url)
           .then(response => {
-            console.log('test')
-            console.log(response.body.products)
-            console.log('test')
             if (response.data.success) {
               response.body.products.forEach(function (el) {
-                var product = new Classes.Product(el.id, el.name, el.description, el.pictureUrl, el.productUrl, el.channelid, el.tagid)
-                console.log(product.channelid)
+                var product = new Classes.ChannelProduct(el.id, el.name, el.description, el.pictureUrl, el.productUrl, el.channelid, el.tagid)
                 newlikedProducts.push(product)
               }, this)
               this.likedProducts = newlikedProducts
