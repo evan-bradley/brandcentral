@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="content has-text-left">
-                      {{ product.name.substring(0, 80) + '...' }}
+                      {{ product.name.substring(0, 28) + '...' }}
                     </div>
                   </div>
                   <div class="content has-text-left">
@@ -140,9 +140,11 @@
       },
       previousPage () {
         this.loadLikedProducts(this.currentPage - 1)
+        window.scrollTo(0, 0)
       },
       nextPage () {
         this.loadLikedProducts(this.currentPage + 1)
+        window.scrollTo(0, 0)
       },
       RemoveFromChannel (product) {
         var body = {
