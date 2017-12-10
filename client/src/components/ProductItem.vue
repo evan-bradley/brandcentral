@@ -78,7 +78,7 @@
         <div class="columns box" style="margin: 0px;">
           <div class="column is-4">
             <div class="image-container image is-square">
-              <img :src="displayProduct.pictureUrl" alt="Placeholder image">
+              <img id="mediumProductImage" :src="propProduct.pictureUrl" alt="Placeholder image">
             </div>
           </div>
           <br>
@@ -123,7 +123,7 @@
                   </span>
                 </a>
               </p>
-              <p v-if="liked | disliked" class="control display-on-hover">
+              <p v-if="showDelete" class="control display-on-hover">
                 <a class="button is-medium" v-on:click.stop.prevent="deletePreference" style="border-radius: 100px;">
                   <span class="icon is-small">
                     <i class="material-icons md-24">close</i>
@@ -216,14 +216,25 @@ export default {
   data () {
     return {
       displayProduct: this.product,
+      propProduct: this.product,
       user: this.$store.state.User,
       liked: false,
-      disliked: false
+      disliked: false,
+      hideDelete: this.displayMode === 'medium'
+    }
+  },
+  computed: {
+    showDelete () {
+      return !this.hideDelete && (this.liked || this.disliked)
     }
   },
   watch: {
     product (product) {
-      this.displayProduct = product
+      if (this.displayMode === 'medium') {
+        this.propProduct = product
+      } else {
+        this.displayProduct = product
+      }
     },
     productId (productId) {
       this.loadProductFromId(productId)
@@ -238,10 +249,12 @@ export default {
   },
   methods: {
     previous () {
+      this.hideDelete = false
       this.$parent.$emit('previousProduct')
     },
     next () {
       this.$parent.$emit('nextProduct')
+      this.hideDelete = true
     },
     like () {
       var body = {
@@ -320,6 +333,14 @@ export default {
           console.log(response)
           this.failureMessage = response.data.message
         })
+    },
+    loadProductFromProp () {
+      this.displayProduct = this.propProduct
+    }
+  },
+  mounted () {
+    document.getElementById('mediumProductImage').onload = () => {
+      this.loadProductFromProp()
     }
   }
 }
