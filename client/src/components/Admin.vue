@@ -6,14 +6,26 @@
       the bottom half displays all the products and gives you a button to press to remove a products
       tag. also added some logging to display post request responses.
     -->
+    <br>
+    <section class="section">
       <div class="columns is-multiline" v-show="currentChannel === null">
-          <div v-for="channel in userChannels" :key="channel.id" class="column is-2">
-              <button class="button is-primary" @click="currentChannel = channel, loadLikedProducts(1)">{{ channel.name }}</button>
+        <div class="container">
+          <div class="columns is-mobile is-multiline">
+            <div v-for="channel in userChannels" v-bind:key="channel.id" class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+              <a class="box" v-on:click="currentChannel = channel, loadLikedProducts(1)">
+                <h3 class="title is-6">
+                  <i class="material-icons md-16" style="opacity: 0.4; margin-right: 5px;" aria-hidden="true">local_offer</i>
+                  <span>{{ channel.CHANNEL_NAME }}</span>
+                </h3>
+              </a>
+            </div>
           </div>
+        </div>
       </div>
+    </section>
       <div v-if="currentChannel">
           <div class="columns is-multiline">
-            <div class="column is-12"> Channel Name: {{ currentChannel.name }} <br> Channel ID: {{ currentChannel.id }} <br> Number Of Products: {{ totalProducts }}</div>
+            <div class="column is-12"> Channel Name: {{ currentChannel.CHANNEL_NAME }} <br> Channel ID: {{ currentChannel.CHANNEL_ID }} <br> Number Of Products: {{ totalProducts }}</div>
               <div class="column is-12">
                 <button class="button is-primary" @click="currentChannel = null">Back to channel select</button>
               </div>
@@ -88,7 +100,7 @@
     },
     methods: {
       loadChannels () {
-        this.$http.get(`/api/user/${this.$store.state.User.Id}/channels`)
+        this.$http.get('/api/channels/onboard')
           .then(response => {
             console.log(response.data.channels)
             if (response.data.success) {
@@ -108,7 +120,7 @@
         var userId = this.$store.state.User.Id
         this.currentPage = page
         var newlikedProducts = []
-        var url = `/api/channel/products/${this.currentChannel.id}?productsPer=${this.numberPerPage}&page=${page}`
+        var url = `/api/channel/products/${this.currentChannel.CHANNEL_ID}?productsPer=${this.numberPerPage}&page=${page}`
         this.$http.get(url)
           .then(response => {
             if (response.data.success) {
