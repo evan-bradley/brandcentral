@@ -78,7 +78,7 @@
         <div class="columns box" style="margin: 0px;">
           <div class="column is-4">
             <div class="image-container image is-square">
-              <img :src="displayProduct.pictureUrl" alt="Placeholder image">
+              <img id="mediumProductImage" :src="propProduct.pictureUrl" alt="Placeholder image">
             </div>
           </div>
           <br>
@@ -216,6 +216,7 @@ export default {
   data () {
     return {
       displayProduct: this.product,
+      propProduct: this.product,
       user: this.$store.state.User,
       liked: false,
       disliked: false
@@ -223,7 +224,11 @@ export default {
   },
   watch: {
     product (product) {
-      this.displayProduct = product
+      if (this.displayMode === 'medium') {
+        this.propProduct = product
+      } else {
+        this.displayProduct = product
+      }
     },
     productId (productId) {
       this.loadProductFromId(productId)
@@ -320,6 +325,10 @@ export default {
           console.log(response)
           this.failureMessage = response.data.message
         })
+  },
+  mounted () {
+    document.getElementById('mediumProductImage').onload = () => {
+      this.loadProductFromProp()
     }
   }
 }
