@@ -123,7 +123,7 @@
                   </span>
                 </a>
               </p>
-              <p v-if="liked | disliked" class="control display-on-hover">
+              <p v-if="showDelete" class="control display-on-hover">
                 <a class="button is-medium" v-on:click.stop.prevent="deletePreference" style="border-radius: 100px;">
                   <span class="icon is-small">
                     <i class="material-icons md-24">close</i>
@@ -219,7 +219,13 @@ export default {
       propProduct: this.product,
       user: this.$store.state.User,
       liked: false,
-      disliked: false
+      disliked: false,
+      hideDelete: this.displayMode === 'medium'
+    }
+  },
+  computed: {
+    showDelete () {
+      return !this.hideDelete && (this.liked || this.disliked)
     }
   },
   watch: {
@@ -243,10 +249,12 @@ export default {
   },
   methods: {
     previous () {
+      this.hideDelete = false
       this.$parent.$emit('previousProduct')
     },
     next () {
       this.$parent.$emit('nextProduct')
+      this.hideDelete = true
     },
     like () {
       var body = {
@@ -325,6 +333,10 @@ export default {
           console.log(response)
           this.failureMessage = response.data.message
         })
+    },
+    loadProductFromProp () {
+      this.displayProduct = this.propProduct
+    }
   },
   mounted () {
     document.getElementById('mediumProductImage').onload = () => {
