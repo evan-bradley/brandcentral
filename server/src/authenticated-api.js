@@ -549,7 +549,7 @@ router.get('/api/products/trending', async (req, res) => {
 /**
  * @api {get} api/user/likedproducts/:id Get a user's liked products
  * @apiName GetLikedProducts
- * @apiGroup user
+ * @apiGroup User
  *
  * @apiParam {Number} id          User's ID
  * @apiParam {Number} page        Page number (query)
@@ -605,9 +605,9 @@ router.get('/api/user/likedproducts/:id', async (req, res) => {
 /**
  * @api {get} /api/users/search Search for users
  * @apiName SearchForUsers
- * @apiGroup users
+ * @apiGroup User
  *
- * @apiParam {String} query entered search word
+ * @apiParam {String} query entered search word (query)
  * @apiParam {Number} limit limit for return (query)
  *
  * @apiSuccess {Boolean} success    true
@@ -638,11 +638,11 @@ router.get('/api/users/search', async (req, res) => {
 })
 
 /**
- * @api {get} /api/channel/search/:searchFor Search for users
+ * @api {get} /api/channel/search Search for channels
  * @apiName SearchForChannels
- * @apiGroup channel
+ * @apiGroup Channel
  *
- * @apiParam {String} query entered search word
+ * @apiParam {String} query entered search word (query)
  * @apiParam {Number} limit limit for return (query)
  *
  * @apiSuccess {Boolean} success       true
@@ -675,7 +675,7 @@ router.get('/api/channel/search', async (req, res) => {
 /**
  * @api {get} /api/search Search for users and channels
  * @apiName SearchForChannelsAndUsers
- * @apiGroup product
+ * @apiGroup Product
  *
  * @apiParam {String} query      entered search word
  * @apiParam {Number} limit      limit for return (query)
@@ -688,7 +688,7 @@ router.get('/api/channel/search', async (req, res) => {
  */
 router.get('/api/search', async (req, res) => {
   if (req.query.query === undefined) {
-    req.query.query = ""
+    req.query.query = ''
   }
   if (req.query.limit === undefined) {
     req.query.limit = 10
@@ -711,12 +711,12 @@ router.get('/api/search', async (req, res) => {
 })
 
 /**
- * @api {get} /api/product/userpreference/:uid returns what input a user has given for a product
+ * @api {get} /api/product/:pid/preference/:uid returns what input a user has given for a product
  * @apiName UserPreference
- * @apiGroup product
+ * @apiGroup Product
  *
  * @apiParam {Number} uid user id that you to check their preference for
- * @apiQuery {Number} pid product id to check (query)
+ * @apiparam {Number} pid product id to check (query)
  *
  * @apiSuccess {Boolean} success true
  * @apiSuccess {String}  preference will return like/dislike/none
@@ -740,10 +740,10 @@ router.get('/api/product/:pid/preference/:uid', async (req, res) => {
 /**
  * @api {delete} /api/product/:pid/preference/:uid deletes any input a user has entered on a product
  * @apiName deletepreference
- * @apiGroup product
+ * @apiGroup Product
  *
  * @apiParam {Number} uid user id that you to check their preference for
- * @apiQuery {Number} pid product id to check (query)
+ * @apiParam {Number} pid product id to check
  *
  * @apiSuccess {Boolean} success true
  * @apiSuccess {String}  preference will be deleted
@@ -765,13 +765,13 @@ router.delete('/api/product/:pid/preference/:uid', async (req, res) => {
 })
 
 /**
- * @api {get} /api/product/predicted/:id Gets recommended product
+ * @api {get} /api/product/predicted/:cid Gets recommended product
  * @apiName GetRecommendedProduct
- * @apiGroup product
+ * @apiGroup Product
  *
  * @apiParam {Number} cid ID of the channel
- * @apiQuery {Number} userId User ID (optional)
- * @apiQuery {Number} num Number of products
+ * @apiParam {Number} userId User ID (optional)
+ * @apiParam {Number} num Number of products
  *
  * @apiSuccess {Boolean} success  true
  * @apiSuccess {Array}   products Array of recommended products
@@ -806,9 +806,9 @@ router.get('/api/product/predicted/:cid', async (req, res) => {
  * @apiError   {String}  message Error message
  */
 router.post('/api/mobile/product/like/:id', async (req, res) => {
-    try {
-      await db.likeProduct(req.body.userId, req.params.id, req.body.channelId)
-      res.send({
+  try {
+    await db.likeProduct(req.body.userId, req.params.id, req.body.channelId)
+    res.send({
       success: true
     })
   } catch (e) {
@@ -847,7 +847,7 @@ router.post('/api/mobile/product/dislike/:id', async (req, res) => {
 /**
  * @api {get} /api/channel/products/:cid Get a user's liked products
  * @apiName GetChannelProducts
- * @apiGroup channel
+ * @apiGroup Channel
  *
  * @apiParam {Number} cid          channel ID
  * @apiParam {Number} page        Page number (query)
