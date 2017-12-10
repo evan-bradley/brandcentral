@@ -1095,7 +1095,8 @@ pool.getNumChannelProducts = cid => {
 }
 
 const GET_CHANNEL_PRODUCT_Q = `
-SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) 
+SELECT PRODUCT.PRODUCT_ID AS PID, PROD_NAME, PROD_DESC, PROD_PICT_URL, PROD_URL, PROD_MODEL, CHANNEL_ID AS CID, TAG.TAG_ID AS TID 
+FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) 
 INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) 
 WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ? LIMIT ?, ?;
 `
@@ -1113,14 +1114,14 @@ pool.getChannelProducts = (cid, page, productsPer) => {
       if (results.length > 0) {
         for (let i = 0; i < results.length; i++) {
           const product = {
-            id: results[i].PRODUCT_ID,
+            id: results[i].PID,
             name: results[i].PROD_NAME,
             description: results[i].PROD_DESC,
             pictureUrl: results[i].PROD_PICT_URL,
             productUrl: results[i].PROD_URL,
             model: results[i].PROD_MODEL,
-            channelid: results[i].CHANNEL_ID,
-            tagid: results[i].TAG_ID
+            channelid: results[i].CID,
+            tagid: results[i].TID
           }
           productsarray[i] = product
         }

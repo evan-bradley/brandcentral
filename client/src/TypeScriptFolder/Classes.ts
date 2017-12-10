@@ -49,4 +49,23 @@ export namespace Classes {
       this.productUrl = productUrl;
     }
   }
+  export class ChannelProduct {
+    public id: string;
+    public name : string;
+    public description : string;
+    public pictureUrl : string;
+    public productUrl : string;
+    public channelid : string;
+    public tagid : string;
+
+    constructor(id: string, name: string = "", description: string = "", pictureUrl: string, productUrl: string = "", channelid: string = "", tagid: string = "") {
+      this.id = id;
+      this.name = name;
+      this.description = description;
+      this.pictureUrl = pictureUrl;
+      this.productUrl = productUrl;
+      this.channelid = channelid;
+      this.tagid = tagid;
+    }
+  }
 }
