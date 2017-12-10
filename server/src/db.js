@@ -185,7 +185,7 @@ pool.updateProfile = info => {
       }
 
       if (info.username) {
-        var res = await pool.query('SELECT count(*) as count FROM USER WHERE USERNAME = ? AND USER_ID != ?', [info.username, info.id])
+        const res = await pool.query('SELECT count(*) as count FROM USER WHERE USERNAME = ? AND USER_ID != ?', [info.username, info.id])
         if (res[0].count) {
           throw new Error('Username taken')
         }
@@ -389,11 +389,6 @@ pool.getRandomProduct = (channel, number = 1) => {
   })
 }
 
-const GET_CNN_RESULT_Q = `select PRODUCT_ID from CNN_RESULTS where
-CLUSTER_ID = (select USER_CLUSTER_ID from USER WHERE USER_ID = ?)
-and LIKE_PCT > 0.50 AND PRODUCT_ID IN (?)`
-const GET_WEIGHT_VECTOR_RESULT_Q = `select PRODUCT_ID from
-WEIGHT_VECTOR_RESULTS where USER_ID = ? and PREDICTION = 1 AND PRODUCT_ID IN (?)`
 const GET_FILT_RAND_PRODUCT_Q = `SELECT DISTINCT P.PRODUCT_ID FROM PRODUCT AS P JOIN PROD_TAG_ASSIGN 
 AS PT ON P.PRODUCT_ID = PT.PRODUCT_ID JOIN CHANNEL_TAG_ASSIGN AS CT ON PT.TAG_ID = CT.TAG_ID WHERE CT.CHANNEL_ID = ? 
 AND P.PRODUCT_ID NOT IN (SELECT PRODUCT.PRODUCT_ID FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID WHERE LIKES.USER_ID = ?) 
@@ -422,17 +417,17 @@ AND CLUSTER_ID = (SELECT USER_CLUSTER_ID FROM USER WHERE USER_ID = ?);`
 pool.getRecommendedProduct = (cid, uid) => {
   return new Promise(async (resolve, reject) => {
     try {
-      if(parseInt(cid) === 0) {
+      if (parseInt(cid) === 0) {
         const predResults = await
-        pool.query(GET_GENERAL_PRED_PRODUCT_Q, [uid, uid, uid, uid])
-        console.log("got results")
+          pool.query(GET_GENERAL_PRED_PRODUCT_Q, [uid, uid, uid, uid])
+        console.log('got results')
 
         if (predResults.length > 0) {
-          console.log("got predicted results")
+          console.log('got predicted results')
           const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
           console.log(predResults[productNum].PRODUCT_ID)
           const results = await
-          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
+            pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
           resolve({
             id: results[0].PRODUCT_ID,
             name: results[0].PROD_NAME,
@@ -442,13 +437,13 @@ pool.getRecommendedProduct = (cid, uid) => {
             model: results[0].PROD_MODEL
           })
         } else {
-          console.log("got random results")
+          console.log('got random results')
           const randResults = await
-          pool.query(GET_GENERAL_FILT_RAND_PRODUCT_Q, [uid, uid])
+            pool.query(GET_GENERAL_FILT_RAND_PRODUCT_Q, [uid, uid])
           const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
           console.log(randResults[productNum].PRODUCT_ID)
           const results = await
-          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
+            pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
           resolve({
             id: results[0].PRODUCT_ID,
             name: results[0].PROD_NAME,
@@ -458,18 +453,17 @@ pool.getRecommendedProduct = (cid, uid) => {
             model: results[0].PROD_MODEL
           })
         }
-
-    } else {
+      } else {
         const predResults = await
-        pool.query(GET_PRED_PRODUCT_Q, [cid, uid, uid, uid, uid])
-        console.log("got results")
+          pool.query(GET_PRED_PRODUCT_Q, [cid, uid, uid, uid, uid])
+        console.log('got results')
 
         if (predResults.length > 0) {
-          console.log("got predicted results")
+          console.log('got predicted results')
           const productNum = parseInt(Math.random() * (predResults.length - 0) + 0, 10)
           console.log(predResults[productNum].PRODUCT_ID)
           const results = await
-          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
+            pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [predResults[productNum].PRODUCT_ID])
           resolve({
             id: results[0].PRODUCT_ID,
             name: results[0].PROD_NAME,
@@ -479,13 +473,13 @@ pool.getRecommendedProduct = (cid, uid) => {
             model: results[0].PROD_MODEL
           })
         } else {
-          console.log("got random results")
+          console.log('got random results')
           const randResults = await
-          pool.query(GET_FILT_RAND_PRODUCT_Q, [cid, uid, uid])
+            pool.query(GET_FILT_RAND_PRODUCT_Q, [cid, uid, uid])
           const productNum = parseInt(Math.random() * (randResults.length - 0) + 0, 10)
           console.log(randResults[productNum].PRODUCT_ID)
           const results = await
-          pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
+            pool.query('SELECT * FROM PRODUCT WHERE PRODUCT_ID = ?', [randResults[productNum].PRODUCT_ID])
           resolve({
             id: results[0].PRODUCT_ID,
             name: results[0].PROD_NAME,
@@ -507,7 +501,7 @@ pool.getProduct = (productId) => {
   return new Promise(async (resolve, reject) => {
     try {
       const results = await pool.query(GET_PRODUCT_Q, [productId])
-      if(results.length == 0) {
+      if (results.length === 0) {
         reject(new Error(`No such product exists with id: ${productId}`))
         return
       }
@@ -532,7 +526,7 @@ const CHECKLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM LIKES WHERE USER_ID = ? AN
 const CHECKDISLIKES_Q = 'SELECT USER_ID, PRODUCT_ID FROM DISLIKES WHERE USER_ID = ? AND PRODUCT_ID = ?'
 pool.likeProduct = (user, product, channelId) => {
   return new Promise(async (resolve, reject) => {
-    if (user === null || product === null  || channelId === null ) {
+    if (user === null || product === null || channelId === null) {
       console.log(user)
       console.log(product)
       console.log(channelId)
@@ -659,7 +653,6 @@ pool.getLikedProducts = (user, page, productsPer) => {
 
     try {
       const startproduct = ((page - 1) * productsPer)
-      const endproduct = (page * productsPer)
       const results = await pool.query(LIKEDPRODUCTS_Q, [ user, startproduct, parseInt(productsPer) ])
       const productsarray = []
       if (results.length > 0) {
@@ -794,7 +787,7 @@ pool.getSearchForUsers = (searchFor, limit) => {
 const NUMUSERSSEARCH_Q = 'SELECT USER_ID, USERNAME, USER_FNAME, USER_LNAME FROM USER WHERE CONCAT(USERNAME, USER_FNAME, USER_LNAME) LIKE ?'
 pool.getNumUsersSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
-      if (!searchFor) {
+    if (!searchFor) {
       reject(new Error('Missing required field'))
       return
     }
@@ -813,49 +806,49 @@ const SEARCHCHANNELS_Q = 'SELECT CHANNEL_NAME, CHANNEL_ID FROM CHANNEL WHERE CHA
 pool.getSearchForChannels = (searchFor, limit) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !limit) {
-    reject(new Error('Missing required field'))
-    return
-  }
-
-  try {
-    const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
-    const channelArray = []
-    if (results.length > 0) {
-      for (let i = 0; i < results.length; i++) {
-        const Channel = {
-          id: results[i].CHANNEL_ID,
-          name: results[i].CHANNEL_NAME
-        }
-        channelArray[i] = Channel
-      }
-      resolve(channelArray)
-    } else {
-      resolve([])
+      reject(new Error('Missing required field'))
+      return
     }
-  } catch (e) {
-    console.log(e)
-    reject(e)
-  }
-})
+
+    try {
+      const wildcard = '%' + searchFor + '%'
+      const results = await pool.query(SEARCHCHANNELS_Q, [wildcard, limit])
+      const channelArray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const Channel = {
+            id: results[i].CHANNEL_ID,
+            name: results[i].CHANNEL_NAME
+          }
+          channelArray[i] = Channel
+        }
+        resolve(channelArray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
 }
 
 const NUMCHANNELSSEARCH_Q = 'SELECT CHANNEL_NAME, CHANNEL_ID FROM CHANNEL WHERE CHANNEL_NAME LIKE ?'
 pool.getNumChannelsSearch = searchFor => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor) {
-    reject(new Error('Missing required field'))
-    return
-  }
+      reject(new Error('Missing required field'))
+      return
+    }
 
-  try {
-    const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
-    resolve(results.length)
-  } catch (e) {
-    reject(e)
-  }
-})
+    try {
+      const wildcard = '%' + searchFor + '%'
+      const results = await pool.query(NUMCHANNELSSEARCH_Q, [wildcard])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 
 const SEACHUSERANDCHANNEL_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME, USER_ID, USERNAME FROM ((SELECT CHANNEL_ID, CHANNEL_NAME, \' \' AS USER_ID, \' \' AS USERNAME FROM CHANNEL) UNION (SELECT \' \' AS CHANNEL_ID, \' \' AS CHANNEL_NAME, USER_ID, USERNAME FROM USER)) AS USERCHANNEL WHERE CHANNEL_NAME LIKE ? OR USERNAME LIKE ? LIMIT ?'
@@ -895,11 +888,11 @@ pool.getSearchForChannelsAndUsers = (searchFor, limit) => {
 const NUMCHANNELSANDUSERSEARCH_Q = 'SELECT CHANNEL_ID, CHANNEL_NAME, USER_ID, USERNAME FROM ((SELECT CHANNEL_ID, CHANNEL_NAME, \' \' AS USER_ID, \' \' AS USERNAME FROM CHANNEL) UNION (SELECT \' \' AS CHANNEL_ID, \' \' AS CHANNEL_NAME, USER_ID, USERNAME FROM USER)) AS USERCHANNEL WHERE CHANNEL_NAME LIKE ? OR USERNAME LIKE ?'
 
 pool.getNumChannelsAndUsersSearch = searchFor => {
-    return new Promise(async (resolve, reject) => {
-      if (!searchFor) {
-        reject(new Error('Missing required field'))
-        return
-      }
+  return new Promise(async (resolve, reject) => {
+    if (!searchFor) {
+      reject(new Error('Missing required field'))
+      return
+    }
 
     try {
       const wildcard = '%' + searchFor + '%'
@@ -913,9 +906,9 @@ pool.getNumChannelsAndUsersSearch = searchFor => {
 
 pool.getUserPreference = (userID, productID) => {
   return new Promise(async (resolve, reject) => {
-      if (!userID || !productID) {
-        reject(new Error('Missing required field'))
-        return
+    if (!userID || !productID) {
+      reject(new Error('Missing required field'))
+      return
     }
 
     try {
@@ -938,59 +931,59 @@ const SEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_
 pool.getSearchLikedProducts = (searchFor, page, productsPer, user) => {
   return new Promise(async (resolve, reject) => {
     if (!searchFor || !page || !user) {
-    reject(new Error('Missing required field'))
-    return
-  }
-
-  try {
-    const startproduct = ((page - 1) * productsPer)
-    const endproduct = (page * productsPer)
-    const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, startproduct, endproduct])
-    const productArray = []
-    if (results.length > 0) {
-      for (let i = 0; i < results.length; i++) {
-        const product = {
-          id: results[i].PRODUCT_ID,
-          name: results[i].PROD_NAME,
-          description: results[i].PROD_DESC,
-          pictureUrl: results[i].PROD_PICT_URL,
-          productUrl: results[i].PROD_URL,
-          model: results[i].PROD_MODEL
-        }
-        productArray[i] = product
-      }
-      resolve(productArray)
-    } else {
-      resolve([])
+      reject(new Error('Missing required field'))
+      return
     }
-  } catch (e) {
-    console.log(e)
-    reject(e)
-  }
-})
+
+    try {
+      const startproduct = ((page - 1) * productsPer)
+      const endproduct = (page * productsPer)
+      const wildcard = '%' + searchFor + '%'
+      const results = await pool.query(SEARCHLIKEDPRODUCTS_Q, [user, wildcard, startproduct, endproduct])
+      const productArray = []
+      if (results.length > 0) {
+        for (let i = 0; i < results.length; i++) {
+          const product = {
+            id: results[i].PRODUCT_ID,
+            name: results[i].PROD_NAME,
+            description: results[i].PROD_DESC,
+            pictureUrl: results[i].PROD_PICT_URL,
+            productUrl: results[i].PROD_URL,
+            model: results[i].PROD_MODEL
+          }
+          productArray[i] = product
+        }
+        resolve(productArray)
+      } else {
+        resolve([])
+      }
+    } catch (e) {
+      console.log(e)
+      reject(e)
+    }
+  })
 }
 const NUMSEARCHLIKEDPRODUCTS_Q = 'SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL FROM PRODUCT JOIN LIKES ON PRODUCT.PRODUCT_ID = LIKES.PRODUCT_ID JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID WHERE USER_ID = ? AND PRODUCT.PROD_NAME LIKE ? OR TAG.TAG_DESC LIKE ?'
 pool.getNumSearchLikedProducts = (searchFor, user) => {
   return new Promise(async (resolve, reject) => {
     if (!user || !searchFor) {
-    reject(new Error('Missing required field'))
-    return
-  }
+      reject(new Error('Missing required field'))
+      return
+    }
 
-  try {
-    const wildcard = '%' + searchFor + '%'
-    const results = await pool.query(NUMSEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard])
-    resolve(results.length)
-  } catch (e) {
-    reject(e)
-  }
-})
+    try {
+      const wildcard = '%' + searchFor + '%'
+      const results = await pool.query(NUMSEARCHLIKEDPRODUCTS_Q, [user, wildcard, wildcard])
+      resolve(results.length)
+    } catch (e) {
+      reject(e)
+    }
+  })
 }
 
 pool.deleteUserPreference = (userID, productID) => {
   return new Promise(async (resolve, reject) => {
-      if (!userID || !productID) {
+    if (!userID || !productID) {
       reject(new Error('Missing required field'))
       return
     }
@@ -1009,7 +1002,7 @@ const GET_CNN_LIKE_PERCENT_Q = `select LIKE_PCT from (USER INNER JOIN CNN_RESULT
 ON USER.USER_CLUSTER_ID = CNN_RESULTS.CLUSTER_ID) WHERE USER_ID = ? AND PRODUCT_ID = ?`
 pool.getCNNLikePercent = (userID, productID) => {
   return new Promise(async (resolve, reject) => {
-      if (!userID || !productID) {
+    if (!userID || !productID) {
       reject(new Error('Missing required field'))
       return
     }
@@ -1042,9 +1035,9 @@ WHERE TIME_LIKED > NOW() - INTERVAL ? DAY
 GROUP BY CHANNEL_LIKES.CHANNEL_ID
 ORDER BY CHANNEL_RANK desc
 LIMIT ?;`
-pool.getPopularChannels = async (limit = 12, days_ago = 7) => {
-  const results = await pool.query(POPULAR_CHANNELS_QUERY, [days_ago, parseInt(limit)])
-  var channelArray = results.map((result) => {
+pool.getPopularChannels = async (limit = 12, daysAgo = 7) => {
+  const results = await pool.query(POPULAR_CHANNELS_QUERY, [daysAgo, parseInt(limit)])
+  const channelArray = results.map((result) => {
     return {
       id: result.CHANNEL_ID,
       name: result.CHANNEL_NAME,
@@ -1068,9 +1061,9 @@ GROUP BY PRODUCT_LIKES.PRODUCT_ID
 ORDER BY PRODUCT_RANK desc
 LIMIT ?;
 `
-pool.getPopularProducts = async (limit = 12, days_ago = 7) => {
-  const results = await pool.query(POPULAR_PRODUCTS_QUERY, [days_ago, parseInt(limit)])
-  var productsArray = results.map((result) => {
+pool.getPopularProducts = async (limit = 12, daysAgo = 7) => {
+  const results = await pool.query(POPULAR_PRODUCTS_QUERY, [daysAgo, parseInt(limit)])
+  const productsArray = results.map((result) => {
     return {
       id: result.PRODUCT_ID,
       number_of_likes: result.PRODUCT_RANK
@@ -1086,8 +1079,8 @@ JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG
 WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?)
 `
 pool.getNumChannelProducts = cid => {
-    return new Promise(async (resolve, reject) => {
-      if (!cid) {
+  return new Promise(async (resolve, reject) => {
+    if (!cid) {
       reject(new Error('Missing required field'))
       return
     }
@@ -1101,20 +1094,14 @@ pool.getNumChannelProducts = cid => {
   })
 }
 
-const CHANNELPRODUCTS_Q = `
-SELECT DISTINCT PRODUCT.PRODUCT_ID, PRODUCT.PROD_NAME, PRODUCT.PROD_DESC, 
-PRODUCT.PROD_PICT_URL, PRODUCT.PROD_URL, PRODUCT.PROD_MODEL, TAG.TAG_ID FROM PRODUCT 
-JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID JOIN TAG ON TAG.TAG_ID = PROD_TAG_ASSIGN.TAG_ID 
-WHERE TAG.TAG_ID IN (SELECT TAG_ID FROM CHANNEL_TAG_ASSIGN WHERE CHANNEL_ID = ?) LIMIT ?, ?
-`
 const GET_CHANNEL_PRODUCT_Q = `
 SELECT * FROM (((PRODUCT INNER JOIN PROD_TAG_ASSIGN ON PRODUCT.PRODUCT_ID = PROD_TAG_ASSIGN.PRODUCT_ID) 
 INNER JOIN TAG ON PROD_TAG_ASSIGN.TAG_ID = TAG.TAG_ID) INNER JOIN CHANNEL_TAG_ASSIGN ON TAG.TAG_ID = CHANNEL_TAG_ASSIGN.TAG_ID) 
 WHERE CHANNEL_TAG_ASSIGN.CHANNEL_ID = ? LIMIT ?, ?;
 `
 pool.getChannelProducts = (cid, page, productsPer) => {
-    return new Promise(async (resolve, reject) => {
-      if (!cid || !productsPer || !page) {
+  return new Promise(async (resolve, reject) => {
+    if (!cid || !productsPer || !page) {
       reject(new Error('Missing required field'))
     }
 
@@ -1150,8 +1137,8 @@ pool.getChannelProducts = (cid, page, productsPer) => {
 
 const DELETETAGASSIGN_Q = 'DELETE FROM PROD_TAG_ASSIGN WHERE PRODUCT_ID = ? AND TAG_ID = ?'
 pool.deleteTagAssign = (pid, tagid) => {
-    return new Promise(async (resolve, reject) => {
-      if (!pid || !tagid) {
+  return new Promise(async (resolve, reject) => {
+    if (!pid || !tagid) {
       reject(new Error('Missing required field'))
       return
     }
