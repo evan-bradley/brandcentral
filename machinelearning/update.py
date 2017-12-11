@@ -155,8 +155,14 @@ def train_models_for_clusters():
     with connection.cursor() as cursor:
         cursor.execute("SELECT DISTINCT USER_CLUSTER_ID FROM USER")
         num_clusters = cursor.rowcount
+
+        # Get the products that the user likes
+        sql = "SELECT USER_ID as uid FROM USER;"
+        cursor.execute(sql)
+        user_ids = cursor.fetchall()
+
     clustered_users, centers = cluster_users(num_clusters)
-    for cluster_id in range(1, num_clusters + 1):
+    for cluster_id in range(0, num_clusters):
         # Retrieve all users in the cluster
         print("Training Cluster: " + str(cluster_id))
         users = []
@@ -166,8 +172,13 @@ def train_models_for_clusters():
 
         # Train and store the model for that cluster
         model = train_model_for_users(users)
+        print(model)
         if model != 0:
             classification_models[cluster_id] = train_model_for_users(users)
+
+    for uid in user_ids:
+        print("Updating User -> ", uid)
+        update_user(uid['uid'])
 
 def train_model_for_users(uids):
     # Retrieve the training data and test data
@@ -261,7 +272,7 @@ def update_predictions_for_user(user_id):
 
         for product_id, product_vector in product_vectors.items():
             input_vector = product_vector * user_weight_vector
-            prediction = classification_models[cluster_id].predict([input_vector])
+            prediction = classification_models[cluster_id-1].predict([input_vector])
             cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS (USER_ID, PRODUCT_ID, PREDICTION) VALUES ("+str(user_id)+", "+str(product_id)+", "+str(prediction[0])+") ON DUPLICATE KEY UPDATE PREDICTION = "+str(prediction[0]))
             connection.commit()
 
