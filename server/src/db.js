@@ -242,7 +242,7 @@ pool.getProfileData = id => {
 }
 
 // This function will query the database for the first 16 tags.
-const GET_ONBOARD_CHANNELS_Q = `SELECT * FROM CHANNEL LIMIT 16;`
+const GET_ONBOARD_CHANNELS_Q = `SELECT * FROM CHANNEL LIMIT 1, 16;`
 pool.getOnboardChannels = pool.query.bind(pool, GET_ONBOARD_CHANNELS_Q, [])
 
 const LAST_SEEN_Q = `
