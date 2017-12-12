@@ -23,6 +23,7 @@ connection = pymysql.connect(host='138.197.85.34',
                              cursorclass=pymysql.cursors.DictCursor)
 
 classification_models = {}
+train_count = 0
 
 def calculate_product_vectors(vector_length=200):
     """
@@ -211,18 +212,36 @@ def rabbitmq_start():
 
     # Configure the callback. Expects body to be in the form {"user_id":1}
     def on_message(channel, method, properties, body):
+        global train_count
+        train_count += 1
         body_json = json.loads(body)
         user_id = body_json['user_id']
         print(" [x] Updating user: {user_id}")
-        update_user(user_id)
+        update_predictions_for_user(user_id)
+        print(train_count)
+        if train_count == 5:
+            train_models_for_clusters()
+            train_count=0
     channel.basic_consume(on_message, queue='user_update_queue', no_ack=True)
     channel.basic_consume(CNNUpdate.on_message, queue='cnn_training', no_ack=True)
     # Start listening for messages
     print('[*] Waiting for messages. To exit press CTRL+C')
-    try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        channel.stop_consuming()
+    while True:
+        try:
+            if connection.is_closed:
+                #reconnect
+                print("Reset Connection")
+                connection = pika.BlockingConnection(parameters)
+                channel = connection.channel()
+                channel.basic_consume(on_message, queue='user_update_queue', no_ack=True)
+                channel.basic_consume(CNNUpdate.on_message, queue='cnn_training', no_ack=True)
+            channel.start_consuming()
+        except KeyboardInterrupt:
+            channel.stop_consuming()
+            break
+        except:
+            print("Lost connection")
+    
     connection.close()
 
 def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
