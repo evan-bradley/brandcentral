@@ -51,12 +51,12 @@
       // Register event handlers
       this.$on('likedProduct', event => {
         console.log('LIKED')
-        this.next()
+        setTimeout(this.next, 250)
       })
 
       this.$on('dislikedProduct', event => {
         console.log('DISLIKED')
-        this.next()
+        setTimeout(this.next, 250)
       })
 
       this.$on('nextProduct', event => {
