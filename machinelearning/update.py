@@ -6,14 +6,18 @@ import pika
 from sklearn.cluster import KMeans
 from sklearn.metrics import classification_report,confusion_matrix,accuracy_score
 from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import cross_val_score
 from random import *
 import json
 from CNN import CNNUpdate
+from contextlib import closing
+import time
+import sys
 
 # Create a connection to the mysql database
-connection = pymysql.connect(host='localhost',
+connection = pymysql.connect(host='138.197.85.34',
                              user='root',
-                             password='',
+                             password='somethingeasy',
                              db='BRAND_CENTRAL',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
@@ -98,9 +102,17 @@ def cluster_users(number_of_clusters):
 
     # Perform clustering using K Means
     user_weights_array = np.array(list(user_weights.values()))
+    user_keys_array = np.array(list(user_weights.keys()))
     kmeans = KMeans(n_clusters=number_of_clusters).fit(user_weights_array)
     print("Number of Clusters:", number_of_clusters)
     print("Cluster Labels:", kmeans.labels_)
+    with connection.cursor() as cursor:
+        for inx in range(0, len(user_keys_array)):
+            print("User Cluster Update: User{", str(user_keys_array[inx]), "} Cluster{", str(kmeans.labels_[inx]), "}")
+            sql = "UPDATE USER SET USER_CLUSTER_ID = " + str(kmeans.labels_[inx]) + " WHERE USER_ID =" + str(user_keys_array[inx])
+            cursor.execute(sql)
+            connection.commit()
+
     #print("Cluster Means:", kmeans.cluster_centers_)
     return kmeans.labels_, kmeans.cluster_centers_
 
@@ -151,41 +163,43 @@ def data_train_test_for_uids(uids):
 
 def train_models_for_clusters():
     global classification_models
-    num_clusters = 0
+    num_clusters = 6
+    # cluster_users(num_clusters)
     with connection.cursor() as cursor:
-        cursor.execute("SELECT DISTINCT USER_CLUSTER_ID FROM USER")
-        num_clusters = cursor.rowcount
-
         # Get the products that the user likes
-        sql = "SELECT USER_ID as uid FROM USER;"
+        sql = "SELECT USER_ID as uid, USER_CLUSTER_ID as cluster_id FROM USER;"
         cursor.execute(sql)
         user_ids = cursor.fetchall()
 
-    clustered_users, centers = cluster_users(num_clusters)
     for cluster_id in range(0, num_clusters):
         # Retrieve all users in the cluster
         print("Training Cluster: " + str(cluster_id))
         users = []
-        for inx in range(len(clustered_users)):
-            if clustered_users[inx] == cluster_id:
-                users.append(inx)
+        for uid in user_ids:
+           if uid['cluster_id'] == cluster_id:
+                users.append(uid['uid'])
 
         # Train and store the model for that cluster
         model = train_model_for_users(users)
-        print(model)
+        print(users)
         if model != 0:
-            classification_models[cluster_id] = train_model_for_users(users)
+            classification_models[cluster_id] = model
 
     for uid in user_ids:
         print("Updating User -> ", uid)
-        update_user(uid['uid'])
+        update_predictions_for_user(uid['uid'])
 
 def train_model_for_users(uids):
     # Retrieve the training data and test data
     X, y = data_train_test_for_uids(uids)
+    print("Used to classify: ", len(X))
+    clf = MLPClassifier(max_iter=1000)
     if len(X) == 0:
         return 0
-    return MLPClassifier(max_iter=1000).fit(X,y)
+    if len(X) > 5:
+        scores = cross_val_score(clf, X, y, cv=5)
+        print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+    return clf.fit(X,y)
 
 def rabbitmq_start():
     # credentials = pika.PlainCredentials('brandcentral', 'brandcentral')
@@ -210,12 +224,6 @@ def rabbitmq_start():
     except KeyboardInterrupt:
         channel.stop_consuming()
     connection.close()
-
-def update_user(user_id):
-    "Updates a users weight vectors and similarity to other users"
-    update_weight_vector_for_user(user_id)
-    update_similarities_for_user(user_id)
-    update_predictions_for_user(user_id)
 
 def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
     """
@@ -247,19 +255,8 @@ def calculate_weight_vector_for_user(user_id, weight_vector_size=200):
 
         return weight_vector
 
-def update_weight_vector_for_user(user_id):
-    "Updates a users weight vector and inserts it into the database"
-    print("   Updating weight vector for user: {user_id}...")
-    weight_vector = calculate_weight_vector_for_user(user_id)
-    #TODO: Insert the weight vector into the user table using user_id.
-
-def update_similarities_for_user(user_id):
-    print("   Updating similarities for user: {user_id}...")
-    #TODO: Calculate similarity between this user and all other users.
-
 def update_predictions_for_user(user_id):
-    print("   Updating neural network classifications for user: {user_id}...")
-    # TODO: This should probably be pre calculated.
+    print("   Updating classifications for user: {", user_id, "}")
     product_vectors = calculate_product_vectors()
 
     with connection.cursor() as cursor:
@@ -267,14 +264,35 @@ def update_predictions_for_user(user_id):
         user = cursor.fetchone()
         user_id = user['USER_ID']
         cluster_id = user['USER_CLUSTER_ID']
-        #TODO: Perform a database lookup her instead of calculating each time.
         user_weight_vector = calculate_weight_vector_for_user(user_id)
 
+        input_vector = []
+        product_id_array = []
         for product_id, product_vector in product_vectors.items():
-            input_vector = product_vector * user_weight_vector
-            prediction = classification_models[cluster_id-1].predict([input_vector])
-            cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS (USER_ID, PRODUCT_ID, PREDICTION) VALUES ("+str(user_id)+", "+str(product_id)+", "+str(prediction[0])+") ON DUPLICATE KEY UPDATE PREDICTION = "+str(prediction[0]))
+            input_vector.append(product_vector * user_weight_vector)
+            product_id_array.append(product_id)
+            
+        predictions = classification_models[cluster_id].predict(input_vector)
+        print("   ", np.count_nonzero(predictions == 1), "positive prediction")
+        print("   ", np.count_nonzero(predictions == 0), "negative prediction")
+
+        mod=100
+        toolbar_width = int(len(product_vectors.items())/mod) + 1
+
+        sys.stdout.write("[%s]" % (" " * toolbar_width))
+        sys.stdout.flush()
+        sys.stdout.write("\b" * (toolbar_width+1)) # return to start of line, after '['
+
+        for index in range(0, len(predictions)):
+            prediction = predictions[index]
+            product_id = product_id_array[index]
+            cursor.execute("INSERT INTO WEIGHT_VECTOR_RESULTS (USER_ID, PRODUCT_ID, PREDICTION) VALUES ("+str(user_id)+", "+str(product_id)+", "+str(prediction)+") ON DUPLICATE KEY UPDATE PREDICTION = "+str(prediction))
             connection.commit()
+            if index % mod == 0:
+                sys.stdout.write("=")
+                sys.stdout.flush()
+
+        sys.stdout.write("\n")
 
 def main():
     try:
